@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 6.0.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/shinubi-2.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/shinubi-3.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/shinubi-1.ico">
+  <link rel="mask-icon" href="/images/algolia_logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=PT+sans:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pace-js@1.2.4/themes/blue/pace-theme-center-atom.css">
+  <script src="https://cdn.jsdelivr.net/npm/pace-js@1.2.4/pace.min.js" integrity="sha256-gqd7YTjg/BtfqWSwsJOvndl0Bxc8gFImLEkXQT8+qj0=" crossorigin="anonymous"></script>
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"zongpenglin.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":true,"version":"8.10.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"buttons","active":"gitalk","storage":true,"lazyload":false,"nav":{"gitalk":{"order":-1}},"activeClass":"gitalk"},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+  <meta name="description" content="分布式计算：如果所有人的大脑都联网会怎样？实际上，一台计算机在数据中心里是不够的。因为如果只有一台计算机，我们会遇到三个核心问题。第一个核心问题，叫作垂直扩展和水平扩展的选择问题，第二问题叫">
+<meta property="og:type" content="website">
+<meta property="og:title" content="分布式计算">
+<meta property="og:url" content="https://zongpenglin.github.io/posts/dd37509c/index.html">
+<meta property="og:site_name" content="Pang-YUM&#39;s Neverland">
+<meta property="og:description" content="分布式计算：如果所有人的大脑都联网会怎样？实际上，一台计算机在数据中心里是不够的。因为如果只有一台计算机，我们会遇到三个核心问题。第一个核心问题，叫作垂直扩展和水平扩展的选择问题，第二问题叫">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://zongpenglin.github.io/img/computer_img/云服务购买.webp">
+<meta property="og:image" content="https://zongpenglin.github.io/img/computer_img/分布式负载均衡.webp">
+<meta property="og:image" content="https://zongpenglin.github.io/img/computer_img/服务器可用性.webp">
+<meta property="og:image" content="https://zongpenglin.github.io/img/computer_img/单点故障.webp">
+<meta property="og:image" content="https://zongpenglin.github.io/img/computer_img/故障检测.webp">
+<meta property="article:published_time" content="2022-01-20T16:00:00.000Z">
+<meta property="article:modified_time" content="2022-02-08T10:46:21.344Z">
+<meta property="article:author" content="Zongpeng Lin">
+<meta property="article:tag" content="分布式">
+<meta property="article:tag" content="负载均衡">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://zongpenglin.github.io/img/computer_img/云服务购买.webp">
+
+
+<link rel="canonical" href="https://zongpenglin.github.io/posts/dd37509c/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://zongpenglin.github.io/posts/dd37509c/","path":"posts/dd37509c/","title":"分布式计算"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>分布式计算 | Pang-YUM's Neverland</title>
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+<a target="_blank" rel="noopener" href="https://github.com/ZongpengLin" class="github-corner" aria-label="View source on GitHub"><svg width="90" height="90" viewBox="0 0 250 250" style="fill:#151513; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Pang-YUM's Neverland</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description"><br><font face="魏碑-简">人生若只如初见</font></p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+        <li class="menu-item menu-item-commonweal"><a href="/404/" rel="section"><i class="fa fa-heartbeat fa-fw"></i>公益 404</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%88%86%E5%B8%83%E5%BC%8F%E8%AE%A1%E7%AE%97%EF%BC%9A%E5%A6%82%E6%9E%9C%E6%89%80%E6%9C%89%E4%BA%BA%E7%9A%84%E5%A4%A7%E8%84%91%E9%83%BD%E8%81%94%E7%BD%91%E4%BC%9A%E6%80%8E%E6%A0%B7%EF%BC%9F"><span class="nav-number">1.</span> <span class="nav-text">分布式计算：如果所有人的大脑都联网会怎样？</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%8E%E7%A1%AC%E4%BB%B6%E5%8D%87%E7%BA%A7%E5%88%B0%E6%B0%B4%E5%B9%B3%E6%89%A9%E5%B1%95"><span class="nav-number">1.1.</span> <span class="nav-text">从硬件升级到水平扩展</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%90%86%E8%A7%A3%E9%AB%98%E5%8F%AF%E7%94%A8%E6%80%A7%E5%92%8C%E5%8D%95%E7%82%B9%E6%95%85%E9%9A%9C"><span class="nav-number">1.2.</span> <span class="nav-text">理解高可用性和单点故障</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93%E5%BB%B6%E4%BC%B8"><span class="nav-number">1.3.</span> <span class="nav-text">总结延伸</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Zongpeng Lin"
+      src="/images/author.jpg">
+  <p class="site-author-name" itemprop="name">Zongpeng Lin</p>
+  <div class="site-description" itemprop="description"><font face="雅痞-繁">Wish you a happy mood and a sweet smile!</font></div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">27</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">33</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/" title="GitHub → https:&#x2F;&#x2F;github.com" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:18155360849@163.com" title="E-Mail → mailto:18155360849@163.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://plus.google.com/yourname" title="Google → https:&#x2F;&#x2F;plus.google.com&#x2F;yourname" rel="noopener" target="_blank"><i class="fab fa-google fa-fw"></i>Google</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/images/personal_wechat.JPG" title="Wechat → &#x2F;images&#x2F;personal_wechat.JPG"><i class="fab fa-weixin fa-fw"></i>Wechat</a>
+      </span>
+  </div>
+  <div class="cc-license site-overview-item animated" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="https://cdn.jsdelivr.net/npm/@creativecommons/vocabulary@2020.11.3/assets/license_badges/small/by_nc_sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+      
+      <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=330 height=86 src="//music.163.com/outchain/player?type=2&id=31134621&auto=0&height=66"></iframe>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://zongpenglin.github.io/posts/dd37509c/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/author.jpg">
+      <meta itemprop="name" content="Zongpeng Lin">
+      <meta itemprop="description" content="<font face="雅痞-繁">Wish you a happy mood and a sweet smile!</font>">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Pang-YUM's Neverland">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          分布式计算
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2022-01-21 00:00:00" itemprop="dateCreated datePublished" datetime="2022-01-21T00:00:00+08:00">2022-01-21</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BB%84%E6%88%90%E5%8E%9F%E7%90%86/" itemprop="url" rel="index"><span itemprop="name">计算机组成原理</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>5k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>5 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="分布式计算：如果所有人的大脑都联网会怎样？"><a href="#分布式计算：如果所有人的大脑都联网会怎样？" class="headerlink" title="分布式计算：如果所有人的大脑都联网会怎样？"></a>分布式计算：如果所有人的大脑都联网会怎样？</h1><p>实际上，一台计算机在数据中心里是不够的。因为如果只有一台计算机，我们会遇到三个核心问题。第一个核心问题，叫作<strong>垂直扩展和水平扩展的选择问题</strong>，第二问题叫<span id="more"></span>作如何<strong>保持高可用性</strong>（High Availability），第三个问题叫作<strong>一致性问题</strong>（Consistency）。</p>
+<p>围绕这三个问题，其实就是我们今天要讲的主题，分布式计算。当然，短短的一讲肯定讲不完这么大一个主题。这一讲的目标，是让你能理解水平扩展、高可用性这两个核心问题。对于分布式系统带来的一致性问题，我们会留在我们的实战篇里面，再用案例来为大家分析。</p>
+<h2 id="从硬件升级到水平扩展"><a href="#从硬件升级到水平扩展" class="headerlink" title="从硬件升级到水平扩展"></a>从硬件升级到水平扩展</h2><p>从技术开发的角度来讲，想要在 2019 年创业真的很幸福。只要在 AWS 或者阿里云这样的云服务上注册一个账号，一个月花上一两百块钱，你就可以有一台在数据中心里面的服务器了。而且这台服务器，可以直接提供给世界各国人民访问。如果你想要做海外市场，你可以把这个服务器放在美国、欧洲、东南亚，任何一个你想要去的市场的数据中心里，然后把自己的网站部署在这台服务器里面就可以了。<br><img src="/img/computer_img/云服务购买.webp" alt="云服务购买" style="zoom:50%;" /><br>当然，这台服务器就是我们在第 34 讲里说的虚拟机。不过因为只是个业余时间的小项目，一开始这台服务器的配置也不会太高。我以我现在公司所用的 Google Cloud 为例。最低的配置差不多是 1 个 CPU 核心、3.75G 内存以及一块 10G 的 SSD 系统盘。这样一台服务器每个月的价格差不多是 28 美元。</p>
+<p>幸运的是，你的网站很受大家欢迎，访问量也上来了。这个时候，这台单核心的服务器的性能有点不够用了。这个时候，你需要升级你的服务器。于是，你就会面临两个选择。</p>
+<ul>
+<li>第一个选择是升级现在这台服务器的硬件，变成 2 个 CPU 核心、7.5G 内存。这样的选择我们称之为<strong>垂直扩展</strong>（Scale Up）。</li>
+<li>第二个选择则是我们再租用一台和之前一样的服务器。于是，我们有了 2 台 1 个 CPU 核心、3.75G 内存的服务器。这样的选择我们称之为<strong>水平扩展</strong>（Scale Out）。</li>
+</ul>
+<p>在这个阶段，这两个选择，从成本上看起来没有什么差异。2 核心、7.5G 内存的服务器，成本是 56.61 美元，而 2 台 1 核心、3.75G 内存的服务器价格，成本是 57 美元，这之间的价格差异不到 1%。</p>
+<p>不过，垂直扩展和水平扩展看似是两个不同的选择，但是随着流量不断增长。到最后，只会变成一个选择。那就是既会垂直扩展，又会水平扩展，并且最终依靠水平扩展，来支撑 Google、Facebook、阿里、腾讯这样体量的互联网服务。</p>
+<p>垂直扩展背后的逻辑和优势都很简单。一般来说，垂直扩展通常不需要我们去改造程序，也就是说，我们没有研发成本。那为什么我们最终还是要用水平扩展呢？你可以先自己想一想。</p>
+<p>原因其实很简单，因为我们没有办法不停地去做垂直扩展。我们在 Google Cloud 上现在能够买到的性能最好的服务器，是 96 个 CPU 核心、1.4TB 的内存。如果我们的访问量逐渐增大，一台 96 核心的服务器也支撑不了了，那么我们就没有办法再去做垂直扩展了。这个时候，我们就不得不采用水平扩展的方案了。</p>
+<p>96 个 CPU 核心看起来是个很强大的服务器，但是你算一算就知道，其实它的计算资源并没有多大。你现在多半在用一台 4 核心，或者至少也是 2 核心的 CPU。96 个 CPU 也就是 30～50 台日常使用的开发机的计算性能。而我们今天在互联网上遇到的问题，是每天数亿的访问量，靠 30～50 台个人电脑的计算能力想要支撑这样的计算需求，可谓是天方夜谭了。</p>
+<p>然而，一旦开始采用水平扩展，我们就会面临在软件层面改造的问题，也就是需要我们进行分布式计算，需要引入<strong>负载均衡</strong>（Load Balancer）这样的组件，来进行流量分配。我们需要拆分应用服务器和数据库服务器，来进行垂直功能的切分。在不同的应用之间通过消息队列，来进行异步任务的执行。</p>
+<img src="/img/computer_img/分布式负载均衡.webp" alt="分布式负载均衡" style="zoom:50%;" />
+
+<p>所有这些软件层面的改造，其实都是在做分布式计算的一个核心工作，<em>就是通过消息传递（Message Passing）而不是共享内存（Shared Memory）的方式，让多台不同的计算机协作起来共同完成任务。</em></p>
+<p>而因为我们最终必然要进行水平扩展，我们需要在系统设计的早期就基于消息传递而非共享内存来设计系统。即使这些消息只是在同一台服务器上进行传递。</p>
+<p>事实上，有不少增长迅猛的公司，早期没有准备好通过水平扩展来支撑访问量的情况，而一味通过提升硬件配置 Scale Up，来支撑更大的访问量，最终影响了公司的存亡。最典型的例子，就是败在 Facebook 手下的<a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Myspace">MySpace</a>。</p>
+<hr>
+<h2 id="理解高可用性和单点故障"><a href="#理解高可用性和单点故障" class="headerlink" title="理解高可用性和单点故障"></a>理解高可用性和单点故障</h2><p>尽管在 1 个 CPU 核心的服务器支撑不了我们的访问量的时候，选择垂直扩展是一个最简单的办法。不过如果是我的话，第一次扩展我会选择水平扩展。</p>
+<p>选择水平扩展的一个很好的理由，自然是可以“强迫”从开发的角度，尽早地让系统能够支持水平扩展，避免在真的流量快速增长的时候，垂直扩展的解决方案跟不上趟。不过，其实还有一个更重要的理由，那就是系统的可用性问题。</p>
+<p>上面的 1 核变 2 核的垂直扩展的方式，扩展完之后，我们还是只有 1 台服务器。如果这台服务器出现了一点硬件故障，比如，CPU 坏了，那我们的整个系统就坏了，就不可用了。</p>
+<p>如果采用了水平扩展，即便有一台服务器的 CPU 坏了，我们还有另外一台服务器仍然能够提供服务。<strong>负载均衡</strong>能够通过健康检测（Health Check）发现坏掉的服务器没有响应了，就可以自动把所有的流量切换到第 2 台服务器上，这个操作就叫作<em><strong>故障转移（</strong></em>Failover），我们的系统仍然是<strong>可用</strong>的。</p>
+<p>系统的<strong>可用性</strong>（Avaiability）指的就是，我们的系统可以正常服务的时间占比。无论是因为软硬件故障，还是需要对系统进行停机升级，都会让我们损失系统的可用性。可用性通常是用一个百分比的数字来表示，比如 99.99%。我们说，系统每个月的可用性要保障在 99.99%，也就是意味着一个月里，你的服务宕机的时间不能超过 4.32 分钟。</p>
+<p>有些系统可用性的损失，是在我们计划内的。比如上面说的停机升级，这个就是所谓的计划内停机时间（Scheduled Downtime）。有些系统可用性的损失，是在我们计划外的，比如一台服务器的硬盘忽然坏了，这个就是所谓的计划外停机时间（Unscheduled Downtime）。</p>
+<p>我们的系统是一定不可能做到 100% 可用的，特别是计划外的停机时间。从简单的硬件损坏，到机房停电、光缆被挖断，乃至于各种自然灾害，比如地震、洪水、海啸，都有可能使得我们的系统不可用。作为一个工程师和架构师，我们要做的就是尽可能低成本地提高系统的可用性。</p>
+<hr>
+<p>现在的服务器的可用性都已经很不错了，通常都能保障 99.99% 的可用性了。如果我们有一个小小的三台服务器组成的小系统，一台部署了 Nginx 来作为负载均衡和反向代理，一台跑了 PHP-FPM 作为 Web 应用服务器，一台用来作为 MySQL 数据库服务器。每台服务器的可用性都是 99.99%。那么我们整个系统的可用性是多少呢？你可以先想一想。</p>
+<p>答案是 99.99% × 99.99% × 99.99% &#x3D; 99.97%。在这个系统当中，这个数字看起来似乎没有那么大区别。<strong>不过反过来看</strong>，我们是从损失了 0.01% 的可用性，变成了损失 0.03% 的可用性，不可用的时间变成了原来的 3 倍。</p>
+<p>如果我们有 1000 台服务器，那么整个的可用性，就会变成 99.99% ^ 1000 &#x3D; 90.5%。也就是说，我们的服务一年里有超过一个月是不可用的。这可怎么办呀？<br><img src="/img/computer_img/服务器可用性.webp" alt="服务器可用性" style="zoom:67%;" /></p>
+<p>先来分析一下原因。之所以会出现这个问题，是因为在这个场景下，任何一台服务器出错了，整个系统就没法用了。这个问题就叫作<strong>单点故障问题</strong>（Single Point of Failure，SPOF）。我们这里的这个假设特别糟糕。我们假设这 1000 台服务器，每一个都存在单点故障问题。所以，我们的服务也就特别脆弱，随便哪台出现点风吹草动，整个服务就挂了。</p>
+<p>要解决单点故障问题，第一点就是要移除单点。其实移除单点最典型的场景，在我们水平扩展应用服务器的时候就已经看到了，那就是让两台服务器提供相同的功能，然后通过负载均衡把流量分发到两台不同的服务器去。即使一台服务器挂了，还有一台服务器可以正常提供服务。</p>
+<p>不过光用两台服务器是不够的，单点故障其实在数据中心里面无处不在。我们现在用的是云上的两台虚拟机。如果这两台虚拟机是托管在同一台物理机上的，那这台物理机本身又成为了一个单点。那我们就需要把这两台虚拟机分到两台不同的物理机上。</p>
+<p>不过这个还是不够。如果这两台物理机在同一个机架（Rack）上，那机架上的<strong>交换机</strong>（Switch）就成了一个单点。即使放到不同的机架上，还是有可能出现整个数据中心遭遇意外故障的情况。</p>
+<img src="/img/computer_img/单点故障.webp" alt="单点故障" style="zoom:50%;" />
+
+<p>去年我自己就遇到过，部署在 Azure 上的服务所在的数据中心，因为散热问题触发了整个数据中心所有服务器被关闭的问题。面对这种情况，我们就需要设计进行<strong>异地多活</strong>的系统设计和部署。所以，在现代的云服务，你在买服务器的时候可以选择服务器的 area（地区）和 zone（区域），而要不要把服务器放在不同的地区或者区域里，也是避免单点故障的一个重要因素。</p>
+<hr>
+<p>只是能够去除单点，其实我们的可用性问题还没有解决。比如，上面我们用负载均衡把流量均匀地分发到 2 台服务器上，当一台应用服务器挂掉的时候，我们的确还有一台服务器在提供服务。但是负载均衡会把一半的流量发到已经挂掉的服务器上，所以这个时候只能算作一半可用。</p>
+<p>想要让整个服务完全可用，我们就需要有一套故障转移（Failover）机制。想要进行故障转移，就首先要能发现故障。</p>
+<p>以我们这里的 PHP-FPM 的 Web 应用为例，负载均衡通常会定时去请求一个 Web 应用提供的健康检测（Health Check）的地址。这个时间间隔可能是 5 秒钟，如果连续 2～3 次发现健康检测失败，负载均衡就会自动将这台服务器的流量切换到其他服务器上。于是，我们就自动地产生了一次故障转移。    <strong>故障转移的自动化在大型系统里是很重要的</strong>，  因为服务器越多，出现故障基本就是个必然发生的事情。而自动化的故障转移既能够减少运维的人手需求，也能够缩短从故障发现到问题解决的时间周期，提高可用性。</p>
+<img src="/img/computer_img/故障检测.webp" alt="故障检测" style="zoom:50%;" />
+
+<center style="color:#C0C0C0;text-decoration:underline"> 我们在 Web 应用上设置了一个 Heartbeat 接口，每 20 秒检查一次，出现问题的时候可以进行故障转移切换</center>
+
+<p>那么，让我们算一算，通过水平扩展相同功能的服务器来去掉单点故障，并且通过健康检查机制来触发自动的故障转移，这样的可用性会变成多少呢？你可以拿出纸和笔来试一下。</p>
+<p>不知道你想明白应该怎么算了没有，在这种情况下，我们其实只要有任何一台服务器能够正常运转，就能正常提供服务。那么，我们的可用性就是：</p>
+<p>​                100% - (100% - 99.99%) × (100% - 99.99%) &#x3D; 99.999999%</p>
+<p>可以看出，不能提供服务的时间就减少到了原来的万分之一。</p>
+<p>当然，在实际情况中，可用性没法做到那么理想的地步。光从硬件的角度，从服务器到交换机，从网线连接到机房电力，从机房的整体散热到外部的光纤线路等等，可能出现问题的地方太多了。这也是为什么，我们需要从整个系统层面，去设计<em><strong>系统的高可用性</strong></em>。</p>
+<hr>
+<h2 id="总结延伸"><a href="#总结延伸" class="headerlink" title="总结延伸"></a>总结延伸</h2><p>讲到这里，相信你已经很清楚，为什么我们需要水平扩展了。对于怎么去设计整个硬件的部署，来保障高可用性，你应该也有了一个清晰的认识。这两点也是分布式计算在实践中非常重要的应用场景。</p>
+<p>光有这两点还是不够的。一旦系统里面有了很多台服务器。特别是，为了保障可用性，对于同样功能的、有状态的数据库进行了水平的扩展，我们就会面临一个新的挑战，那就是分区一致性问题。不过，这个问题更多的是一个软件设计问题，我把它留在后面的实战篇再进行讲解。这里讲了通过升级硬件规格来提升服务能力的垂直扩展。除此之外，也可以通过增加服务器数量来提升服务能力。不过归根到底，我们一定要走上水平扩展的路径。</p>
+<p>一方面是因为垂直扩展不可持续；另一方面，则是只有水平扩展才能保障高可用性。</p>
+<p>而通过水平扩展保障高可用性，则需要我们做三件事情。</p>
+<ul>
+<li>第一个是理解可用性是怎么计算的。服务器硬件的损坏只是可能导致可用性损失的因素之一，机房内的电力、散热、交换机、网络线路，都有可能导致可用性损失。而外部的光缆、自然灾害，也都有可能造成我们整个系统的不可用。</li>
+<li>第二个，所以在分析设计系统的时候，我们需要尽可能地排除单点故障。</li>
+<li>第三个，对于硬件的故障，我们还要有自动化的故障转移策略。</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>Zongpeng Lin
+  </li>
+  <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="https://zongpenglin.github.io/posts/dd37509c/" title="分布式计算">https://zongpenglin.github.io/posts/dd37509c/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+	
+            <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+
+
+         
+            <div class="reward-container">
+  <div>作者水平有限，文中难免存在一些错误，欢迎邮件@交流讨论~</div>
+  <button>
+    码字不易，鼓励一下
+  </button>
+  <div class="post-reward">
+      <div>
+        <img src="/images/weixin.png" alt="Zongpeng Lin 微信">
+        <span>微信</span>
+      </div>
+      <div>
+        <img src="/images/alipay2.png" alt="Zongpeng Lin 支付宝">
+        <span>支付宝</span>
+      </div>
+
+  </div>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F/" rel="tag"><i class="fa fa-tag"></i> 分布式</a>
+	  <script type="text/javascript">
+            var tagsall=document.getElementsByClassName("post-tags")
+            for (var i = tagsall.length - 1; i >= 0; i--){
+                var tags=tagsall[i].getElementsByTagName("a");
+                for (var j = tags.length - 1; j >= 0; j--) {
+                    var golden_ratio = 0.618033988749895;
+                    var s = 0.5;
+                    var v = 0.999;
+                    var h = golden_ratio + Math.random()*0.8 - 0.5;
+                    var h_i = parseInt(h * 6);
+                    var f = h * 6 - h_i;
+                    var p = v * (1 - s);
+                    var q = v * (1 - f * s);
+                    var t = v * (1 - (1 - f) * s);
+                    var r, g, b;
+                    switch (h_i) {
+                        case 0:
+                            r = v;
+                            g = t;
+                            b = p;
+                            break;
+                        case 1:
+                            r = q;
+                            g = v;
+                            b = p;
+                            break;
+                        case 2:
+                            r = p;
+                            g = v;
+                            b = t;
+                            break;
+                        case 3 :
+                            r = p;
+                            g = q;
+                            b = v;
+                            break;
+                        case 4:
+                            r = t;
+                            g = p;
+                            b = v;
+                            break;
+                        case 5:
+                            r = v;
+                            g = p;
+                            b = q;
+                            break;
+                        default:
+                            r = 1;
+                            g = 1;
+                            b = 1;
+                      }
+                    tags[j].style.background = "rgba("+parseInt(r*255)+","+parseInt(g*255)+","+parseInt(b*255)+","+0.5+")";
+                }
+            }
+            </script>
+              <a href="/tags/%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/" rel="tag"><i class="fa fa-tag"></i> 负载均衡</a>
+	  <script type="text/javascript">
+            var tagsall=document.getElementsByClassName("post-tags")
+            for (var i = tagsall.length - 1; i >= 0; i--){
+                var tags=tagsall[i].getElementsByTagName("a");
+                for (var j = tags.length - 1; j >= 0; j--) {
+                    var golden_ratio = 0.618033988749895;
+                    var s = 0.5;
+                    var v = 0.999;
+                    var h = golden_ratio + Math.random()*0.8 - 0.5;
+                    var h_i = parseInt(h * 6);
+                    var f = h * 6 - h_i;
+                    var p = v * (1 - s);
+                    var q = v * (1 - f * s);
+                    var t = v * (1 - (1 - f) * s);
+                    var r, g, b;
+                    switch (h_i) {
+                        case 0:
+                            r = v;
+                            g = t;
+                            b = p;
+                            break;
+                        case 1:
+                            r = q;
+                            g = v;
+                            b = p;
+                            break;
+                        case 2:
+                            r = p;
+                            g = v;
+                            b = t;
+                            break;
+                        case 3 :
+                            r = p;
+                            g = q;
+                            b = v;
+                            break;
+                        case 4:
+                            r = t;
+                            g = p;
+                            b = v;
+                            break;
+                        case 5:
+                            r = v;
+                            g = p;
+                            b = q;
+                            break;
+                        default:
+                            r = 1;
+                            g = 1;
+                            b = 1;
+                      }
+                    tags[j].style.background = "rgba("+parseInt(r*255)+","+parseInt(g*255)+","+parseInt(b*255)+","+0.5+")";
+                }
+            }
+            </script>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/ee2bfcc7/" rel="prev" title="DMA(Direct Memory Access)">
+                  <i class="fa fa-chevron-left"></i> DMA(Direct Memory Access)
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/posts/2d9bc22b/" rel="next" title="数据完整性（下）">
+                  数据完整性（下） <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments gitalk-container"></div>
+  
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 2021 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Zongpeng Lin</span>
+</div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="站点总字数">96k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">1:27</span>
+  </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+<script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.4.0/dist/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+  <script src="/js/third-party/pace.js"></script>
+
+  
+
+
+
+
+
+    <script src="/js/cursor/cherry.js"></script>
+
+
+
+  <script src="/js/activate-power-mode.min.js"></script>
+  <script>
+    POWERMODE.colorful = true;
+    POWERMODE.shake = false;
+    document.body.addEventListener('input', POWERMODE);
+  </script>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.css" integrity="sha256-AJnUHL7dBv6PGaeyPQJcgQPDjt/Hn/PvYZde1iqfp8U=" crossorigin="anonymous">
+
+<script class="next-config" data-name="gitalk" type="application/json">{"enable":true,"github_id":"ZongpengLin","repo":"gitalk-comments","client_id":"11daf4afe14241784819","client_secret":"3ef19bf3ca914ba210ad722458d2eaad03704746","admin_user":"ZongpengLin","distraction_free_mode":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token","language":"zh-CN","js":{"url":"https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.min.js","integrity":"sha256-Pmj85ojLaPOWwRtlMJwmezB/Qg8BzvJp5eTzvXaYAfA="},"path_md5":"3ab1bfe6e84d2e62dad9947cdd80bd93"}</script>
+<script src="/js/third-party/comments/gitalk.js"></script>
+
+  
+       <script type="text/javascript" src="//cdn.bootcss.com/canvas-nest.js/1.0.0/canvas-nest.min.js"></script>
+  
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"model":{"jsonPath":"/live2dw/assets/hijiki.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"log":false});</script></body>
+</html>

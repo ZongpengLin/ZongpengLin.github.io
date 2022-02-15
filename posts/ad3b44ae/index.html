@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 6.0.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/shinubi-2.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/shinubi-3.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/shinubi-1.ico">
+  <link rel="mask-icon" href="/images/algolia_logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=PT+sans:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pace-js@1.2.4/themes/blue/pace-theme-center-atom.css">
+  <script src="https://cdn.jsdelivr.net/npm/pace-js@1.2.4/pace.min.js" integrity="sha256-gqd7YTjg/BtfqWSwsJOvndl0Bxc8gFImLEkXQT8+qj0=" crossorigin="anonymous"></script>
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"zongpenglin.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":true,"version":"8.10.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"buttons","active":"gitalk","storage":true,"lazyload":false,"nav":{"gitalk":{"order":-1}},"activeClass":"gitalk"},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+  <meta name="description" content="SSD硬盘（上）：如何完成性能优化的KPI？ 随着智能手机的出现，互联网用户在 2008 年之后开始爆发性增长，大家在网上花的时间也越来越多。这也就意味着，隐藏在精美 App 和网页之后的服务端数据请求量">
+<meta property="og:type" content="website">
+<meta property="og:title" content="SSD硬盘（上）">
+<meta property="og:url" content="https://zongpenglin.github.io/posts/ad3b44ae/index.html">
+<meta property="og:site_name" content="Pang-YUM&#39;s Neverland">
+<meta property="og:description" content="SSD硬盘（上）：如何完成性能优化的KPI？ 随着智能手机的出现，互联网用户在 2008 年之后开始爆发性增长，大家在网上花的时间也越来越多。这也就意味着，隐藏在精美 App 和网页之后的服务端数据请求量">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://zongpenglin.github.io/img/computer_img/SSD.webp">
+<meta property="og:image" content="https://zongpenglin.github.io/img/computer_img/SSD电容.webp">
+<meta property="og:image" content="https://zongpenglin.github.io/img/computer_img/电压比特.webp">
+<meta property="og:image" content="https://zongpenglin.github.io/img/computer_img/SSD%20物理构造.webp">
+<meta property="og:image" content="https://zongpenglin.github.io/img/computer_img/SSD盘面.webp">
+<meta property="og:image" content="https://zongpenglin.github.io/img/computer_img/SSD%20擦写.webp">
+<meta property="article:published_time" content="2022-01-18T16:00:00.000Z">
+<meta property="article:modified_time" content="2022-02-08T10:46:21.336Z">
+<meta property="article:author" content="Zongpeng Lin">
+<meta property="article:tag" content="存储器">
+<meta property="article:tag" content="SSD">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://zongpenglin.github.io/img/computer_img/SSD.webp">
+
+
+<link rel="canonical" href="https://zongpenglin.github.io/posts/ad3b44ae/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://zongpenglin.github.io/posts/ad3b44ae/","path":"posts/ad3b44ae/","title":"SSD硬盘（上）"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>SSD硬盘（上） | Pang-YUM's Neverland</title>
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+<a target="_blank" rel="noopener" href="https://github.com/ZongpengLin" class="github-corner" aria-label="View source on GitHub"><svg width="90" height="90" viewBox="0 0 250 250" style="fill:#151513; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Pang-YUM's Neverland</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description"><br><font face="魏碑-简">人生若只如初见</font></p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+        <li class="menu-item menu-item-commonweal"><a href="/404/" rel="section"><i class="fa fa-heartbeat fa-fw"></i>公益 404</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#SSD%E7%A1%AC%E7%9B%98%EF%BC%88%E4%B8%8A%EF%BC%89%EF%BC%9A%E5%A6%82%E4%BD%95%E5%AE%8C%E6%88%90%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E7%9A%84KPI%EF%BC%9F"><span class="nav-number">1.</span> <span class="nav-text">SSD硬盘（上）：如何完成性能优化的KPI？</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#SSD-%E7%9A%84%E8%AF%BB%E5%86%99%E5%8E%9F%E7%90%86"><span class="nav-number">1.1.</span> <span class="nav-text">SSD 的读写原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SLC%E3%80%81MLC%E3%80%81TLC-%E5%92%8C-QLC"><span class="nav-number">1.2.</span> <span class="nav-text">SLC、MLC、TLC 和 QLC</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#P-x2F-E-%E6%93%A6%E5%86%99%E9%97%AE%E9%A2%98"><span class="nav-number">1.3.</span> <span class="nav-text">P&#x2F;E 擦写问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SSD-%E8%AF%BB%E5%86%99%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F"><span class="nav-number">1.4.</span> <span class="nav-text">SSD 读写的生命周期</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93%E5%BB%B6%E4%BC%B8"><span class="nav-number">1.5.</span> <span class="nav-text">总结延伸</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Zongpeng Lin"
+      src="/images/author.jpg">
+  <p class="site-author-name" itemprop="name">Zongpeng Lin</p>
+  <div class="site-description" itemprop="description"><font face="雅痞-繁">Wish you a happy mood and a sweet smile!</font></div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">27</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">33</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/" title="GitHub → https:&#x2F;&#x2F;github.com" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:18155360849@163.com" title="E-Mail → mailto:18155360849@163.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://plus.google.com/yourname" title="Google → https:&#x2F;&#x2F;plus.google.com&#x2F;yourname" rel="noopener" target="_blank"><i class="fab fa-google fa-fw"></i>Google</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/images/personal_wechat.JPG" title="Wechat → &#x2F;images&#x2F;personal_wechat.JPG"><i class="fab fa-weixin fa-fw"></i>Wechat</a>
+      </span>
+  </div>
+  <div class="cc-license site-overview-item animated" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="https://cdn.jsdelivr.net/npm/@creativecommons/vocabulary@2020.11.3/assets/license_badges/small/by_nc_sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+      
+      <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=330 height=86 src="//music.163.com/outchain/player?type=2&id=31134621&auto=0&height=66"></iframe>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://zongpenglin.github.io/posts/ad3b44ae/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/author.jpg">
+      <meta itemprop="name" content="Zongpeng Lin">
+      <meta itemprop="description" content="<font face="雅痞-繁">Wish you a happy mood and a sweet smile!</font>">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Pang-YUM's Neverland">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          SSD硬盘（上）
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2022-01-19 00:00:00" itemprop="dateCreated datePublished" datetime="2022-01-19T00:00:00+08:00">2022-01-19</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BB%84%E6%88%90%E5%8E%9F%E7%90%86/" itemprop="url" rel="index"><span itemprop="name">计算机组成原理</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>3.5k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>3 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="SSD硬盘（上）：如何完成性能优化的KPI？"><a href="#SSD硬盘（上）：如何完成性能优化的KPI？" class="headerlink" title="SSD硬盘（上）：如何完成性能优化的KPI？"></a>SSD硬盘（上）：如何完成性能优化的KPI？</h1><blockquote>
+<p>随着智能手机的出现，互联网用户在 2008 年之后开始爆发性增长，大家在网上花的时间也越来越多。这也就意味着，隐藏在精美 App 和网页之后的服务端数据请求量<span id="more"></span>，呈数量级的上升。无论是用 10000 转的企业级机械硬盘，还是用 t Stroking 这样的方式进一步提升 IOPS，HDD 硬盘已经满足不了我们的需求了。上面这些优化措施，无非就是，把 IOPS 从 100 提升到 300、500 也就到头了。</p>
+<p>SSD 硬盘在 2010 年前后，进入了主流的商业应用。我们在第 44 讲看过，一块普通的 SSD 硬盘，可以轻松支撑 10000 乃至 20000 的 IOPS。那个时候，不少互联网公司想要完成性能优化的 KPI，最后的解决方案都变成了换 SSD 的硬盘。如果这还不够，那就换上使用 PCI Express 接口的 SSD。</p>
+</blockquote>
+<h2 id="SSD-的读写原理"><a href="#SSD-的读写原理" class="headerlink" title="SSD 的读写原理"></a>SSD 的读写原理</h2><p>SSD 没有像机械硬盘那样的寻道过程，所以它的随机读写都更快。我在下面列了一个表格，对比了一下 SSD 和机械硬盘的优缺点。<br><img src="/img/computer_img/SSD.webp" alt="SSD" style="zoom:50%;" /></p>
+<p>你会发现，不管是机械硬盘不擅长的随机读写，还是它本身已经表现不错的顺序写入，SSD 在这些方面都要比 HDD 强。不过，有一点，机械硬盘要远强于 SSD，那就是耐用性。如果我们需要频繁地重复写入删除数据，那么机械硬盘要比 SSD 性价比高很多。</p>
+<p>要想知道为什么 SSD 的耐用性不太好，我们先要理解 SSD 硬盘的存储和读写原理。我们之前说过，CPU Cache 用的 SRAM 是用一个电容来存放一个比特的数据。<strong>对于 SSD 硬盘，我们也可以先简单地认为，它是由一个电容加上一个电压计组合在一起，记录了一个或者多个比特。</strong></p>
+<h2 id="SLC、MLC、TLC-和-QLC"><a href="#SLC、MLC、TLC-和-QLC" class="headerlink" title="SLC、MLC、TLC 和 QLC"></a>SLC、MLC、TLC 和 QLC</h2><p>能够记录一个比特很容易理解。给电容里面充上电有电压的时候就是 1，给电容放电里面没有电就是 0。采用这样方式存储数据的 SSD 硬盘，我们一般称之为使用了 SLC 的颗粒，全称是 Single-Level Cell，也就是一个存储单元中只有一位数据。</p>
+<img src="/img/computer_img/SSD电容.webp" alt="SSD电容" style="zoom:50%;" />
+
+<p>但是，这样的方式会遇到和 CPU Cache 类似的问题，那就是，同样的面积下，能够存放下的元器件是有限的。如果只用 SLC，我们就会遇到，存储容量上不去，并且价格下不来的问题。于是呢，硬件工程师们就陆续发明了 MLC（Multi-Level Cell）、TLC（Triple-Level Cell）以及 QLC（Quad-Level Cell），也就是能在一个电容里面存下 2 个、3 个乃至 4 个比特。</p>
+<img src="/img/computer_img/电压比特.webp" alt="电压比特" style="zoom:50%;" />
+
+<p>只有一个电容，我们怎么能够表示更多的比特呢？别忘了，这里我们还有一个电压计。4 个比特一共可以从 0000-1111 表示 16 个不同的数。那么，如果我们能往电容里面充电的时候，充上 15 个不同的电压，并且我们电压计能够区分出这 15 个不同的电压。加上电容被放空代表的 0，就能够代表从 0000-1111 这样 4 个比特了。</p>
+<p>不过，要想表示 15 个不同的电压，充电和读取的时候，对于精度的要求就会更高。这会导致充电和读取的时候都更慢，所以 QLC 的 SSD 的读写速度，要比 SLC 的慢上好几倍。如果你想要知道是什么样的物理原理导致这个 QLC 更慢，可以去读一读这篇<a target="_blank" rel="noopener" href="https://www.anandtech.com/show/5067/understanding-tlc-nand/2">文章</a>。</p>
+<hr>
+<h2 id="P-x2F-E-擦写问题"><a href="#P-x2F-E-擦写问题" class="headerlink" title="P&#x2F;E 擦写问题"></a>P&#x2F;E 擦写问题</h2><p>如果我们去看一看 SSD 硬盘的硬件构造，可以看到，它大概是自顶向下是这么构成的。</p>
+<img src="/img/computer_img/SSD 物理构造.webp" alt="SSD 物理构造" style="zoom:50%;" />
+
+<p>首先，自然和其他的 I&#x2F;O 设备一样，它有对应的接口和控制电路。现在的 SSD 硬盘用的是 SATA 或者 PCI Express 接口。在控制电路里，有一个很重要的模块，叫作 FTL（Flash-Translation Layer），也就是闪存转换层。这个可以说是 SSD 硬盘的一个核心模块，SSD 硬盘性能的好坏，很大程度上也取决于 FTL 的算法好不好。现在容我卖个关子，我们晚一会儿仔细讲 FTL 的功能。</p>
+<p>接下来是实际 I&#x2F;O 设备，它其实和机械硬盘很像。现在新的大容量 SSD 硬盘都是 3D 封装的了，也就是说，是由很多个裸片（Die）叠在一起的，就好像我们的机械硬盘把很多个盘面（Platter）叠放再一起一样，这样可以在同样的空间下放下更多的容量。</p>
+<img src="/img/computer_img/SSD盘面.webp" alt="SSD盘面" style="zoom:50%;" />
+
+<p>接下来，一张裸片上可以放多个平面（Plane），一般一个平面上的存储容量大概在 GB 级别。一个平面上面，会划分成很多个块（Block），一般一个块（Block）的存储大小， 通常几百 KB 到几 MB 大小。一个块里面，还会区分很多个页（Page），就和我们内存里面的页一样，一个页的大小通常是 4KB。</p>
+<p>在这一层一层的结构里面，处在最下面的两层块和页非常重要</p>
+<p>对于 SSD 硬盘来说，数据的写入叫作 Program。写入不能像机械硬盘一样，通过<strong>覆写（Overwrite）</strong>来进行的，而是要先去<strong>擦除（Erase）</strong>，然后再写入。</p>
+<p>SSD 的读取和写入的基本单位，不是一个比特（bit）或者一个字节（byte），而是一个<strong>页（Page）</strong>。SSD 的擦除单位就更夸张了，我们不仅不能按照比特或者字节来擦除，连按照页来擦除都不行，我们必须按照<strong>块</strong>来擦除。</p>
+<p><em>而且，你必须记住的一点是，SSD 的使用寿命，其实是每一个块（Block）的擦除的次数。</em>（你可以把 SSD 硬盘的一个平面看成是一张白纸。我们在上面写入数据，就好像用铅笔在白纸上写字。如果想要把已经写过字的地方写入新的数据，我们先要用橡皮把已经写好的字擦掉。但是，如果频繁擦同一个地方，那这个地方就会破掉，之后就没有办法再写字了。）</p>
+<blockquote>
+<p>我们上面说的 SLC 的芯片，可以擦除的次数大概在 10 万次，MLC 就在 1 万次左右，而 TLC 和 QLC 就只在几千次了。这也是为什么，你去购买 SSD 硬盘，会看到同样的容量的价格差别很大，因为它们的芯片颗粒和寿命完全不一样。</p>
+</blockquote>
+<hr>
+<h2 id="SSD-读写的生命周期"><a href="#SSD-读写的生命周期" class="headerlink" title="SSD 读写的生命周期"></a>SSD 读写的生命周期</h2><ul>
+<li>我用三种颜色分别来表示 SSD 硬盘里面的页的不同状态，白色代表这个页从来没有写入过数据，绿色代表里面写入的是有效的数据，红色代表里面的数据，在我们的操作系统看来已经是删除的了。</li>
+</ul>
+<img src="/img/computer_img/SSD 擦写.webp" alt="SSD 擦写" style="zoom:67%;" />
+
+<p>一开始，所有块的每一个页都是白色的。随着我们开始往里面写数据，里面的有些页就变成了绿色。</p>
+<p>然后，因为我们删除了硬盘上的一些文件，所以有些页变成了红色。但是这些红色的页，并不能再次写入数据。因为 SSD 硬盘不能单独擦除一个页，必须一次性擦除整个块，所以新的数据，我们只能往后面的白色的页里面写。这些散落在各个绿色空间里面的红色空洞，就好像硬盘碎片。</p>
+<p>如果有哪一个块的数据一次性全部被标红了，那我们就可以把整个块进行擦除。它就又会变成白色，可以重新一页一页往里面写数据。这种情况其实也会经常发生。毕竟一个块不大，也就在几百 KB 到几 MB。你删除一个几 MB 的文件，数据又是连续存储的，自然会导致整个块可以被擦除。</p>
+<p>随着硬盘里面的数据越来越多，红色空洞占的地方也会越来越多。于是，你会发现，我们就要没有白色的空页去写入数据了。这个时候，我们要做一次类似于 Windows 里面“磁盘碎片整理”或者 Java 里面的“内存垃圾回收”工作。   <em><strong>找一个红色空洞最多的块，把里面的绿色数据，挪到另一个块里面去，然后把整个块擦除，变成白色，可以重新写入数据。</strong></em></p>
+<p>不过，这个“磁盘碎片整理”或者“内存垃圾回收”的工作，我们不能太主动、太频繁地去做。因为 SSD 的擦除次数是有限的。如果动不动就搞个磁盘碎片整理，那么我们的 SSD 硬盘很快就会报废了。</p>
+<p>说到这里，你可能要问了，这是不是说，我们的 SSD 硬盘的容量是用不满的？因为我们总会遇到一些红色空洞？</p>
+<p>没错，一块 SSD 的硬盘容量，是没办法完全用满的。   不过，为了不得罪消费者，生产 SSD 硬盘的厂商，其实是预留了一部分空间，<em><strong>专门用来做这个“磁盘碎片整理”工作的。一块标成 240G 的 SSD 硬盘，往往实际有 256G 的硬盘空间。</strong></em>     SSD 硬盘通过我们的控制芯片电路，把多出来的硬盘空间，用来进行各种数据的闪转腾挪，让你能够写满那 240G 的空间。这个多出来的 16G 空间，叫作<strong>预留空间</strong>（Over Provisioning），一般 SSD 的硬盘的预留空间都在 7%-15% 左右。</p>
+<h2 id="总结延伸"><a href="#总结延伸" class="headerlink" title="总结延伸"></a>总结延伸</h2><hr>
+<p>到这里，相信你对 SSD 硬盘的写入和擦除的原理已经清楚了，也明白了 SSD 硬盘的使用寿命受限于可以擦除的次数。</p>
+<p>仔细想一想，你会发现 SSD 硬盘，特别适合读多写少的应用。在日常应用里面，我们的系统盘适合用 SSD。但是，如果我们用 SSD 做专门的下载盘，一直下载各种影音数据，然后刻盘备份就不太好了，特别是现在 QLC 颗粒的 SSD，它只有几千次可擦写的寿命啊。</p>
+<ul>
+<li>在数据中心里面，SSD 的应用场景也是适合读多写少的场景。</li>
+<li>我们拿 SSD 硬盘用来做数据库，存放电商网站的商品信息很合适。但是，用来作为 Hadoop 这样的 Map-Reduce 应用的数据盘就不行了。因为 Map-Reduce 任务会大量在任务中间向硬盘写入中间数据再删除掉，这样用不了多久，SSD 硬盘的寿命就会到了</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>Zongpeng Lin
+  </li>
+  <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="https://zongpenglin.github.io/posts/ad3b44ae/" title="SSD硬盘（上）">https://zongpenglin.github.io/posts/ad3b44ae/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+	
+            <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+
+
+         
+            <div class="reward-container">
+  <div>作者水平有限，文中难免存在一些错误，欢迎邮件@交流讨论~</div>
+  <button>
+    码字不易，鼓励一下
+  </button>
+  <div class="post-reward">
+      <div>
+        <img src="/images/weixin.png" alt="Zongpeng Lin 微信">
+        <span>微信</span>
+      </div>
+      <div>
+        <img src="/images/alipay2.png" alt="Zongpeng Lin 支付宝">
+        <span>支付宝</span>
+      </div>
+
+  </div>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/%E5%AD%98%E5%82%A8%E5%99%A8/" rel="tag"><i class="fa fa-tag"></i> 存储器</a>
+	  <script type="text/javascript">
+            var tagsall=document.getElementsByClassName("post-tags")
+            for (var i = tagsall.length - 1; i >= 0; i--){
+                var tags=tagsall[i].getElementsByTagName("a");
+                for (var j = tags.length - 1; j >= 0; j--) {
+                    var golden_ratio = 0.618033988749895;
+                    var s = 0.5;
+                    var v = 0.999;
+                    var h = golden_ratio + Math.random()*0.8 - 0.5;
+                    var h_i = parseInt(h * 6);
+                    var f = h * 6 - h_i;
+                    var p = v * (1 - s);
+                    var q = v * (1 - f * s);
+                    var t = v * (1 - (1 - f) * s);
+                    var r, g, b;
+                    switch (h_i) {
+                        case 0:
+                            r = v;
+                            g = t;
+                            b = p;
+                            break;
+                        case 1:
+                            r = q;
+                            g = v;
+                            b = p;
+                            break;
+                        case 2:
+                            r = p;
+                            g = v;
+                            b = t;
+                            break;
+                        case 3 :
+                            r = p;
+                            g = q;
+                            b = v;
+                            break;
+                        case 4:
+                            r = t;
+                            g = p;
+                            b = v;
+                            break;
+                        case 5:
+                            r = v;
+                            g = p;
+                            b = q;
+                            break;
+                        default:
+                            r = 1;
+                            g = 1;
+                            b = 1;
+                      }
+                    tags[j].style.background = "rgba("+parseInt(r*255)+","+parseInt(g*255)+","+parseInt(b*255)+","+0.5+")";
+                }
+            }
+            </script>
+              <a href="/tags/SSD/" rel="tag"><i class="fa fa-tag"></i> SSD</a>
+	  <script type="text/javascript">
+            var tagsall=document.getElementsByClassName("post-tags")
+            for (var i = tagsall.length - 1; i >= 0; i--){
+                var tags=tagsall[i].getElementsByTagName("a");
+                for (var j = tags.length - 1; j >= 0; j--) {
+                    var golden_ratio = 0.618033988749895;
+                    var s = 0.5;
+                    var v = 0.999;
+                    var h = golden_ratio + Math.random()*0.8 - 0.5;
+                    var h_i = parseInt(h * 6);
+                    var f = h * 6 - h_i;
+                    var p = v * (1 - s);
+                    var q = v * (1 - f * s);
+                    var t = v * (1 - (1 - f) * s);
+                    var r, g, b;
+                    switch (h_i) {
+                        case 0:
+                            r = v;
+                            g = t;
+                            b = p;
+                            break;
+                        case 1:
+                            r = q;
+                            g = v;
+                            b = p;
+                            break;
+                        case 2:
+                            r = p;
+                            g = v;
+                            b = t;
+                            break;
+                        case 3 :
+                            r = p;
+                            g = q;
+                            b = v;
+                            break;
+                        case 4:
+                            r = t;
+                            g = p;
+                            b = v;
+                            break;
+                        case 5:
+                            r = v;
+                            g = p;
+                            b = q;
+                            break;
+                        default:
+                            r = 1;
+                            g = 1;
+                            b = 1;
+                      }
+                    tags[j].style.background = "rgba("+parseInt(r*255)+","+parseInt(g*255)+","+parseInt(b*255)+","+0.5+")";
+                }
+            }
+            </script>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/158723cb/" rel="prev" title="SSD硬盘（下）">
+                  <i class="fa fa-chevron-left"></i> SSD硬盘（下）
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/posts/ee2bfcc7/" rel="next" title="DMA(Direct Memory Access)">
+                  DMA(Direct Memory Access) <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments gitalk-container"></div>
+  
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 2021 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Zongpeng Lin</span>
+</div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="站点总字数">96k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">1:27</span>
+  </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+<script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.4.0/dist/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+  <script src="/js/third-party/pace.js"></script>
+
+  
+
+
+
+
+
+    <script src="/js/cursor/cherry.js"></script>
+
+
+
+  <script src="/js/activate-power-mode.min.js"></script>
+  <script>
+    POWERMODE.colorful = true;
+    POWERMODE.shake = false;
+    document.body.addEventListener('input', POWERMODE);
+  </script>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.css" integrity="sha256-AJnUHL7dBv6PGaeyPQJcgQPDjt/Hn/PvYZde1iqfp8U=" crossorigin="anonymous">
+
+<script class="next-config" data-name="gitalk" type="application/json">{"enable":true,"github_id":"ZongpengLin","repo":"gitalk-comments","client_id":"11daf4afe14241784819","client_secret":"3ef19bf3ca914ba210ad722458d2eaad03704746","admin_user":"ZongpengLin","distraction_free_mode":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token","language":"zh-CN","js":{"url":"https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.min.js","integrity":"sha256-Pmj85ojLaPOWwRtlMJwmezB/Qg8BzvJp5eTzvXaYAfA="},"path_md5":"3e006594070c0aa0b99e46250d3ba215"}</script>
+<script src="/js/third-party/comments/gitalk.js"></script>
+
+  
+       <script type="text/javascript" src="//cdn.bootcss.com/canvas-nest.js/1.0.0/canvas-nest.min.js"></script>
+  
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"model":{"jsonPath":"/live2dw/assets/hijiki.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"log":false});</script></body>
+</html>
