@@ -42,61 +42,6 @@
       </tags>
   </entry>
   <entry>
-    <title>初窥计算机指令</title>
-    <url>/posts/d754f544/</url>
-    <content><![CDATA[<h1 id="初窥计算机指令"><a href="#初窥计算机指令" class="headerlink" title="初窥计算机指令"></a>初窥计算机指令</h1><h2 id="在软硬件接口中，CPU-帮我们做了什么事？"><a href="#在软硬件接口中，CPU-帮我们做了什么事？" class="headerlink" title="在软硬件接口中，CPU 帮我们做了什么事？"></a>在软硬件接口中，CPU 帮我们做了什么事？</h2><ul>
-<li><p>从硬件角度来看，CPU就是一个超大规模集成电路<span id="more"></span>，通过电路实现了加法、乘法乃至各种各样的处理逻辑。</p>
-</li>
-<li><p>从软件上来看，CPU 就是一个执行各种计算机指令的逻辑机器。这里的计算机指令，就好比一门 CPU 能够听得懂的语言，我们也可以把它叫作机器语言（Machine Language）。</p>
-</li>
-</ul>
-<p>不同的 CPU 能够听懂的语言不太一样。比如，我们的个人电脑用的是 Intel 的 CPU，苹果手机用的是 ARM 的 CPU。这两者能听懂的语言就不太一样。类似这样两种 CPU 各自支持的语言，就是两组不同的<strong>计算机指令集</strong>，英文叫 Instruction Set。<br>一个计算机程序实际上是由成千上万条指令组成的，但是CPU里不能一直放着所有指令，所以计算机程序平时是存储在存储器中的，这种程序指令存储在存储器里面的计算机，我们就叫作存储程序型计算机（Stored-program Computer）。</p>
-<h2 id="从编译到汇编，代码怎么变成机器码？"><a href="#从编译到汇编，代码怎么变成机器码？" class="headerlink" title="从编译到汇编，代码怎么变成机器码？"></a>从编译到汇编，代码怎么变成机器码？</h2><p>平时编写的代码，到底是怎么变成一条条计算机指令，最后被 CPU 执行的呢？我们拿一小段真实的 C 语言程序来看看。</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">// test.c</span><br><span class="line">int main()</span><br><span class="line">&#123;</span><br><span class="line">  int a = 1; </span><br><span class="line">  int b = 2;</span><br><span class="line">  a = a + b;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>要让这段程序在一个 Linux 操作系统上跑起来，我们需要把整个程序翻译成一个汇编语言（ASM，Assembly Language）的程序，这个过程我们一般叫编译（Compile）成汇编代码。</p>
-<p>正对汇编代码，我们可以再用汇编器（Assember）翻译成机器码（Machine Code）。这些机器码由“0”和“1”组成的机器语言表示。这一条条机器码，就是一条条的计算机指令。这样一串串的 16 进制数字，就是我们 CPU 能够真正认识的计算机指令。</p>
-<p>在一个 Linux 操作系统上，我们可以简单地使用 <strong>gcc</strong> 和 <strong>objdump</strong> 这样两条命令，把对应的汇编代码和机器码都打印出来。</p>
-<p>可以看到，左边对应的是一条条机器码，右边有一系列的 push、mov、add、pop 等，这些就是对应的汇编代码。</p>
-<img src="/img/computer_img/机器码和汇编.png" alt="机器码和汇编" style="zoom:50%;" />
-
-<center style:"color:C0C0C0">机器码和汇编代码</center>
-
-<h2 id=""><a href="#" class="headerlink" title=""></a><img src="/img/computer_img/汇编过程.webp" alt="汇编过程" style="zoom:50%;" /></h2><p>从高级语言到汇编代码，再到机器码，就是一个日常开发程序，最终变成了CPU 可以执行的计算机指令的过程。</p>
-<h2 id="常见指令"><a href="#常见指令" class="headerlink" title="常见指令"></a>常见指令</h2><ol>
-<li>算数类指令。我们的加减乘除，在 CPU 层面，都会变成一条条算术类指令。</li>
-<li>数据传输类指令。给变量赋值、在内存里读写数据，用的都是数据传输类指令。</li>
-<li>逻辑类指令。逻辑上的与或非，都是这一类指令。</li>
-<li>条件分支类指令。比如“if&#x2F;else”</li>
-<li>无条件条转指令。写一些大一点的程序，我们常常需要写一些函数或者方法。在调用函数的时候，其实就是发起了一个无条件跳转指令。</li>
-</ol>
-<p>&lt;img src&#x3D;”&#x2F;img&#x2F;computer_img&#x2F;各种指令.webp style&#x3D;”zoom:67%;)</p>
-<center style="color:#C0C0C0;">常见指令</center>
-
-<h2 id="MIPS-指令集"><a href="#MIPS-指令集" class="headerlink" title="MIPS 指令集"></a>MIPS 指令集</h2><img src="/img/computer_img/MIPS位数.webp" alt="MIPS位数" style="zoom:67%;" />
-
-<p>MIPS 的指令是一个 32 位的整数，高 6 位叫操作码（Opcode），也就是代表这条指令具体是一条什么样的指令，剩下的 26 位有三种格式，分别是 R、I 和 J。</p>
-<p><strong>R指令</strong>一般用来算术和逻辑操作，里面有读取和写入数据的寄存器的地址。如果是逻辑位移操作，后面还有位移操作的位移量，而最后的功能码，则是在前面的操作码不够的时候，扩展操作码表示对应的具体指令的。</p>
-<p><strong>I 指令</strong>，则通常是用数据传输、条件分支，以及在运算的时候使用的并非变量还是常数的时候。这个时候，没有了位移量和操作码，也没有了第三个寄存器，而是把这三部分直接合并成了一个地址值或者一个常数。</p>
-<p><strong>J 指令</strong>就是一个跳转指令，高 6 位之外的 26 位都是一个跳转后的地址。</p>
-<p>我以一个简单的加法算术指令 add t0,s1, $s2, 为例，</p>
-<p>​                                <code>add  $t0,$s2,$s1</code> </p>
-<p>对应的 MIPS 指令里 opcode 是 0，rs 代表第一个寄存器 s1 的地址是 17，rt 代表第二个寄存器 s2 的地址是 18，rd 代表目标的临时寄存器 t0 的地址，是 8。因为不是位移操作，所以位移量是 0。把这些数字拼在一起，就变成了一个 MIPS 的加法指令。</p>
-<p>为了读起来方便，我们一般把对应的二进制数，用 16 进制表示出来。在这里，也就是 0X02324020。这个数字也就是这条指令对应的机器码。</p>
- <img src="/img/computer_img/指令表示.webp" alt="指令表示" style="zoom:50%;" />
-
-<p>为了读起来方便，我们一般把对应的二进制数，用 16 进制表示出来。在这里，也就是 0X02324020。这个数字也就是这条指令对应的机器码。</p>
-]]></content>
-      <categories>
-        <category>计算机组成原理</category>
-      </categories>
-      <tags>
-        <tag>CPU</tag>
-        <tag>指令集</tag>
-        <tag>机器码</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>CPU的主频</title>
     <url>/posts/5dfefcf1/</url>
     <content><![CDATA[<h1 id="透过CPU的主频，谈谈性能究竟是什么"><a href="#透过CPU的主频，谈谈性能究竟是什么" class="headerlink" title="透过CPU的主频，谈谈性能究竟是什么"></a>透过CPU的主频，谈谈性能究竟是什么</h1><h2 id="计算机的性能衡量"><a href="#计算机的性能衡量" class="headerlink" title="计算机的性能衡量"></a>计算机的性能衡量</h2><p>于计算机的性能，我们需要有个标准来衡量。这个标准中主要有两个指标。</p>
@@ -160,54 +105,58 @@ SPEC 提供的 CPU 基准测试程序，就好像 CPU 届的“高考”，通�
       </tags>
   </entry>
   <entry>
-    <title>关于性能提升</title>
-    <url>/posts/bc93e288/</url>
-    <content><![CDATA[<h1 id="穿越功耗墙，我们该从哪些方面提升“性能”？"><a href="#穿越功耗墙，我们该从哪些方面提升“性能”？" class="headerlink" title="穿越功耗墙，我们该从哪些方面提升“性能”？"></a>穿越功耗墙，我们该从哪些方面提升“性能”？</h1><center> ` 程序的 CPU 执行时间 = 指令数 × CPI × Clock Cycle Time `</center>
+    <title>初窥计算机指令</title>
+    <url>/posts/d754f544/</url>
+    <content><![CDATA[<h1 id="初窥计算机指令"><a href="#初窥计算机指令" class="headerlink" title="初窥计算机指令"></a>初窥计算机指令</h1><h2 id="在软硬件接口中，CPU-帮我们做了什么事？"><a href="#在软硬件接口中，CPU-帮我们做了什么事？" class="headerlink" title="在软硬件接口中，CPU 帮我们做了什么事？"></a>在软硬件接口中，CPU 帮我们做了什么事？</h2><ul>
+<li><p>从硬件角度来看，CPU就是一个超大规模集成电路<span id="more"></span>，通过电路实现了加法、乘法乃至各种各样的处理逻辑。</p>
+</li>
+<li><p>从软件上来看，CPU 就是一个执行各种计算机指令的逻辑机器。这里的计算机指令，就好比一门 CPU 能够听得懂的语言，我们也可以把它叫作机器语言（Machine Language）。</p>
+</li>
+</ul>
+<p>不同的 CPU 能够听懂的语言不太一样。比如，我们的个人电脑用的是 Intel 的 CPU，苹果手机用的是 ARM 的 CPU。这两者能听懂的语言就不太一样。类似这样两种 CPU 各自支持的语言，就是两组不同的<strong>计算机指令集</strong>，英文叫 Instruction Set。<br>一个计算机程序实际上是由成千上万条指令组成的，但是CPU里不能一直放着所有指令，所以计算机程序平时是存储在存储器中的，这种程序指令存储在存储器里面的计算机，我们就叫作存储程序型计算机（Stored-program Computer）。</p>
+<h2 id="从编译到汇编，代码怎么变成机器码？"><a href="#从编译到汇编，代码怎么变成机器码？" class="headerlink" title="从编译到汇编，代码怎么变成机器码？"></a>从编译到汇编，代码怎么变成机器码？</h2><p>平时编写的代码，到底是怎么变成一条条计算机指令，最后被 CPU 执行的呢？我们拿一小段真实的 C 语言程序来看看。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">// test.c</span><br><span class="line">int main()</span><br><span class="line">&#123;</span><br><span class="line">  int a = 1; </span><br><span class="line">  int b = 2;</span><br><span class="line">  a = a + b;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<h2 id="功耗：CPU-的“人体极限”"><a href="#功耗：CPU-的“人体极限”" class="headerlink" title="功耗：CPU 的“人体极限”"></a>功耗：CPU 的“人体极限”</h2><p>案例：奔腾 4 的 CPU 主频从来没有达到过 10GHz，最终它的主频上限定格在 3.8GHz。这还不是最糟的，更糟糕的事情是，大家发现，奔腾 4 的主频虽然高，但是它的实际性能却配不上同样的主频。想要用在笔记本上的奔腾 4 2.4GHz 处理器，其性能只和基于奔腾 3 架构的奔腾 M 1.6GHz 处理器差不多。</p>
-<span id="more"></span>
-<img src="https://static001.geekbang.org/resource/image/18/80/1826102a89e4cdd31f7573db53dd9280.png?wh=756*468" alt="CPU的主频变化" style="zoom: 75%;"/>
+<p>要让这段程序在一个 Linux 操作系统上跑起来，我们需要把整个程序翻译成一个汇编语言（ASM，Assembly Language）的程序，这个过程我们一般叫编译（Compile）成汇编代码。</p>
+<p>正对汇编代码，我们可以再用汇编器（Assember）翻译成机器码（Machine Code）。这些机器码由“0”和“1”组成的机器语言表示。这一条条机器码，就是一条条的计算机指令。这样一串串的 16 进制数字，就是我们 CPU 能够真正认识的计算机指令。</p>
+<p>在一个 Linux 操作系统上，我们可以简单地使用 <strong>gcc</strong> 和 <strong>objdump</strong> 这样两条命令，把对应的汇编代码和机器码都打印出来。</p>
+<p>可以看到，左边对应的是一条条机器码，右边有一系列的 push、mov、add、pop 等，这些就是对应的汇编代码。</p>
+<img src="/img/computer_img/机器码和汇编.png" alt="机器码和汇编" style="zoom:50%;" />
 
-<p>2019 年的最高配置 Intel i9 CPU，主频也只不过是 5GHz 而已。相较于 1978 年到 2000 年，这 20 年里 300 倍的主频提升，从 2000 年到现在的这 19 年，CPU 的主频大概提高了 3 倍。 </p>
-<p>奔腾 4 的主频为什么没能超过 3.8GHz 的障碍呢？答案就是功耗问题。什么是功耗问题呢？</p>
-<p>(一个 3.8GHz 的奔腾 4 处理器，满载功率是 130 瓦。这个 130 瓦是什么概念呢？机场允许带上飞机的充电宝的容量上限是 100 瓦时。如果我们把这个 CPU 安在手机里面，不考虑屏幕内存之类的耗电，这个 CPU 满载运行 45 分钟，充电宝里面就没电了。而 iPhone X 使用 ARM 架构的 CPU，功率则只有 4.5 瓦左右。)</p>
-<p>我们的 CPU，一般都被叫作超大规模集成电路（Very-Large-Scale Integration，VLSI）。这些电路，实际上都是一个个晶体管组合而成的。CPU 在计算，其实就是让晶体管里面的“开关”不断地去“打开”和“关闭”，来组合完成各种运算和功能。</p>
-<p>想要计算的快，一方面，我们要在 CPU 里，同样的面积里面，多放一些晶体管，也就是增加密度；另一方面，我们要让晶体管“打开”和“关闭”得更快一点，也就是提升主频。而这两者，都会增加功耗，带来耗电和散热的问题。</p>
-<p>在 CPU 里面，能够放下的晶体管数量和晶体管的“开关”频率也都是有限的。一个CPU 的公路，可以用一个公式表示：</p>
-<center> 功耗 ~= 1/2 ×负载电容×电压的平方×开关频率×晶体管数量</center>
+<center style:"color:C0C0C0">机器码和汇编代码</center>
 
-<p>那么，为了要提升性能，我们需要不断地增加晶体管数量。同样的面积下，我们想要多放一点晶体管，就要把晶体管造得小一点。这个就是平时我们所说的提升“制程”。从 28nm 到 7nm，相当于晶体管本身变成了原来的 1&#x2F;4 大小。我们还要提升主频，让开关的频率变快。 但是，功耗增加太多，就会导致 CPU 散热跟不上，这时，我们就需要降低电压。这里有一点非常关键，在整个功耗的公式里面，功耗和电压的平方是成正比的。这意味着电压下降到原来的 1&#x2F;5，整个的功耗会变成原来的 1&#x2F;25 。</p>
-<h2 id="并行优化，理解阿姆达尔定律"><a href="#并行优化，理解阿姆达尔定律" class="headerlink" title="并行优化，理解阿姆达尔定律"></a>并行优化，理解阿姆达尔定律</h2><p>就是所谓的“吞吐率”变大。所以，不管你有没有需要，现在 CPU 的性能就是提升了 2 倍乃至 8 倍、16 倍。这也是一个最常见的提升性能的方式，<strong>通过并行提高性能。</strong></p>
-<p>通过并行提高性能来解决。如果想要使用这种思想，需要满足这样几个条件。</p>
-<ol>
-<li>需要进行的计算，本身可以分解成几个可以并行的任务。好比上面的乘法和加法计算，几个人可以同时进行，不会影响最后的结果。</li>
-<li>需要能够分解好问题，并确保几个人的结果能够汇总到一起。</li>
-<li>在“汇总”这个阶段，是没有办法并行进行的，还是得顺序执行，一步一步来。</li>
+<h2 id=""><a href="#" class="headerlink" title=""></a><img src="/img/computer_img/汇编过程.webp" alt="汇编过程" style="zoom:50%;" /></h2><p>从高级语言到汇编代码，再到机器码，就是一个日常开发程序，最终变成了CPU 可以执行的计算机指令的过程。</p>
+<h2 id="常见指令"><a href="#常见指令" class="headerlink" title="常见指令"></a>常见指令</h2><ol>
+<li>算数类指令。我们的加减乘除，在 CPU 层面，都会变成一条条算术类指令。</li>
+<li>数据传输类指令。给变量赋值、在内存里读写数据，用的都是数据传输类指令。</li>
+<li>逻辑类指令。逻辑上的与或非，都是这一类指令。</li>
+<li>条件分支类指令。比如“if&#x2F;else”</li>
+<li>无条件条转指令。写一些大一点的程序，我们常常需要写一些函数或者方法。在调用函数的时候，其实就是发起了一个无条件跳转指令。</li>
 </ol>
-<p>这就引出了阿姆达尔定律（Amdahl’s Law）：</p>
-<p>这个定律说的就是，对于一个程序进行优化之后，处理器并行运算之后效率提升的情况。具体可以用这样一个公式来表示：</p>
-<center> **优化后的执行时间 = 受优化影响的执行时间 / 加速倍数 + 不受影响的执行时间** </center>
+<p>&lt;img src&#x3D;”&#x2F;img&#x2F;computer_img&#x2F;各种指令.webp style&#x3D;”zoom:67%;)</p>
+<center style="color:#C0C0C0;">常见指令</center>
 
-<p>比如上面的各个向量的一小段的点积，需要 100ns，加法需要 20ns，总共需要 120ns。这里通过并行 4 个 CPU 有了 4 倍的加速度。那么最终优化后，就有了 100&#x2F;4+20&#x3D;45ns。即使我们增加更多的并行度来提供加速倍数，比如有 100 个 CPU，整个时间也需要 100&#x2F;100+20&#x3D;21ns。</p>
-<p><img src="https://static001.geekbang.org/resource/image/f1/e5/f1d05ec439e6377803df741bc07b09e5.jpeg?wh=3140*2039"></p>
-<p>T1就是不受影响的执行时间 ，T2就是可以优化影响的执行时间</p>
-<h2 id="延伸："><a href="#延伸：" class="headerlink" title="延伸："></a>延伸：</h2><p>在“摩尔定律”和“并行计算”之外，在整个计算机组成层面，还有这样几个原则性的性能提升方法。</p>
-<ol>
-<li><p>加速大概率事件。最典型的就是，过去几年流行的深度学习，整个计算过程中，99% 都是向量和矩阵计算，于是，工程师们通过用 GPU 替代 CPU，大幅度提升了深度学习的模型训练过程。本来一个 CPU 需要跑几小时甚至几天的程序，GPU 只需要几分钟就好了。Google 更是不满足于 GPU 的性能，进一步地推出了 TPU。</p>
-</li>
-<li><p>通过流水线提高性能。现代的工厂里的生产线叫“流水线”。我们可以把装配 iPhone 这样的任务拆分成一个个细分的任务，让每个人都只需要处理一道工序，最大化整个工厂的生产效率。类似的，我们的 CPU 其实就是一个“运算工厂”。我们把 CPU 指令执行的过程进行拆分，细化运行，也是现代 CPU 在主频没有办法提升那么多的情况下，性能仍然可以得到提升的重要原因之一。</p>
-</li>
-<li><p>通过预测提高性能。通过预先猜测下一步该干什么，而不是等上一步运行的结果，提前进行运算，也是让程序跑得更快一点的办法。典型的例子就是在一个循环访问数组的时候，凭经验，你也会猜到下一步我们会访问数组的下一项。所谓的“分支和冒险”、“局部性原理”这些 CPU 和存储系统设计方法，其实都是在利用我们对于未来的“预测”，提前进行相应的操作，来提升我们的程序性能。</p>
-</li>
-</ol>
-<p>比如：</p>
-<p>1.加速大概率事件<br>各种缓存(内存缓存、CDN缓存)<br>2.流水线<br>并发编程、异步编程<br>音视频播放器边播放边缓冲<br>3.预测<br>小说的下一页预加载<br>电商大促的CDN预热</p>
+<h2 id="MIPS-指令集"><a href="#MIPS-指令集" class="headerlink" title="MIPS 指令集"></a>MIPS 指令集</h2><img src="/img/computer_img/MIPS位数.webp" alt="MIPS位数" style="zoom:67%;" />
+
+<p>MIPS 的指令是一个 32 位的整数，高 6 位叫操作码（Opcode），也就是代表这条指令具体是一条什么样的指令，剩下的 26 位有三种格式，分别是 R、I 和 J。</p>
+<p><strong>R指令</strong>一般用来算术和逻辑操作，里面有读取和写入数据的寄存器的地址。如果是逻辑位移操作，后面还有位移操作的位移量，而最后的功能码，则是在前面的操作码不够的时候，扩展操作码表示对应的具体指令的。</p>
+<p><strong>I 指令</strong>，则通常是用数据传输、条件分支，以及在运算的时候使用的并非变量还是常数的时候。这个时候，没有了位移量和操作码，也没有了第三个寄存器，而是把这三部分直接合并成了一个地址值或者一个常数。</p>
+<p><strong>J 指令</strong>就是一个跳转指令，高 6 位之外的 26 位都是一个跳转后的地址。</p>
+<p>我以一个简单的加法算术指令 add t0,s1, $s2, 为例，</p>
+<p>​                                <code>add  $t0,$s2,$s1</code> </p>
+<p>对应的 MIPS 指令里 opcode 是 0，rs 代表第一个寄存器 s1 的地址是 17，rt 代表第二个寄存器 s2 的地址是 18，rd 代表目标的临时寄存器 t0 的地址，是 8。因为不是位移操作，所以位移量是 0。把这些数字拼在一起，就变成了一个 MIPS 的加法指令。</p>
+<p>为了读起来方便，我们一般把对应的二进制数，用 16 进制表示出来。在这里，也就是 0X02324020。这个数字也就是这条指令对应的机器码。</p>
+ <img src="/img/computer_img/指令表示.webp" alt="指令表示" style="zoom:50%;" />
+
+<p>为了读起来方便，我们一般把对应的二进制数，用 16 进制表示出来。在这里，也就是 0X02324020。这个数字也就是这条指令对应的机器码。</p>
 ]]></content>
       <categories>
         <category>计算机组成原理</category>
       </categories>
       <tags>
-        <tag>性能与主频</tag>
+        <tag>CPU</tag>
+        <tag>指令集</tag>
+        <tag>机器码</tag>
       </tags>
   </entry>
   <entry>
@@ -267,66 +216,54 @@ SPEC 提供的 CPU 基准测试程序，就好像 CPU 届的“高考”，通�
       </tags>
   </entry>
   <entry>
-    <title>ELF和静态链接</title>
-    <url>/posts/b778160a/</url>
-    <content><![CDATA[<h1 id="ELF和静态链接：为什么程序无法同时在Linux和Windows下运行？"><a href="#ELF和静态链接：为什么程序无法同时在Linux和Windows下运行？" class="headerlink" title="ELF和静态链接：为什么程序无法同时在Linux和Windows下运行？"></a>ELF和静态链接：为什么程序无法同时在Linux和Windows下运行？</h1><h2 id="编译、链接和装载：-拆解程序执行"><a href="#编译、链接和装载：-拆解程序执行" class="headerlink" title="编译、链接和装载： 拆解程序执行"></a>编译、链接和装载： 拆解程序执行</h2><p>之前，我们通过 gcc 生成的文件和 objdump 获取到的汇编指令都有些小小的问题，以add 函数示例，<span id="more"></span>拆分成两个文件 add_lib.c 和 link_example.c 。</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">// add_lib.c</span><br><span class="line">int add(int a, int b)</span><br><span class="line">&#123;</span><br><span class="line">    return a+b;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+    <title>关于性能提升</title>
+    <url>/posts/bc93e288/</url>
+    <content><![CDATA[<h1 id="穿越功耗墙，我们该从哪些方面提升“性能”？"><a href="#穿越功耗墙，我们该从哪些方面提升“性能”？" class="headerlink" title="穿越功耗墙，我们该从哪些方面提升“性能”？"></a>穿越功耗墙，我们该从哪些方面提升“性能”？</h1><center> ` 程序的 CPU 执行时间 = 指令数 × CPI × Clock Cycle Time `</center>
 
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">// link_example.c</span><br><span class="line"></span><br><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">int main()</span><br><span class="line">&#123;</span><br><span class="line">    int a = 10;</span><br><span class="line">    int b = 5;</span><br><span class="line">    int c = add(a, b);</span><br><span class="line">    printf(&quot;c = %d\n&quot;, c);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="功耗：CPU-的“人体极限”"><a href="#功耗：CPU-的“人体极限”" class="headerlink" title="功耗：CPU 的“人体极限”"></a>功耗：CPU 的“人体极限”</h2><p>案例：奔腾 4 的 CPU 主频从来没有达到过 10GHz，最终它的主频上限定格在 3.8GHz。这还不是最糟的，更糟糕的事情是，大家发现，奔腾 4 的主频虽然高，但是它的实际性能却配不上同样的主频。想要用在笔记本上的奔腾 4 2.4GHz 处理器，其性能只和基于奔腾 3 架构的奔腾 M 1.6GHz 处理器差不多。</p>
+<span id="more"></span>
+<img src="https://static001.geekbang.org/resource/image/18/80/1826102a89e4cdd31f7573db53dd9280.png?wh=756*468" alt="CPU的主频变化" style="zoom: 75%;"/>
 
-<p>我们通过 gcc 来编译这两个文件，然后通过 objdump 命令看看它们的汇编代码。</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">$ gcc -g -c add_lib.c link_example.c</span><br><span class="line">$ objdump -d -M intel -S add_lib.o</span><br><span class="line">$ objdump -d -M intel -S link_example.o</span><br></pre></td></tr></table></figure>
+<p>2019 年的最高配置 Intel i9 CPU，主频也只不过是 5GHz 而已。相较于 1978 年到 2000 年，这 20 年里 300 倍的主频提升，从 2000 年到现在的这 19 年，CPU 的主频大概提高了 3 倍。 </p>
+<p>奔腾 4 的主频为什么没能超过 3.8GHz 的障碍呢？答案就是功耗问题。什么是功耗问题呢？</p>
+<p>(一个 3.8GHz 的奔腾 4 处理器，满载功率是 130 瓦。这个 130 瓦是什么概念呢？机场允许带上飞机的充电宝的容量上限是 100 瓦时。如果我们把这个 CPU 安在手机里面，不考虑屏幕内存之类的耗电，这个 CPU 满载运行 45 分钟，充电宝里面就没电了。而 iPhone X 使用 ARM 架构的 CPU，功率则只有 4.5 瓦左右。)</p>
+<p>我们的 CPU，一般都被叫作超大规模集成电路（Very-Large-Scale Integration，VLSI）。这些电路，实际上都是一个个晶体管组合而成的。CPU 在计算，其实就是让晶体管里面的“开关”不断地去“打开”和“关闭”，来组合完成各种运算和功能。</p>
+<p>想要计算的快，一方面，我们要在 CPU 里，同样的面积里面，多放一些晶体管，也就是增加密度；另一方面，我们要让晶体管“打开”和“关闭”得更快一点，也就是提升主频。而这两者，都会增加功耗，带来耗电和散热的问题。</p>
+<p>在 CPU 里面，能够放下的晶体管数量和晶体管的“开关”频率也都是有限的。一个CPU 的公路，可以用一个公式表示：</p>
+<center> 功耗 ~= 1/2 ×负载电容×电压的平方×开关频率×晶体管数量</center>
 
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">add_lib.o:     file format elf64-x86-64</span><br><span class="line">Disassembly of section .text:</span><br><span class="line">0000000000000000 &lt;add&gt;:</span><br><span class="line">   0:   55                      push   rbp</span><br><span class="line">   1:   48 89 e5                mov    rbp,rsp</span><br><span class="line">   4:   89 7d fc                mov    DWORD PTR [rbp-0x4],edi</span><br><span class="line">   7:   89 75 f8                mov    DWORD PTR [rbp-0x8],esi</span><br><span class="line">   a:   8b 55 fc                mov    edx,DWORD PTR [rbp-0x4]</span><br><span class="line">   d:   8b 45 f8                mov    eax,DWORD PTR [rbp-0x8]</span><br><span class="line">  10:   01 d0                   add    eax,edx</span><br><span class="line">  12:   5d                      pop    rbp</span><br><span class="line">  13:   c3                      ret    </span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">link_example.o:     file format elf64-x86-64</span><br><span class="line">Disassembly of section .text:</span><br><span class="line">0000000000000000 &lt;main&gt;:</span><br><span class="line">   0:   55                      push   rbp</span><br><span class="line">   1:   48 89 e5                mov    rbp,rsp</span><br><span class="line">   4:   48 83 ec 10             sub    rsp,0x10</span><br><span class="line">   8:   c7 45 fc 0a 00 00 00    mov    DWORD PTR [rbp-0x4],0xa</span><br><span class="line">   f:   c7 45 f8 05 00 00 00    mov    DWORD PTR [rbp-0x8],0x5</span><br><span class="line">  16:   8b 55 f8                mov    edx,DWORD PTR [rbp-0x8]</span><br><span class="line">  19:   8b 45 fc                mov    eax,DWORD PTR [rbp-0x4]</span><br><span class="line">  1c:   89 d6                   mov    esi,edx</span><br><span class="line">  1e:   89 c7                   mov    edi,eax</span><br><span class="line">  20:   b8 00 00 00 00          mov    eax,0x0</span><br><span class="line">  25:   e8 00 00 00 00          call   2a &lt;main+0x2a&gt;</span><br><span class="line">  2a:   89 45 f4                mov    DWORD PTR [rbp-0xc],eax</span><br><span class="line">  2d:   8b 45 f4                mov    eax,DWORD PTR [rbp-0xc]</span><br><span class="line">  30:   89 c6                   mov    esi,eax</span><br><span class="line">  32:   48 8d 3d 00 00 00 00    lea    rdi,[rip+0x0]        # 39 &lt;main+0x39&gt;</span><br><span class="line">  39:   b8 00 00 00 00          mov    eax,0x0</span><br><span class="line">  3e:   e8 00 00 00 00          call   43 &lt;main+0x43&gt;</span><br><span class="line">  43:   b8 00 00 00 00          mov    eax,0x0</span><br><span class="line">  48:   c9                      leave  </span><br><span class="line">  49:   c3                      ret    </span><br></pre></td></tr></table></figure>
-
-<p>既然代码已经被我们“编译”成了指令，我们不妨尝试运行一下 .&#x2F;link_example.o。不幸的是，文件没有执行权限，我们遇到一个 Permission denied 错误。即使通过 chmod 命令赋予 link_example.o 文件可执行的权限，运行.&#x2F;link_example.o 仍然只会得到一条 cannot execute binary file: Exec format error 的错误。</p>
-<p>我们再仔细看一下 objdump 出来的两个文件的代码，会发现两个程序的地址都是从 0 开始的。如果地址是一样的，程序如果需要通过 call 指令调用函数的话，它怎么知道应该跳转到哪一个文件里呢？</p>
-<p>这么说吧，无论是这里的运行报错，还是 objdump 出来的汇编代码里面的重复地址，都是因为 add_lib.o 以及 link_example.o 并不是一个<strong>可执行文件</strong>（Executable Program），而是<strong>目标文件（</strong>Object File）。只有通过链接器（Linker）把多个目标文件以及调用的各种函数库链接起来，才能得到一个可执行文件。</p>
-<p>我们通过 gcc 的 -o 参数，可以生成对应的可执行文件，对应执行之后，就可以得到这个简单的加法调用函数的结果。</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">$ gcc -o link-example add_lib.o link_example.o</span><br><span class="line">$ ./link_example</span><br><span class="line">c = 15</span><br></pre></td></tr></table></figure>
-
-<h2 id="“C-语言代码-汇编代码-机器码”-的过程"><a href="#“C-语言代码-汇编代码-机器码”-的过程" class="headerlink" title="“C 语言代码 - 汇编代码 - 机器码” 的过程"></a>“C 语言代码 - 汇编代码 - 机器码” 的过程</h2><p>实际上，“C 语言代码 - 汇编代码 - 机器码” 这个过程，在我们的计算机上进行的时候是由两部分组成的。</p>
-<ul>
-<li><p>第一部分： 由编译（Compile）、汇编（Assemble）以及链接（Link）三个阶段组成。之后生成一个可执行文件。</p>
-</li>
-<li><p>第二部分，我们通过装载器（Loader）把可执行文件装载（Load）到内存中。CPU 从内存中读取指令和数据，开始真正执行程序。</p>
-<img src="/img/computer_img/装载.webp" alt="装载" style="zoom:33%;" /></li>
-</ul>
-<h2 id="ELF-格式和链接：理解链接过程"><a href="#ELF-格式和链接：理解链接过程" class="headerlink" title="ELF 格式和链接：理解链接过程"></a>ELF 格式和链接：理解链接过程</h2><p>程序最终是通过装载器变成指令和数据的，所以其实我们生成的可执行代码也并不仅仅是一条条的指令。我们还是通过 objdump 指令，把可执行文件的内容拿出来看看。</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">link_example:     file format elf64-x86-64</span><br><span class="line">Disassembly of section .init:</span><br><span class="line">...</span><br><span class="line">Disassembly of section .plt:</span><br><span class="line">...</span><br><span class="line">Disassembly of section .plt.got:</span><br><span class="line">...</span><br><span class="line">Disassembly of section .text:</span><br><span class="line">...</span><br><span class="line"></span><br><span class="line"> 6b0:   55                      push   rbp</span><br><span class="line"> 6b1:   48 89 e5                mov    rbp,rsp</span><br><span class="line"> 6b4:   89 7d fc                mov    DWORD PTR [rbp-0x4],edi</span><br><span class="line"> 6b7:   89 75 f8                mov    DWORD PTR [rbp-0x8],esi</span><br><span class="line"> 6ba:   8b 55 fc                mov    edx,DWORD PTR [rbp-0x4]</span><br><span class="line"> 6bd:   8b 45 f8                mov    eax,DWORD PTR [rbp-0x8]</span><br><span class="line"> 6c0:   01 d0                   add    eax,edx</span><br><span class="line"> 6c2:   5d                      pop    rbp</span><br><span class="line"> 6c3:   c3                      ret    </span><br><span class="line">00000000000006c4 &lt;main&gt;:</span><br><span class="line"> 6c4:   55                      push   rbp</span><br><span class="line"> 6c5:   48 89 e5                mov    rbp,rsp</span><br><span class="line"> 6c8:   48 83 ec 10             sub    rsp,0x10</span><br><span class="line"> 6cc:   c7 45 fc 0a 00 00 00    mov    DWORD PTR [rbp-0x4],0xa</span><br><span class="line"> 6d3:   c7 45 f8 05 00 00 00    mov    DWORD PTR [rbp-0x8],0x5</span><br><span class="line"> 6da:   8b 55 f8                mov    edx,DWORD PTR [rbp-0x8]</span><br><span class="line"> 6dd:   8b 45 fc                mov    eax,DWORD PTR [rbp-0x4]</span><br><span class="line"> 6e0:   89 d6                   mov    esi,edx</span><br><span class="line"> 6e2:   89 c7                   mov    edi,eax</span><br><span class="line"> 6e4:   b8 00 00 00 00          mov    eax,0x0</span><br><span class="line"> 6e9:   e8 c2 ff ff ff          call   6b0 &lt;add&gt;</span><br><span class="line"> ------------------------------------------------</span><br><span class="line"> 6ee:   89 45 f4                mov    DWORD PTR [rbp-0xc],eax</span><br><span class="line"> 6f1:   8b 45 f4                mov    eax,DWORD PTR [rbp-0xc]</span><br><span class="line"> 6f4:   89 c6                   mov    esi,eax</span><br><span class="line"> 6f6:   48 8d 3d 97 00 00 00    lea    rdi,[rip+0x97]        # 794 &lt;_IO_stdin_used+0x4&gt;</span><br><span class="line"> 6fd:   b8 00 00 00 00          mov    eax,0x0</span><br><span class="line"> 702:   e8 59 fe ff ff          call   560 &lt;printf@plt&gt;</span><br><span class="line"> 707:   b8 00 00 00 00          mov    eax,0x0</span><br><span class="line"> 70c:   c9                      leave  </span><br><span class="line"> 70d:   c3                      ret    </span><br><span class="line"> 70e:   66 90                   xchg   ax,ax</span><br><span class="line">...</span><br><span class="line">Disassembly of section .fini:</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
-
-<p>你会发现，可执行代码 dump 出来内容，和之前的目标代码长得差不多，但是长了很多。因为在 Linux 下，可执行文件和目标文件所使用的都是一种叫<strong>ELF（Execuatable and Linkable File Format）</strong>的文件格式，中文名叫可执行与可链接文件格式，这里面不仅存放了编译成的汇编指令，还保留了很多别的数据。</p>
-<p>比如我们过去所有 objdump 出来的代码里，你都可以看到对应的函数名称，像 add、main 等等，乃至你自己定义的全局可以访问的变量名称，都存放在这个 ELF 格式文件里。这些名字和他们对应的地址，在ELF 文件里，存储在一个叫作符号表（Symbols Table）的位置里。符号表相当于一个地址簿，把它们关联了起来。</p>
-<p>只关注和我们的 add 以及 main 函数相关的部分。你会发现，这里面，main 函数里调用 add 的跳转地址，不再是下一条指令的地址，而是 add 函数的入口地址了，这就是ELF 格式和链接器的功劳。</p>
-<img src="/img/computer_img/ELF 格式.webp" alt="ELF 格式" style="zoom:33%;" />
-
-<p>ELF 文件格式把各种信息，分成一个一个的 Section 保存起来。ELF 有一个基本的文件头（File Header）,用来表示这个文件的基本属性，比如是否是可执行文件，对应的 CPU、操作系统等等。除了这些基本属性之外，大部分程序还有这么一些 Section：</p>
+<p>那么，为了要提升性能，我们需要不断地增加晶体管数量。同样的面积下，我们想要多放一点晶体管，就要把晶体管造得小一点。这个就是平时我们所说的提升“制程”。从 28nm 到 7nm，相当于晶体管本身变成了原来的 1&#x2F;4 大小。我们还要提升主频，让开关的频率变快。 但是，功耗增加太多，就会导致 CPU 散热跟不上，这时，我们就需要降低电压。这里有一点非常关键，在整个功耗的公式里面，功耗和电压的平方是成正比的。这意味着电压下降到原来的 1&#x2F;5，整个的功耗会变成原来的 1&#x2F;25 。</p>
+<h2 id="并行优化，理解阿姆达尔定律"><a href="#并行优化，理解阿姆达尔定律" class="headerlink" title="并行优化，理解阿姆达尔定律"></a>并行优化，理解阿姆达尔定律</h2><p>就是所谓的“吞吐率”变大。所以，不管你有没有需要，现在 CPU 的性能就是提升了 2 倍乃至 8 倍、16 倍。这也是一个最常见的提升性能的方式，<strong>通过并行提高性能。</strong></p>
+<p>通过并行提高性能来解决。如果想要使用这种思想，需要满足这样几个条件。</p>
 <ol>
-<li><p>text Section: 代码段或者指令段（Code Section）,用来保存程序的代码和指令；</p>
+<li>需要进行的计算，本身可以分解成几个可以并行的任务。好比上面的乘法和加法计算，几个人可以同时进行，不会影响最后的结果。</li>
+<li>需要能够分解好问题，并确保几个人的结果能够汇总到一起。</li>
+<li>在“汇总”这个阶段，是没有办法并行进行的，还是得顺序执行，一步一步来。</li>
+</ol>
+<p>这就引出了阿姆达尔定律（Amdahl’s Law）：</p>
+<p>这个定律说的就是，对于一个程序进行优化之后，处理器并行运算之后效率提升的情况。具体可以用这样一个公式来表示：</p>
+<center> **优化后的执行时间 = 受优化影响的执行时间 / 加速倍数 + 不受影响的执行时间** </center>
+
+<p>比如上面的各个向量的一小段的点积，需要 100ns，加法需要 20ns，总共需要 120ns。这里通过并行 4 个 CPU 有了 4 倍的加速度。那么最终优化后，就有了 100&#x2F;4+20&#x3D;45ns。即使我们增加更多的并行度来提供加速倍数，比如有 100 个 CPU，整个时间也需要 100&#x2F;100+20&#x3D;21ns。</p>
+<p><img src="https://static001.geekbang.org/resource/image/f1/e5/f1d05ec439e6377803df741bc07b09e5.jpeg?wh=3140*2039"></p>
+<p>T1就是不受影响的执行时间 ，T2就是可以优化影响的执行时间</p>
+<h2 id="延伸："><a href="#延伸：" class="headerlink" title="延伸："></a>延伸：</h2><p>在“摩尔定律”和“并行计算”之外，在整个计算机组成层面，还有这样几个原则性的性能提升方法。</p>
+<ol>
+<li><p>加速大概率事件。最典型的就是，过去几年流行的深度学习，整个计算过程中，99% 都是向量和矩阵计算，于是，工程师们通过用 GPU 替代 CPU，大幅度提升了深度学习的模型训练过程。本来一个 CPU 需要跑几小时甚至几天的程序，GPU 只需要几分钟就好了。Google 更是不满足于 GPU 的性能，进一步地推出了 TPU。</p>
 </li>
-<li><p>data Section ,也叫数据段（Data Section）,用来保存程序里设置好的初始化数据信息。</p>
+<li><p>通过流水线提高性能。现代的工厂里的生产线叫“流水线”。我们可以把装配 iPhone 这样的任务拆分成一个个细分的任务，让每个人都只需要处理一道工序，最大化整个工厂的生产效率。类似的，我们的 CPU 其实就是一个“运算工厂”。我们把 CPU 指令执行的过程进行拆分，细化运行，也是现代 CPU 在主频没有办法提升那么多的情况下，性能仍然可以得到提升的重要原因之一。</p>
 </li>
-<li><p>.rel.text.Section ,也叫重定位表。表里保留的是当前的文件里面，哪些跳转地址是我们不知道的。比如上面的 link_example.o 里面，我们在 main 函数里面调用了 add 和 printf 这两个函数，但是在链接发生之前，我们并不知道该跳转到哪里，这些信息就存在重定位表里；</p>
-</li>
-<li><p>最后是 .symtab Section ,也叫符号表。符号表保留了我们所说的当前文件里面定义的函数名称和对应地址的地址簿。</p>
+<li><p>通过预测提高性能。通过预先猜测下一步该干什么，而不是等上一步运行的结果，提前进行运算，也是让程序跑得更快一点的办法。典型的例子就是在一个循环访问数组的时候，凭经验，你也会猜到下一步我们会访问数组的下一项。所谓的“分支和冒险”、“局部性原理”这些 CPU 和存储系统设计方法，其实都是在利用我们对于未来的“预测”，提前进行相应的操作，来提升我们的程序性能。</p>
 </li>
 </ol>
-<h2 id="链接器工作原理"><a href="#链接器工作原理" class="headerlink" title="链接器工作原理"></a>链接器工作原理</h2><p>链接器会扫描所有输入的目标文件，然后把所有<strong>符号表</strong>里的信息收集起来，构成一个全局的符号表。然后再根据<strong>重定位表</strong>，把所有不确定要跳转地址的代码，根据符号表里的存储地址，进行一次修正。最后，把所有的目标文件的对应段进行一次合并，变成了最终的可执行代码。<em>这也是为什么，可执行文件里面的函数调用的地址是正确的。</em></p>
-<img src="/img/computer_img/ELF 链接过程.webp" alt="ELF 链接过程" style="zoom: 33%;" />
-
-<p><strong>最后</strong>，在链接器把程序变成可执行文件之后，要装载器去执行程序就容易多了。装载器不再需要考虑地址跳转的问题，只需要解析 ELF 文件，把对应的指令和数据，加载到内存里面供 CPU 执行就可以了。</p>
-<h2 id="总结延伸："><a href="#总结延伸：" class="headerlink" title="总结延伸："></a>总结延伸：</h2><p>什么同样一个程序，在 Linux 下可以执行而在 Windows 下不能执行了。其中一个非常重要的原因就是，两个操作系统下可执行文件的格式不一样。Linux 下的 ELF 文件格式，而 Windows 的可执行文件格式是一种叫作 PE（Portable Executable Format）的文件格式。Linux 下的装载器只能解析 ELF 格式而不能解析 PE 格式。</p>
-<p>如果我们有一个可以能够解析PE 格式的装载器，我们就有可能在 Linux 下运行 Windows 程序。</p>
-<p>对于 ELF 格式的文件，为了能够实现这样一个<em><strong>静态链接</strong></em>的机制，里面不只是简单罗列了程序所需要执行的指令，还会包括链接所需要的重定位表和符号表。</p>
+<p>比如：</p>
+<p>1.加速大概率事件<br>各种缓存(内存缓存、CDN缓存)<br>2.流水线<br>并发编程、异步编程<br>音视频播放器边播放边缓冲<br>3.预测<br>小说的下一页预加载<br>电商大促的CDN预热</p>
 ]]></content>
       <categories>
         <category>计算机组成原理</category>
       </categories>
       <tags>
-        <tag>程序</tag>
-        <tag>链接</tag>
+        <tag>性能与主频</tag>
       </tags>
   </entry>
   <entry>
@@ -390,6 +327,69 @@ SPEC 提供的 CPU 基准测试程序，就好像 CPU 届的“高考”，通�
         <tag>机器码</tag>
         <tag>stack overflow</tag>
         <tag>函数内联</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>ELF和静态链接</title>
+    <url>/posts/b778160a/</url>
+    <content><![CDATA[<h1 id="ELF和静态链接：为什么程序无法同时在Linux和Windows下运行？"><a href="#ELF和静态链接：为什么程序无法同时在Linux和Windows下运行？" class="headerlink" title="ELF和静态链接：为什么程序无法同时在Linux和Windows下运行？"></a>ELF和静态链接：为什么程序无法同时在Linux和Windows下运行？</h1><h2 id="编译、链接和装载：-拆解程序执行"><a href="#编译、链接和装载：-拆解程序执行" class="headerlink" title="编译、链接和装载： 拆解程序执行"></a>编译、链接和装载： 拆解程序执行</h2><p>之前，我们通过 gcc 生成的文件和 objdump 获取到的汇编指令都有些小小的问题，以add 函数示例，<span id="more"></span>拆分成两个文件 add_lib.c 和 link_example.c 。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">// add_lib.c</span><br><span class="line">int add(int a, int b)</span><br><span class="line">&#123;</span><br><span class="line">    return a+b;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">// link_example.c</span><br><span class="line"></span><br><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">int main()</span><br><span class="line">&#123;</span><br><span class="line">    int a = 10;</span><br><span class="line">    int b = 5;</span><br><span class="line">    int c = add(a, b);</span><br><span class="line">    printf(&quot;c = %d\n&quot;, c);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>我们通过 gcc 来编译这两个文件，然后通过 objdump 命令看看它们的汇编代码。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">$ gcc -g -c add_lib.c link_example.c</span><br><span class="line">$ objdump -d -M intel -S add_lib.o</span><br><span class="line">$ objdump -d -M intel -S link_example.o</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">add_lib.o:     file format elf64-x86-64</span><br><span class="line">Disassembly of section .text:</span><br><span class="line">0000000000000000 &lt;add&gt;:</span><br><span class="line">   0:   55                      push   rbp</span><br><span class="line">   1:   48 89 e5                mov    rbp,rsp</span><br><span class="line">   4:   89 7d fc                mov    DWORD PTR [rbp-0x4],edi</span><br><span class="line">   7:   89 75 f8                mov    DWORD PTR [rbp-0x8],esi</span><br><span class="line">   a:   8b 55 fc                mov    edx,DWORD PTR [rbp-0x4]</span><br><span class="line">   d:   8b 45 f8                mov    eax,DWORD PTR [rbp-0x8]</span><br><span class="line">  10:   01 d0                   add    eax,edx</span><br><span class="line">  12:   5d                      pop    rbp</span><br><span class="line">  13:   c3                      ret    </span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">link_example.o:     file format elf64-x86-64</span><br><span class="line">Disassembly of section .text:</span><br><span class="line">0000000000000000 &lt;main&gt;:</span><br><span class="line">   0:   55                      push   rbp</span><br><span class="line">   1:   48 89 e5                mov    rbp,rsp</span><br><span class="line">   4:   48 83 ec 10             sub    rsp,0x10</span><br><span class="line">   8:   c7 45 fc 0a 00 00 00    mov    DWORD PTR [rbp-0x4],0xa</span><br><span class="line">   f:   c7 45 f8 05 00 00 00    mov    DWORD PTR [rbp-0x8],0x5</span><br><span class="line">  16:   8b 55 f8                mov    edx,DWORD PTR [rbp-0x8]</span><br><span class="line">  19:   8b 45 fc                mov    eax,DWORD PTR [rbp-0x4]</span><br><span class="line">  1c:   89 d6                   mov    esi,edx</span><br><span class="line">  1e:   89 c7                   mov    edi,eax</span><br><span class="line">  20:   b8 00 00 00 00          mov    eax,0x0</span><br><span class="line">  25:   e8 00 00 00 00          call   2a &lt;main+0x2a&gt;</span><br><span class="line">  2a:   89 45 f4                mov    DWORD PTR [rbp-0xc],eax</span><br><span class="line">  2d:   8b 45 f4                mov    eax,DWORD PTR [rbp-0xc]</span><br><span class="line">  30:   89 c6                   mov    esi,eax</span><br><span class="line">  32:   48 8d 3d 00 00 00 00    lea    rdi,[rip+0x0]        # 39 &lt;main+0x39&gt;</span><br><span class="line">  39:   b8 00 00 00 00          mov    eax,0x0</span><br><span class="line">  3e:   e8 00 00 00 00          call   43 &lt;main+0x43&gt;</span><br><span class="line">  43:   b8 00 00 00 00          mov    eax,0x0</span><br><span class="line">  48:   c9                      leave  </span><br><span class="line">  49:   c3                      ret    </span><br></pre></td></tr></table></figure>
+
+<p>既然代码已经被我们“编译”成了指令，我们不妨尝试运行一下 .&#x2F;link_example.o。不幸的是，文件没有执行权限，我们遇到一个 Permission denied 错误。即使通过 chmod 命令赋予 link_example.o 文件可执行的权限，运行.&#x2F;link_example.o 仍然只会得到一条 cannot execute binary file: Exec format error 的错误。</p>
+<p>我们再仔细看一下 objdump 出来的两个文件的代码，会发现两个程序的地址都是从 0 开始的。如果地址是一样的，程序如果需要通过 call 指令调用函数的话，它怎么知道应该跳转到哪一个文件里呢？</p>
+<p>这么说吧，无论是这里的运行报错，还是 objdump 出来的汇编代码里面的重复地址，都是因为 add_lib.o 以及 link_example.o 并不是一个<strong>可执行文件</strong>（Executable Program），而是<strong>目标文件（</strong>Object File）。只有通过链接器（Linker）把多个目标文件以及调用的各种函数库链接起来，才能得到一个可执行文件。</p>
+<p>我们通过 gcc 的 -o 参数，可以生成对应的可执行文件，对应执行之后，就可以得到这个简单的加法调用函数的结果。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">$ gcc -o link-example add_lib.o link_example.o</span><br><span class="line">$ ./link_example</span><br><span class="line">c = 15</span><br></pre></td></tr></table></figure>
+
+<h2 id="“C-语言代码-汇编代码-机器码”-的过程"><a href="#“C-语言代码-汇编代码-机器码”-的过程" class="headerlink" title="“C 语言代码 - 汇编代码 - 机器码” 的过程"></a>“C 语言代码 - 汇编代码 - 机器码” 的过程</h2><p>实际上，“C 语言代码 - 汇编代码 - 机器码” 这个过程，在我们的计算机上进行的时候是由两部分组成的。</p>
+<ul>
+<li><p>第一部分： 由编译（Compile）、汇编（Assemble）以及链接（Link）三个阶段组成。之后生成一个可执行文件。</p>
+</li>
+<li><p>第二部分，我们通过装载器（Loader）把可执行文件装载（Load）到内存中。CPU 从内存中读取指令和数据，开始真正执行程序。</p>
+<img src="/img/computer_img/装载.webp" alt="装载" style="zoom:33%;" /></li>
+</ul>
+<h2 id="ELF-格式和链接：理解链接过程"><a href="#ELF-格式和链接：理解链接过程" class="headerlink" title="ELF 格式和链接：理解链接过程"></a>ELF 格式和链接：理解链接过程</h2><p>程序最终是通过装载器变成指令和数据的，所以其实我们生成的可执行代码也并不仅仅是一条条的指令。我们还是通过 objdump 指令，把可执行文件的内容拿出来看看。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">link_example:     file format elf64-x86-64</span><br><span class="line">Disassembly of section .init:</span><br><span class="line">...</span><br><span class="line">Disassembly of section .plt:</span><br><span class="line">...</span><br><span class="line">Disassembly of section .plt.got:</span><br><span class="line">...</span><br><span class="line">Disassembly of section .text:</span><br><span class="line">...</span><br><span class="line"></span><br><span class="line"> 6b0:   55                      push   rbp</span><br><span class="line"> 6b1:   48 89 e5                mov    rbp,rsp</span><br><span class="line"> 6b4:   89 7d fc                mov    DWORD PTR [rbp-0x4],edi</span><br><span class="line"> 6b7:   89 75 f8                mov    DWORD PTR [rbp-0x8],esi</span><br><span class="line"> 6ba:   8b 55 fc                mov    edx,DWORD PTR [rbp-0x4]</span><br><span class="line"> 6bd:   8b 45 f8                mov    eax,DWORD PTR [rbp-0x8]</span><br><span class="line"> 6c0:   01 d0                   add    eax,edx</span><br><span class="line"> 6c2:   5d                      pop    rbp</span><br><span class="line"> 6c3:   c3                      ret    </span><br><span class="line">00000000000006c4 &lt;main&gt;:</span><br><span class="line"> 6c4:   55                      push   rbp</span><br><span class="line"> 6c5:   48 89 e5                mov    rbp,rsp</span><br><span class="line"> 6c8:   48 83 ec 10             sub    rsp,0x10</span><br><span class="line"> 6cc:   c7 45 fc 0a 00 00 00    mov    DWORD PTR [rbp-0x4],0xa</span><br><span class="line"> 6d3:   c7 45 f8 05 00 00 00    mov    DWORD PTR [rbp-0x8],0x5</span><br><span class="line"> 6da:   8b 55 f8                mov    edx,DWORD PTR [rbp-0x8]</span><br><span class="line"> 6dd:   8b 45 fc                mov    eax,DWORD PTR [rbp-0x4]</span><br><span class="line"> 6e0:   89 d6                   mov    esi,edx</span><br><span class="line"> 6e2:   89 c7                   mov    edi,eax</span><br><span class="line"> 6e4:   b8 00 00 00 00          mov    eax,0x0</span><br><span class="line"> 6e9:   e8 c2 ff ff ff          call   6b0 &lt;add&gt;</span><br><span class="line"> ------------------------------------------------</span><br><span class="line"> 6ee:   89 45 f4                mov    DWORD PTR [rbp-0xc],eax</span><br><span class="line"> 6f1:   8b 45 f4                mov    eax,DWORD PTR [rbp-0xc]</span><br><span class="line"> 6f4:   89 c6                   mov    esi,eax</span><br><span class="line"> 6f6:   48 8d 3d 97 00 00 00    lea    rdi,[rip+0x97]        # 794 &lt;_IO_stdin_used+0x4&gt;</span><br><span class="line"> 6fd:   b8 00 00 00 00          mov    eax,0x0</span><br><span class="line"> 702:   e8 59 fe ff ff          call   560 &lt;printf@plt&gt;</span><br><span class="line"> 707:   b8 00 00 00 00          mov    eax,0x0</span><br><span class="line"> 70c:   c9                      leave  </span><br><span class="line"> 70d:   c3                      ret    </span><br><span class="line"> 70e:   66 90                   xchg   ax,ax</span><br><span class="line">...</span><br><span class="line">Disassembly of section .fini:</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+
+<p>你会发现，可执行代码 dump 出来内容，和之前的目标代码长得差不多，但是长了很多。因为在 Linux 下，可执行文件和目标文件所使用的都是一种叫<strong>ELF（Execuatable and Linkable File Format）</strong>的文件格式，中文名叫可执行与可链接文件格式，这里面不仅存放了编译成的汇编指令，还保留了很多别的数据。</p>
+<p>比如我们过去所有 objdump 出来的代码里，你都可以看到对应的函数名称，像 add、main 等等，乃至你自己定义的全局可以访问的变量名称，都存放在这个 ELF 格式文件里。这些名字和他们对应的地址，在ELF 文件里，存储在一个叫作符号表（Symbols Table）的位置里。符号表相当于一个地址簿，把它们关联了起来。</p>
+<p>只关注和我们的 add 以及 main 函数相关的部分。你会发现，这里面，main 函数里调用 add 的跳转地址，不再是下一条指令的地址，而是 add 函数的入口地址了，这就是ELF 格式和链接器的功劳。</p>
+<img src="/img/computer_img/ELF 格式.webp" alt="ELF 格式" style="zoom:33%;" />
+
+<p>ELF 文件格式把各种信息，分成一个一个的 Section 保存起来。ELF 有一个基本的文件头（File Header）,用来表示这个文件的基本属性，比如是否是可执行文件，对应的 CPU、操作系统等等。除了这些基本属性之外，大部分程序还有这么一些 Section：</p>
+<ol>
+<li><p>text Section: 代码段或者指令段（Code Section）,用来保存程序的代码和指令；</p>
+</li>
+<li><p>data Section ,也叫数据段（Data Section）,用来保存程序里设置好的初始化数据信息。</p>
+</li>
+<li><p>.rel.text.Section ,也叫重定位表。表里保留的是当前的文件里面，哪些跳转地址是我们不知道的。比如上面的 link_example.o 里面，我们在 main 函数里面调用了 add 和 printf 这两个函数，但是在链接发生之前，我们并不知道该跳转到哪里，这些信息就存在重定位表里；</p>
+</li>
+<li><p>最后是 .symtab Section ,也叫符号表。符号表保留了我们所说的当前文件里面定义的函数名称和对应地址的地址簿。</p>
+</li>
+</ol>
+<h2 id="链接器工作原理"><a href="#链接器工作原理" class="headerlink" title="链接器工作原理"></a>链接器工作原理</h2><p>链接器会扫描所有输入的目标文件，然后把所有<strong>符号表</strong>里的信息收集起来，构成一个全局的符号表。然后再根据<strong>重定位表</strong>，把所有不确定要跳转地址的代码，根据符号表里的存储地址，进行一次修正。最后，把所有的目标文件的对应段进行一次合并，变成了最终的可执行代码。<em>这也是为什么，可执行文件里面的函数调用的地址是正确的。</em></p>
+<img src="/img/computer_img/ELF 链接过程.webp" alt="ELF 链接过程" style="zoom: 33%;" />
+
+<p><strong>最后</strong>，在链接器把程序变成可执行文件之后，要装载器去执行程序就容易多了。装载器不再需要考虑地址跳转的问题，只需要解析 ELF 文件，把对应的指令和数据，加载到内存里面供 CPU 执行就可以了。</p>
+<h2 id="总结延伸："><a href="#总结延伸：" class="headerlink" title="总结延伸："></a>总结延伸：</h2><p>什么同样一个程序，在 Linux 下可以执行而在 Windows 下不能执行了。其中一个非常重要的原因就是，两个操作系统下可执行文件的格式不一样。Linux 下的 ELF 文件格式，而 Windows 的可执行文件格式是一种叫作 PE（Portable Executable Format）的文件格式。Linux 下的装载器只能解析 ELF 格式而不能解析 PE 格式。</p>
+<p>如果我们有一个可以能够解析PE 格式的装载器，我们就有可能在 Linux 下运行 Windows 程序。</p>
+<p>对于 ELF 格式的文件，为了能够实现这样一个<em><strong>静态链接</strong></em>的机制，里面不只是简单罗列了程序所需要执行的指令，还会包括链接所需要的重定位表和符号表。</p>
+]]></content>
+      <categories>
+        <category>计算机组成原理</category>
+      </categories>
+      <tags>
+        <tag>程序</tag>
+        <tag>链接</tag>
       </tags>
   </entry>
   <entry>
@@ -518,65 +518,6 @@ SPEC 提供的 CPU 基准测试程序，就好像 CPU 届的“高考”，通�
       </tags>
   </entry>
   <entry>
-    <title>机械硬盘</title>
-    <url>/posts/96e2fa17/</url>
-    <content><![CDATA[<h1 id="机械硬盘：Google早期用过的“黑科技”"><a href="#机械硬盘：Google早期用过的“黑科技”" class="headerlink" title="机械硬盘：Google早期用过的“黑科技”"></a>机械硬盘：Google早期用过的“黑科技”</h1><h2 id="拆解机械硬盘"><a href="#拆解机械硬盘" class="headerlink" title="拆解机械硬盘"></a>拆解机械硬盘</h2><p>一块机械硬盘是由盘面、磁头和悬臂三个部件组成的。下面我们一一来看每一个部件<span id="more"></span>。</p>
-<img src="/img/computer_img/机械硬盘构造.webp" alt="机械硬盘构造" style="zoom:50%;" />
-
-<ul>
-<li>首先，自然是盘面（Disk Platter）。我们平时买硬盘的时候经常会听到一个指标，叫作这个硬盘的转速。我们的硬盘有 5400 转的、7200 转的，乃至 10000 转的。这个多少多少转，指的就是盘面中间电机控制的转轴的旋转速度，英文单位叫 RPM，也就是每分钟的旋转圈数（Rotations Per Minute）。所谓 7200 转，其实更准确地说是 7200RPM，指的就是一旦电脑开机供电之后，我们的硬盘就可以一直做到每分钟转上 7200 圈。如果折算到每一秒钟，就是 120 圈。</li>
-<li>我们来看磁头（Drive Head）。我们的数据并不能直接从盘面传输到总线上，而是通过磁头，从盘面上读取到，然后再通过电路信号传输给控制电路、接口，再到总线上的。         通常，我们的一个盘面上会有两个磁头，分别在盘面的正反面。盘面在正反两面都有对应的磁性涂层来存储数据，而且一块硬盘也不是只有一个盘面，而是上下堆叠了很多个盘面，各个盘面之间是平行的。每个盘面的正反两面都有对应的磁头。</li>
-<li>最后我们来看悬臂（Actutor Arm）。悬臂链接在磁头上，并且在一定范围内会去把磁头定位到盘面的某个特定的磁道（Track）上。</li>
-</ul>
-<p>读取数据，分为两个步骤：</p>
-<ol>
-<li>就是把盘面旋转到某一个位置。在这个位置上，我们的悬臂可以定位到整个盘面的某一个子区间。这个子区间的形状有点儿像一块披萨饼，我们一般把这个区间叫作几何扇区（Geometrical Sector），意思是，在“几何位置上”，所有这些扇区都可以被悬臂访问到。</li>
-<li>就是把我们的悬臂移动到特定磁道的特定扇区，也就在这个“几何扇区”里面，找到我们实际的扇区。找到之后，我们的磁头会落下，就可以读取到正对着扇区的数据。</li>
-</ol>
-<img src="/img/computer_img/数据扇区.webp" alt="数据扇区" style="zoom:50%;" />
-
-
-
-<p>所以，我们进行一次磁盘上的随机访问，需要的时间由两个部分组成。</p>
-<ol>
-<li><p>第一个部分，叫作平均延时（Average Latency）。这个时间，其实就是把我们的盘面旋转，把几何扇区对准悬臂位置的时间。这个时间很容易计算，它其实就和我们机械硬盘的转速相关。随机情况下，平均找到一个几何扇区，我们需要旋转半圈盘面。上面 7200 转的硬盘，那么一秒里面，就可以旋转 240 个半圈。那么，这个平均延时就是 </p>
-<p>​                    1s &#x2F; 240 &#x3D; 4.17ms</p>
-</li>
-<li><p>第二个部分，叫作平均寻道时间（Average Seek Time），也就是在盘面选转之后，我们的悬臂定位到扇区的的时间。我们现在用的 HDD 硬盘的平均寻道时间一般在 4-10ms。</p>
-</li>
-</ol>
-<p>这样，我们就能够算出来，如果随机在整个硬盘上找一个数据，需要 8-14 ms。我们的硬盘是机械结构的，只有一个电机转轴，也只有一个悬臂，所以我们没有办法并行地去定位或者读取数据。那一块 7200 转的硬盘，我们一秒钟随机的 IO 访问次数，也就是 ：</p>
-<p>​                    1s &#x2F; 8 ms &#x3D; 125 IOPS 或者 1s &#x2F; 14ms &#x3D; 70 IOPS</p>
-<blockquote>
-<p>现在，你明白我们上一讲所说的，HDD 硬盘的 IOPS 每秒 100 次左右是怎么来的吧？好了，现在你再思考一个问题。如果我们不是去进行随机的数据访问，而是进行顺序的数据读写，我们应该怎么最大化读取效率呢？</p>
-<p>我们可以选择把顺序存放的数据，尽可能地存放在同一个柱面上。这样，我们只需要旋转一次盘面，进行一次寻道，就可以去写入或者读取，同一个垂直空间上的多个盘面的数据。<strong>如果一个柱面上的数据不够，我们也不要去动悬臂，而是通过电机转动盘面</strong>，这样就可以顺序读完一个磁道上的所有数据。   所以，其实对于 HDD 硬盘的顺序数据读写，吞吐率还是很不错的，可以达到 200MB&#x2F;s 左右。</p>
-</blockquote>
-<h2 id="Partial-Stroking：根据场景提升性能"><a href="#Partial-Stroking：根据场景提升性能" class="headerlink" title="Partial Stroking：根据场景提升性能"></a>Partial Stroking：根据场景提升性能</h2><p>只有 100 的 IOPS，其实很难满足现在互联网海量高并发的请求。所以，今天的数据库，都会把数据存储在 SSD 硬盘上。不过，如果我们把时钟倒播 20 年，那个时候，我们可没有现在这么便宜的 SSD 硬盘。数据库里面的数据，只能存放在 HDD 硬盘上。</p>
-<p>今天，即便是数据中心用的 HDD 硬盘，一般也是 7200 转的，因为如果要更快的随机访问速度，我们会选择用 SSD 硬盘。但是在当时，SSD 硬盘价格非常昂贵，还没有能够商业化。硬盘厂商们在不断地研发转得更快的硬盘。在数据中心里，往往我们会用上 10000 转，乃至 15000 转的硬盘。甚至直到 2010 年，SSD 硬盘已经开始逐步进入市场了，西数还在尝试研发 20000 转的硬盘。转速更高、寻道时间更短的机械硬盘，才能满足实际的数据库需求。</p>
-<p>不过，10000 转，乃至 15000 转的硬盘也更昂贵。如果你想要节约成本，提高性价比，那就得想点别的办法。你应该听说过，<em>Google 早年用家用 PC 乃至二手的硬件，通过软件层面的设计来解决可靠性和性能的问题。</em>那么，我们是不是也有什么办法，能提高机械硬盘的 IOPS 呢？</p>
-<p>还真的有。这个方法，就叫作 <strong>Partial Stroking 或者 Short Stroking。</strong>我没有看到过有中文资料给这个方法命名。在这里，我就暂时把它翻译成“缩短行程”技术。</p>
-<p>其实这个方法的思路很容易理解，我一说你就明白了。既然我们访问一次数据的时间，是“平均延时 + 寻道时间”，那么只要能缩短这两个之一，不就可以提升 IOPS 了吗？</p>
-<p>一般情况下，硬盘的寻道时间都比平均延时要长。那么我们自然就可以想一下，有什么办法可以缩短平均的寻道时间。最极端的办法就是我们不需要寻道，也就是说，我们把所有数据都放在一个磁道上。比如，我们始终把磁头放在最外道的磁道上。这样，我们的寻道时间就基本为 0，访问时间就只有平均延时了。那样，我们的 IOPS，就变成了</p>
-<p>​                                        1s &#x2F; 4ms &#x3D; 250 IOPS</p>
-<p>不过呢，只用一个磁道，我们能存的数据就比较有限了。这个时候，可能我们还不如把这些数据直接都放到内存里面呢。所以，实践当中，我们可以只用 1&#x2F;2 或者 1&#x2F;4 的磁道，也就是最外面 1&#x2F;4 或者 1&#x2F;2 的磁道。这样，我们硬盘可以使用的容量可能变成了 1&#x2F;2 或者 1&#x2F;4。但是呢，我们的寻道时间，也变成了 1&#x2F;4 或者 1&#x2F;2，因为悬臂需要移动的“行程”也变成了原来的 1&#x2F;2 或者 1&#x2F;4，我们的 IOPS 就能够大幅度提升了。</p>
-<p>比如说，我们一块 7200 转的硬盘，正常情况下，平均延时是 4.17ms，而寻道时间是 9ms。那么，它原本的 IOPS 就是</p>
-<p>​                        1s &#x2F; (4.17ms + 9ms) &#x3D; 75.9 IOPS</p>
-<p>如果我们只用其中 1&#x2F;4 的磁道，那么，它的 IOPS 就变成了</p>
-<p>​                        1s &#x2F; (4.17ms + 9ms&#x2F;4) &#x3D; 155.8 IOPS</p>
-<p>你看这个结果，IOPS 提升了一倍，和一块 15000 转的硬盘的性能差不多了。不过，这个情况下，我们的硬盘能用的空间也只有原来的 1&#x2F;4 了。</p>
-<p>不过，要知道在当时，同样容量的 15000 转的硬盘的价格可不止是 7200 转硬盘的 4 倍啊。所以，这样通过软件去格式化硬盘，只保留部分磁道让系统可用的情况，可以大大提升硬件的性价比 。</p>
-<h2 id="总结延伸"><a href="#总结延伸" class="headerlink" title="总结延伸"></a>总结延伸</h2><p>机械硬盘的硬件，主要由盘面、磁头和悬臂三部分组成。我们的数据在盘面上的位置，可以通过磁道、扇区和柱面来定位。实际的一次对于硬盘的访问，需要把盘面旋转到某一个“几何扇区”，对准悬臂的位置。然后，悬臂通过寻道，把磁头放到我们实际要读取的扇区上。</p>
-<p>受制于机械硬盘的结构，我们对于随机数据的访问速度，就要包含旋转盘面的平均延时和移动悬臂的寻道时间。通过这两个时间，我们能计算出机械硬盘的 IOPS。</p>
-<p>7200 转机械硬盘的 IOPS，只能做到 100 左右。在互联网时代的早期，我们也没有 SSD 硬盘可以用，所以工程师们就想出了 Partial Stroking 这个浪费存储空间，但是可以缩短寻道时间来提升硬盘的 IOPS 的解决方案。这个解决方案，也是一个典型的、在深入理解了硬件原理之后的软件优化方案。</p>
-]]></content>
-      <categories>
-        <category>计算机组成原理</category>
-      </categories>
-      <tags>
-        <tag>存储器</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>存储器层次结构</title>
     <url>/posts/8e9c1609/</url>
     <content><![CDATA[<h1 id="存储器层次结构全景：数据存储的大金字塔长什么样？"><a href="#存储器层次结构全景：数据存储的大金字塔长什么样？" class="headerlink" title="存储器层次结构全景：数据存储的大金字塔长什么样？"></a>存储器层次结构全景：数据存储的大金字塔长什么样？</h1><h2 id="存储器的层次结构"><a href="#存储器的层次结构" class="headerlink" title="存储器的层次结构"></a>存储器的层次结构</h2><p>在有计算机之前，我们通常把信息和数据存储在书、文件这样的物理介质里面<span id="more"></span>。有了计算机之后，我们通常把数据存储在计算机的存储器里面。而存储器系统是一个通过各种不同的方法和设备，一层一层组合起来的系统。</p>
@@ -641,6 +582,65 @@ SPEC 提供的 CPU 基准测试程序，就好像 CPU 届的“高考”，通�
       <tags>
         <tag>寄存器</tag>
         <tag>cache</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>机械硬盘</title>
+    <url>/posts/96e2fa17/</url>
+    <content><![CDATA[<h1 id="机械硬盘：Google早期用过的“黑科技”"><a href="#机械硬盘：Google早期用过的“黑科技”" class="headerlink" title="机械硬盘：Google早期用过的“黑科技”"></a>机械硬盘：Google早期用过的“黑科技”</h1><h2 id="拆解机械硬盘"><a href="#拆解机械硬盘" class="headerlink" title="拆解机械硬盘"></a>拆解机械硬盘</h2><p>一块机械硬盘是由盘面、磁头和悬臂三个部件组成的。下面我们一一来看每一个部件<span id="more"></span>。</p>
+<img src="/img/computer_img/机械硬盘构造.webp" alt="机械硬盘构造" style="zoom:50%;" />
+
+<ul>
+<li>首先，自然是盘面（Disk Platter）。我们平时买硬盘的时候经常会听到一个指标，叫作这个硬盘的转速。我们的硬盘有 5400 转的、7200 转的，乃至 10000 转的。这个多少多少转，指的就是盘面中间电机控制的转轴的旋转速度，英文单位叫 RPM，也就是每分钟的旋转圈数（Rotations Per Minute）。所谓 7200 转，其实更准确地说是 7200RPM，指的就是一旦电脑开机供电之后，我们的硬盘就可以一直做到每分钟转上 7200 圈。如果折算到每一秒钟，就是 120 圈。</li>
+<li>我们来看磁头（Drive Head）。我们的数据并不能直接从盘面传输到总线上，而是通过磁头，从盘面上读取到，然后再通过电路信号传输给控制电路、接口，再到总线上的。         通常，我们的一个盘面上会有两个磁头，分别在盘面的正反面。盘面在正反两面都有对应的磁性涂层来存储数据，而且一块硬盘也不是只有一个盘面，而是上下堆叠了很多个盘面，各个盘面之间是平行的。每个盘面的正反两面都有对应的磁头。</li>
+<li>最后我们来看悬臂（Actutor Arm）。悬臂链接在磁头上，并且在一定范围内会去把磁头定位到盘面的某个特定的磁道（Track）上。</li>
+</ul>
+<p>读取数据，分为两个步骤：</p>
+<ol>
+<li>就是把盘面旋转到某一个位置。在这个位置上，我们的悬臂可以定位到整个盘面的某一个子区间。这个子区间的形状有点儿像一块披萨饼，我们一般把这个区间叫作几何扇区（Geometrical Sector），意思是，在“几何位置上”，所有这些扇区都可以被悬臂访问到。</li>
+<li>就是把我们的悬臂移动到特定磁道的特定扇区，也就在这个“几何扇区”里面，找到我们实际的扇区。找到之后，我们的磁头会落下，就可以读取到正对着扇区的数据。</li>
+</ol>
+<img src="/img/computer_img/数据扇区.webp" alt="数据扇区" style="zoom:50%;" />
+
+
+
+<p>所以，我们进行一次磁盘上的随机访问，需要的时间由两个部分组成。</p>
+<ol>
+<li><p>第一个部分，叫作平均延时（Average Latency）。这个时间，其实就是把我们的盘面旋转，把几何扇区对准悬臂位置的时间。这个时间很容易计算，它其实就和我们机械硬盘的转速相关。随机情况下，平均找到一个几何扇区，我们需要旋转半圈盘面。上面 7200 转的硬盘，那么一秒里面，就可以旋转 240 个半圈。那么，这个平均延时就是 </p>
+<p>​                    1s &#x2F; 240 &#x3D; 4.17ms</p>
+</li>
+<li><p>第二个部分，叫作平均寻道时间（Average Seek Time），也就是在盘面选转之后，我们的悬臂定位到扇区的的时间。我们现在用的 HDD 硬盘的平均寻道时间一般在 4-10ms。</p>
+</li>
+</ol>
+<p>这样，我们就能够算出来，如果随机在整个硬盘上找一个数据，需要 8-14 ms。我们的硬盘是机械结构的，只有一个电机转轴，也只有一个悬臂，所以我们没有办法并行地去定位或者读取数据。那一块 7200 转的硬盘，我们一秒钟随机的 IO 访问次数，也就是 ：</p>
+<p>​                    1s &#x2F; 8 ms &#x3D; 125 IOPS 或者 1s &#x2F; 14ms &#x3D; 70 IOPS</p>
+<blockquote>
+<p>现在，你明白我们上一讲所说的，HDD 硬盘的 IOPS 每秒 100 次左右是怎么来的吧？好了，现在你再思考一个问题。如果我们不是去进行随机的数据访问，而是进行顺序的数据读写，我们应该怎么最大化读取效率呢？</p>
+<p>我们可以选择把顺序存放的数据，尽可能地存放在同一个柱面上。这样，我们只需要旋转一次盘面，进行一次寻道，就可以去写入或者读取，同一个垂直空间上的多个盘面的数据。<strong>如果一个柱面上的数据不够，我们也不要去动悬臂，而是通过电机转动盘面</strong>，这样就可以顺序读完一个磁道上的所有数据。   所以，其实对于 HDD 硬盘的顺序数据读写，吞吐率还是很不错的，可以达到 200MB&#x2F;s 左右。</p>
+</blockquote>
+<h2 id="Partial-Stroking：根据场景提升性能"><a href="#Partial-Stroking：根据场景提升性能" class="headerlink" title="Partial Stroking：根据场景提升性能"></a>Partial Stroking：根据场景提升性能</h2><p>只有 100 的 IOPS，其实很难满足现在互联网海量高并发的请求。所以，今天的数据库，都会把数据存储在 SSD 硬盘上。不过，如果我们把时钟倒播 20 年，那个时候，我们可没有现在这么便宜的 SSD 硬盘。数据库里面的数据，只能存放在 HDD 硬盘上。</p>
+<p>今天，即便是数据中心用的 HDD 硬盘，一般也是 7200 转的，因为如果要更快的随机访问速度，我们会选择用 SSD 硬盘。但是在当时，SSD 硬盘价格非常昂贵，还没有能够商业化。硬盘厂商们在不断地研发转得更快的硬盘。在数据中心里，往往我们会用上 10000 转，乃至 15000 转的硬盘。甚至直到 2010 年，SSD 硬盘已经开始逐步进入市场了，西数还在尝试研发 20000 转的硬盘。转速更高、寻道时间更短的机械硬盘，才能满足实际的数据库需求。</p>
+<p>不过，10000 转，乃至 15000 转的硬盘也更昂贵。如果你想要节约成本，提高性价比，那就得想点别的办法。你应该听说过，<em>Google 早年用家用 PC 乃至二手的硬件，通过软件层面的设计来解决可靠性和性能的问题。</em>那么，我们是不是也有什么办法，能提高机械硬盘的 IOPS 呢？</p>
+<p>还真的有。这个方法，就叫作 <strong>Partial Stroking 或者 Short Stroking。</strong>我没有看到过有中文资料给这个方法命名。在这里，我就暂时把它翻译成“缩短行程”技术。</p>
+<p>其实这个方法的思路很容易理解，我一说你就明白了。既然我们访问一次数据的时间，是“平均延时 + 寻道时间”，那么只要能缩短这两个之一，不就可以提升 IOPS 了吗？</p>
+<p>一般情况下，硬盘的寻道时间都比平均延时要长。那么我们自然就可以想一下，有什么办法可以缩短平均的寻道时间。最极端的办法就是我们不需要寻道，也就是说，我们把所有数据都放在一个磁道上。比如，我们始终把磁头放在最外道的磁道上。这样，我们的寻道时间就基本为 0，访问时间就只有平均延时了。那样，我们的 IOPS，就变成了</p>
+<p>​                                        1s &#x2F; 4ms &#x3D; 250 IOPS</p>
+<p>不过呢，只用一个磁道，我们能存的数据就比较有限了。这个时候，可能我们还不如把这些数据直接都放到内存里面呢。所以，实践当中，我们可以只用 1&#x2F;2 或者 1&#x2F;4 的磁道，也就是最外面 1&#x2F;4 或者 1&#x2F;2 的磁道。这样，我们硬盘可以使用的容量可能变成了 1&#x2F;2 或者 1&#x2F;4。但是呢，我们的寻道时间，也变成了 1&#x2F;4 或者 1&#x2F;2，因为悬臂需要移动的“行程”也变成了原来的 1&#x2F;2 或者 1&#x2F;4，我们的 IOPS 就能够大幅度提升了。</p>
+<p>比如说，我们一块 7200 转的硬盘，正常情况下，平均延时是 4.17ms，而寻道时间是 9ms。那么，它原本的 IOPS 就是</p>
+<p>​                        1s &#x2F; (4.17ms + 9ms) &#x3D; 75.9 IOPS</p>
+<p>如果我们只用其中 1&#x2F;4 的磁道，那么，它的 IOPS 就变成了</p>
+<p>​                        1s &#x2F; (4.17ms + 9ms&#x2F;4) &#x3D; 155.8 IOPS</p>
+<p>你看这个结果，IOPS 提升了一倍，和一块 15000 转的硬盘的性能差不多了。不过，这个情况下，我们的硬盘能用的空间也只有原来的 1&#x2F;4 了。</p>
+<p>不过，要知道在当时，同样容量的 15000 转的硬盘的价格可不止是 7200 转硬盘的 4 倍啊。所以，这样通过软件去格式化硬盘，只保留部分磁道让系统可用的情况，可以大大提升硬件的性价比 。</p>
+<h2 id="总结延伸"><a href="#总结延伸" class="headerlink" title="总结延伸"></a>总结延伸</h2><p>机械硬盘的硬件，主要由盘面、磁头和悬臂三部分组成。我们的数据在盘面上的位置，可以通过磁道、扇区和柱面来定位。实际的一次对于硬盘的访问，需要把盘面旋转到某一个“几何扇区”，对准悬臂的位置。然后，悬臂通过寻道，把磁头放到我们实际要读取的扇区上。</p>
+<p>受制于机械硬盘的结构，我们对于随机数据的访问速度，就要包含旋转盘面的平均延时和移动悬臂的寻道时间。通过这两个时间，我们能计算出机械硬盘的 IOPS。</p>
+<p>7200 转机械硬盘的 IOPS，只能做到 100 左右。在互联网时代的早期，我们也没有 SSD 硬盘可以用，所以工程师们就想出了 Partial Stroking 这个浪费存储空间，但是可以缩短寻道时间来提升硬盘的 IOPS 的解决方案。这个解决方案，也是一个典型的、在深入理解了硬件原理之后的软件优化方案。</p>
+]]></content>
+      <categories>
+        <category>计算机组成原理</category>
+      </categories>
+      <tags>
+        <tag>存储器</tag>
       </tags>
   </entry>
   <entry>
@@ -922,6 +922,75 @@ SPEC 提供的 CPU 基准测试程序，就好像 CPU 届的“高考”，通�
       </tags>
   </entry>
   <entry>
+    <title>数据完整性（下）</title>
+    <url>/posts/2d9bc22b/</url>
+    <content><![CDATA[<h1 id="数据完整性（下）：如何还原犯罪现场？"><a href="#数据完整性（下）：如何还原犯罪现场？" class="headerlink" title="数据完整性（下）：如何还原犯罪现场？"></a>数据完整性（下）：如何还原犯罪现场？</h1><p>讲完校验码之后，你现在应该知道，无论是奇偶校验码，还是 CRC 这样的循环校验码，都只能告诉我们一个事情，就是你的数据出错了。所以，校验码也被称为检错码（Error Detecting Code）。<span id="more"></span></p>
+<p>不管是校验码，还是检错码，在硬件出错的时候，只能告诉你“我错了”。但是，下一个问题，“错哪儿了”，它是回答不了的。这就导致，我们的处理方式只有一种，那就是当成“哪儿都错了”。如果是下载一个文件，发现校验码不匹配，我们只能重新去下载；如果是程序计算后放到内存里面的数据，我们只能再重新算一遍。</p>
+<p>这样的效率实在是太低了，所以我们需要有一个办法，不仅告诉我们“我错了”，还能告诉我们“错哪儿了”。于是，计算机科学家们就发明了纠错码。纠错码需要更多的冗余信息，通过这些冗余信息，我们不仅可以知道哪里的数据错了，还能直接把数据给改对。    这个是不是听起来很神奇？接下来就让我们一起来看一看。</p>
+<p>这样的效率实在是太低了，所以我们需要有一个办法，不仅告诉我们“我错了”，还能告诉我们“错哪儿了”。于是，计算机科学家们就发明了纠错码。纠错码需要更多的冗余信息，通过这些冗余信息，我们不仅可以知道哪里的数据错了，还能直接把数据给改对。这个是不是听起来很神奇？接下来就让我们一起来看一看。</p>
+<hr>
+<h2 id="海明码：我们需要多少信息冗余？"><a href="#海明码：我们需要多少信息冗余？" class="headerlink" title="海明码：我们需要多少信息冗余？"></a>海明码：我们需要多少信息冗余？</h2><p>最知名的纠错码就是海明码。海明码（Hamming Code）是以他的发明人 Richard Hamming（理查德·海明）的名字命名的。这个编码方式早在上世纪四十年代就被发明出来了。而直到今天，我们上一讲所说到的 ECC 内存，也还在使用海明码来纠错。</p>
+<p>最基础的海明码叫 <strong>7-4 海明码</strong> 。这里的<em>“7”指的是实际有效的数据</em>，一共是 7 位（Bit）。而这里的<em>“4”，指的是我们额外存储了 4 位数据，用来纠错。</em></p>
+<p>首先，你要明白一点，纠错码的纠错能力是有限的。不是说不管错了多少位，我们都能给纠正过来。不然我们就不需要那 7 个数据位，只需要那 4 个校验位就好了，这意味着我们可以不用数据位就能传输信息了。这就不科学了。事实上，在 7-4 海明码里面， 我们只能纠正某 1 位的错误。这是怎么做到的呢？我们一起来看看。</p>
+<p>4 位的校验码，一共可以表示 2^4 &#x3D; 16 个不同的数。根据数据位计算出来的校验值，一定是确定的。所以，如果数据位出错了，计算出来的校验码，一定和确定的那个校验码不同。那可能的值，就是在 2^4 - 1 &#x3D; 15 那剩下的 15 个可能的校验值当中。</p>
+<p>15 个可能的校验值，其实可以对应 15 个可能出错的位。这个时候你可能就会问了，既然我们的数据位只有 7 位，那为什么我们要用 4 位的校验码呢？用 3 位不就够了吗？2^3 - 1 &#x3D; 7，正好能够对上 7 个不同的数据位啊！</p>
+<p>你别忘了，单比特翻转的错误，不仅可能出现在数据位，也有可能出现在校验位。校验位本身也是可能出错的。所以，7 位数据位和 3 位校验位，如果只有单比特出错，可能出错的位数就是 10 位，2^3 - 1 &#x3D; 7 种情况是不能帮我们找到具体是哪一位出错的。</p>
+<p>事实上，如果我们的数据位有 K 位，校验位有 N 位。那么我们需要满足下面这个不等式，才能确保我们能够对单比特翻转的数据纠错。这个不等式就是：</p>
+<p>​                                            <strong>K + N + 1 &lt;&#x3D; 2^N</strong></p>
+<p>在有 7 位数据位，也就是 K&#x3D;7 的情况下，N 的最小值就是 4。4 位校验位，其实最多可以支持到 11 位数据位。我在下面列了一个简单的数据位数和校验位数的对照表，你可以自己算一算，理解一下上面的公式。</p>
+<img src="/img/computer_img/单比特校验.webp" alt="单比特校验" style="zoom:50%;" />
+
+
+
+<hr>
+<h2 id="海明码的纠错原理"><a href="#海明码的纠错原理" class="headerlink" title="海明码的纠错原理"></a>海明码的纠错原理</h2><p>在数据位数确定的情况下，怎么计算需要的校验位。那接下来，我们就一起看看海明码的编码方式是怎么样的。</p>
+<p>为了算起来简单一点，我们少用一些位数，来算一个 4-3 海明码（也就是 4 位数据位，3 位校验位）。我们把 4 位数据位，分别记作 d1、d2、d3、d4。这里的 d，取的是数据位 data bits 的首字母。我们把 3 位校验位，分别记作 p1、p2、p3。这里的 p，取的是校验位 parity bits 的首字母。</p>
+<p>从 4 位的数据位里面，我们拿走 1 位，然后计算出一个对应的校验位。这个校验位的计算用之前讲过的奇偶校验就可以了。比如，我们用 d1、d2、d4 来计算出一个校验位 p1；用 d1、d3、d4 计算出一个校验位 p2；用 d2、d3、d4 计算出一个校验位 p3。就像下面这个对应的表格一样：</p>
+<img src="/img/computer_img/纠错校验码.webp" alt="纠错校验码" style="zoom:50%;" />
+
+<p>这个时候，你去想一想，如果 d1 这一位的数据出错了，会发生什么情况？我们会发现，p1 和 p2 和校验的计算结果不一样。d2 出错了，是因为 p1 和 p3 的校验的计算结果不一样；d3 出错了，则是因为 p2 和 p3；如果 d4 出错了，则是 p1、p2、p3 都不一样。你会发现，<strong>当数据码出错的时候，至少会有 2 位校验码的计算是不一致的。</strong></p>
+<p>所以校验码不一致，一共有 2^3-1&#x3D;7 种情况，正好对应了 7 个不同的位数的错误。我把这个对应表格也放在下面了，你可以理解一下。</p>
+<img src="/img/computer_img/4-3海明码校验结果.webp" alt="4-3海明码校验结果" style="zoom:50%;" />
+
+<p>可以看到，海明码这样的纠错过程，有点儿像电影里面看到的推理探案的过程。通过出错现场的额外信息，一步一步条分缕析地找出，到底是哪一位的数据出错，还原出错时候的“犯罪现场”。</p>
+<p>看到这里，相信你一方面会觉得海明码特别神奇，但是同时也会冒出一个新的疑问，我们怎么才能用一套程序或者规则来生成海明码呢？其实这个步骤并不复杂，接下来我们就一起来看一下。</p>
+<p>首先，我们先确定编码后，要传输的数据是多少位。比如说，我们这里的 7-4 海明码，就是一共 11 位。</p>
+<p>然后，我们给这 11 位数据从左到右进行编号，并且也把它们的二进制表示写出来。</p>
+<p>接着，我们先把这 11 个数据中的二进制的整数次幂找出来。在这个 7-4 海明码里面，就是 1、2、4、8。这些数，就是我们的校验码位，我们把他们记录做 p1～p4。如果从二进制的角度看，它们是这 11 个数当中，唯四的，在 4 个比特里面只有一个比特是 1 的数值。</p>
+<p>那么剩下的 7 个数，就是我们 d1-d7 的数据码位了。</p>
+<p>然后，对于我们的校验码位，我们还是用奇偶校验码。但是每一个校验码位，不是用所有的 7 位数据来计算校验码。而是 p1 用 3、5、7、9、11 来计算。也就是，在二进制表示下，从右往左数的第一位比特是 1 的情况下，用 p1 作为校验码。</p>
+<p>剩下的 p2，我们用 3、6、10、11 来计算校验码，也就是在二进制表示下，从右往左数的第二位比特是 1 的情况下，用 p2。那么，p3 自然是从右往左数，第三位比特是 1 的情况下的数字校验码。而 p4 则是第四位比特是 1 的情况下的校验码。</p>
+<img src="/img/computer_img/校验码位.webp" alt="校验码位" style="zoom:50%;" />
+
+<p>这个时候，你会发现，任何一个数据码出错了，就至少会有对应的两个或者三个校验码对不上，这样我们就能反过来找到是哪一个数据码出错了。如果校验码出错了，那么只有校验码这一位对不上，我们就知道是这个校验码出错了。</p>
+<p>上面这个方法，我们可以用一段确定的程序表示出来，意味着无论是几位的海明码，我们都不再需要人工去精巧地设计编码方案了。</p>
+<hr>
+<h2 id="海明距离：形象理解海明码的作用"><a href="#海明距离：形象理解海明码的作用" class="headerlink" title="海明距离：形象理解海明码的作用"></a>海明距离：形象理解海明码的作用</h2><p>其实，我们还可以换一个角度来理解海明码的作用。对于两个二进制表示的数据，他们之间有差异的位数，我们称之为海明距离。比如 1001 和 0001 的海明距离是 1，因为他们只有最左侧的第一位是不同的。而 1001 和 0000 的海明距离是 2，因为他们最左侧和最右侧有两位是不同的。</p>
+<img src="/img/computer_img/海明距离.webp" alt="海明距离" style="zoom:50%;" />
+
+<p>于是，你很容易可以想到，所谓的进行一位纠错，也就是所有和我们要传输的数据的海明距离为 1 的数，都能被纠正回来。</p>
+<p>而任何两个实际我们想要传输的数据，海明距离都至少要是 3。你可能会问了，为什么不能是 2 呢？因为如果是 2 的话，那么就会有一个出错的数，到两个正确的数据的海明距离都是 1。当我们看到这个出错的数的时候，我们就不知道究竟应该纠正到那一个数了。</p>
+<p>在引入了海明距离之后，我们就可以更形象地理解纠错码了。在没有纠错功能的情况下，我们看到的数据就好像是空间里面的一个一个点。这个时候，我们可以让数据之间的距离很紧凑，但是如果这些点的坐标稍稍有错，我们就可能搞错是哪一个点。</p>
+<p>在有了 1 位纠错功能之后，就好像我们把一个点变成了以这个点为中心，半径为 1 的球。只要坐标在这个球的范围之内，我们都知道实际要的数据就是球心的坐标。而各个数据球不能距离太近，不同的数据球之间要有 3 个单位的距离。</p>
+<img src="/img/computer_img/纠错形象.webp" alt="纠错形象" style="zoom:50%;" />
+
+
+
+<h2 id="总结延伸"><a href="#总结延伸" class="headerlink" title="总结延伸"></a>总结延伸</h2><p>好了，纠错码的内容到这里就讲完了。你可不要小看这个看起来简单的海明码。虽然它在上世纪 40 年代早早地就诞生了，不过直到今天的 ECC 内存里面，我们还在使用这个技术方案。而海明也因为海明码获得了图灵奖。</p>
+<p>通过在数据中添加多个冗余的校验码位，海明码不仅能够检测到数据中的错误，还能够在只有单个位的数据出错的时候，把错误的一位纠正过来。</p>
+<hr>
+<p>在理解和计算海明码的过程中，有一个很重要的点，就是不仅原来的数据位可能出错。我们新添加的校验位，一样可能会出现单比特翻转的错误。这也是为什么，7 位数据位用 3 位校验码位是不够的，而需要 4 位校验码位。</p>
+<p>实际的海明码编码的过程也并不复杂，我们通过用不同过的校验位，去匹配多个不同的数据组，确保任何一个数据位出错，都会产生一个多个校验码位出错的唯一组合。这样，在出错的时候，我们就可以反过来找到出错的数据位，并纠正过来。当只有一个校验码位出错的时候，我们就知道实际出错的是校验码位了。</p>
+]]></content>
+      <categories>
+        <category>计算机组成原理</category>
+      </categories>
+      <tags>
+        <tag>机器码</tag>
+        <tag>海明码</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>分布式计算</title>
     <url>/posts/dd37509c/</url>
     <content><![CDATA[<h1 id="分布式计算：如果所有人的大脑都联网会怎样？"><a href="#分布式计算：如果所有人的大脑都联网会怎样？" class="headerlink" title="分布式计算：如果所有人的大脑都联网会怎样？"></a>分布式计算：如果所有人的大脑都联网会怎样？</h1><p>实际上，一台计算机在数据中心里是不够的。因为如果只有一台计算机，我们会遇到三个核心问题。第一个核心问题，叫作<strong>垂直扩展和水平扩展的选择问题</strong>，第二问题叫<span id="more"></span>作如何<strong>保持高可用性</strong>（High Availability），第三个问题叫作<strong>一致性问题</strong>（Consistency）。</p>
@@ -992,132 +1061,6 @@ SPEC 提供的 CPU 基准测试程序，就好像 CPU 届的“高考”，通�
       <tags>
         <tag>分布式</tag>
         <tag>负载均衡</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>数据完整性（下）</title>
-    <url>/posts/2d9bc22b/</url>
-    <content><![CDATA[<h1 id="数据完整性（下）：如何还原犯罪现场？"><a href="#数据完整性（下）：如何还原犯罪现场？" class="headerlink" title="数据完整性（下）：如何还原犯罪现场？"></a>数据完整性（下）：如何还原犯罪现场？</h1><p>讲完校验码之后，你现在应该知道，无论是奇偶校验码，还是 CRC 这样的循环校验码，都只能告诉我们一个事情，就是你的数据出错了。所以，校验码也被称为检错码（Error Detecting Code）。<span id="more"></span></p>
-<p>不管是校验码，还是检错码，在硬件出错的时候，只能告诉你“我错了”。但是，下一个问题，“错哪儿了”，它是回答不了的。这就导致，我们的处理方式只有一种，那就是当成“哪儿都错了”。如果是下载一个文件，发现校验码不匹配，我们只能重新去下载；如果是程序计算后放到内存里面的数据，我们只能再重新算一遍。</p>
-<p>这样的效率实在是太低了，所以我们需要有一个办法，不仅告诉我们“我错了”，还能告诉我们“错哪儿了”。于是，计算机科学家们就发明了纠错码。纠错码需要更多的冗余信息，通过这些冗余信息，我们不仅可以知道哪里的数据错了，还能直接把数据给改对。    这个是不是听起来很神奇？接下来就让我们一起来看一看。</p>
-<p>这样的效率实在是太低了，所以我们需要有一个办法，不仅告诉我们“我错了”，还能告诉我们“错哪儿了”。于是，计算机科学家们就发明了纠错码。纠错码需要更多的冗余信息，通过这些冗余信息，我们不仅可以知道哪里的数据错了，还能直接把数据给改对。这个是不是听起来很神奇？接下来就让我们一起来看一看。</p>
-<hr>
-<h2 id="海明码：我们需要多少信息冗余？"><a href="#海明码：我们需要多少信息冗余？" class="headerlink" title="海明码：我们需要多少信息冗余？"></a>海明码：我们需要多少信息冗余？</h2><p>最知名的纠错码就是海明码。海明码（Hamming Code）是以他的发明人 Richard Hamming（理查德·海明）的名字命名的。这个编码方式早在上世纪四十年代就被发明出来了。而直到今天，我们上一讲所说到的 ECC 内存，也还在使用海明码来纠错。</p>
-<p>最基础的海明码叫 <strong>7-4 海明码</strong> 。这里的<em>“7”指的是实际有效的数据</em>，一共是 7 位（Bit）。而这里的<em>“4”，指的是我们额外存储了 4 位数据，用来纠错。</em></p>
-<p>首先，你要明白一点，纠错码的纠错能力是有限的。不是说不管错了多少位，我们都能给纠正过来。不然我们就不需要那 7 个数据位，只需要那 4 个校验位就好了，这意味着我们可以不用数据位就能传输信息了。这就不科学了。事实上，在 7-4 海明码里面， 我们只能纠正某 1 位的错误。这是怎么做到的呢？我们一起来看看。</p>
-<p>4 位的校验码，一共可以表示 2^4 &#x3D; 16 个不同的数。根据数据位计算出来的校验值，一定是确定的。所以，如果数据位出错了，计算出来的校验码，一定和确定的那个校验码不同。那可能的值，就是在 2^4 - 1 &#x3D; 15 那剩下的 15 个可能的校验值当中。</p>
-<p>15 个可能的校验值，其实可以对应 15 个可能出错的位。这个时候你可能就会问了，既然我们的数据位只有 7 位，那为什么我们要用 4 位的校验码呢？用 3 位不就够了吗？2^3 - 1 &#x3D; 7，正好能够对上 7 个不同的数据位啊！</p>
-<p>你别忘了，单比特翻转的错误，不仅可能出现在数据位，也有可能出现在校验位。校验位本身也是可能出错的。所以，7 位数据位和 3 位校验位，如果只有单比特出错，可能出错的位数就是 10 位，2^3 - 1 &#x3D; 7 种情况是不能帮我们找到具体是哪一位出错的。</p>
-<p>事实上，如果我们的数据位有 K 位，校验位有 N 位。那么我们需要满足下面这个不等式，才能确保我们能够对单比特翻转的数据纠错。这个不等式就是：</p>
-<p>​                                            <strong>K + N + 1 &lt;&#x3D; 2^N</strong></p>
-<p>在有 7 位数据位，也就是 K&#x3D;7 的情况下，N 的最小值就是 4。4 位校验位，其实最多可以支持到 11 位数据位。我在下面列了一个简单的数据位数和校验位数的对照表，你可以自己算一算，理解一下上面的公式。</p>
-<img src="/img/computer_img/单比特校验.webp" alt="单比特校验" style="zoom:50%;" />
-
-
-
-<hr>
-<h2 id="海明码的纠错原理"><a href="#海明码的纠错原理" class="headerlink" title="海明码的纠错原理"></a>海明码的纠错原理</h2><p>在数据位数确定的情况下，怎么计算需要的校验位。那接下来，我们就一起看看海明码的编码方式是怎么样的。</p>
-<p>为了算起来简单一点，我们少用一些位数，来算一个 4-3 海明码（也就是 4 位数据位，3 位校验位）。我们把 4 位数据位，分别记作 d1、d2、d3、d4。这里的 d，取的是数据位 data bits 的首字母。我们把 3 位校验位，分别记作 p1、p2、p3。这里的 p，取的是校验位 parity bits 的首字母。</p>
-<p>从 4 位的数据位里面，我们拿走 1 位，然后计算出一个对应的校验位。这个校验位的计算用之前讲过的奇偶校验就可以了。比如，我们用 d1、d2、d4 来计算出一个校验位 p1；用 d1、d3、d4 计算出一个校验位 p2；用 d2、d3、d4 计算出一个校验位 p3。就像下面这个对应的表格一样：</p>
-<img src="/img/computer_img/纠错校验码.webp" alt="纠错校验码" style="zoom:50%;" />
-
-<p>这个时候，你去想一想，如果 d1 这一位的数据出错了，会发生什么情况？我们会发现，p1 和 p2 和校验的计算结果不一样。d2 出错了，是因为 p1 和 p3 的校验的计算结果不一样；d3 出错了，则是因为 p2 和 p3；如果 d4 出错了，则是 p1、p2、p3 都不一样。你会发现，<strong>当数据码出错的时候，至少会有 2 位校验码的计算是不一致的。</strong></p>
-<p>所以校验码不一致，一共有 2^3-1&#x3D;7 种情况，正好对应了 7 个不同的位数的错误。我把这个对应表格也放在下面了，你可以理解一下。</p>
-<img src="/img/computer_img/4-3海明码校验结果.webp" alt="4-3海明码校验结果" style="zoom:50%;" />
-
-<p>可以看到，海明码这样的纠错过程，有点儿像电影里面看到的推理探案的过程。通过出错现场的额外信息，一步一步条分缕析地找出，到底是哪一位的数据出错，还原出错时候的“犯罪现场”。</p>
-<p>看到这里，相信你一方面会觉得海明码特别神奇，但是同时也会冒出一个新的疑问，我们怎么才能用一套程序或者规则来生成海明码呢？其实这个步骤并不复杂，接下来我们就一起来看一下。</p>
-<p>首先，我们先确定编码后，要传输的数据是多少位。比如说，我们这里的 7-4 海明码，就是一共 11 位。</p>
-<p>然后，我们给这 11 位数据从左到右进行编号，并且也把它们的二进制表示写出来。</p>
-<p>接着，我们先把这 11 个数据中的二进制的整数次幂找出来。在这个 7-4 海明码里面，就是 1、2、4、8。这些数，就是我们的校验码位，我们把他们记录做 p1～p4。如果从二进制的角度看，它们是这 11 个数当中，唯四的，在 4 个比特里面只有一个比特是 1 的数值。</p>
-<p>那么剩下的 7 个数，就是我们 d1-d7 的数据码位了。</p>
-<p>然后，对于我们的校验码位，我们还是用奇偶校验码。但是每一个校验码位，不是用所有的 7 位数据来计算校验码。而是 p1 用 3、5、7、9、11 来计算。也就是，在二进制表示下，从右往左数的第一位比特是 1 的情况下，用 p1 作为校验码。</p>
-<p>剩下的 p2，我们用 3、6、10、11 来计算校验码，也就是在二进制表示下，从右往左数的第二位比特是 1 的情况下，用 p2。那么，p3 自然是从右往左数，第三位比特是 1 的情况下的数字校验码。而 p4 则是第四位比特是 1 的情况下的校验码。</p>
-<img src="/img/computer_img/校验码位.webp" alt="校验码位" style="zoom:50%;" />
-
-<p>这个时候，你会发现，任何一个数据码出错了，就至少会有对应的两个或者三个校验码对不上，这样我们就能反过来找到是哪一个数据码出错了。如果校验码出错了，那么只有校验码这一位对不上，我们就知道是这个校验码出错了。</p>
-<p>上面这个方法，我们可以用一段确定的程序表示出来，意味着无论是几位的海明码，我们都不再需要人工去精巧地设计编码方案了。</p>
-<hr>
-<h2 id="海明距离：形象理解海明码的作用"><a href="#海明距离：形象理解海明码的作用" class="headerlink" title="海明距离：形象理解海明码的作用"></a>海明距离：形象理解海明码的作用</h2><p>其实，我们还可以换一个角度来理解海明码的作用。对于两个二进制表示的数据，他们之间有差异的位数，我们称之为海明距离。比如 1001 和 0001 的海明距离是 1，因为他们只有最左侧的第一位是不同的。而 1001 和 0000 的海明距离是 2，因为他们最左侧和最右侧有两位是不同的。</p>
-<img src="/img/computer_img/海明距离.webp" alt="海明距离" style="zoom:50%;" />
-
-<p>于是，你很容易可以想到，所谓的进行一位纠错，也就是所有和我们要传输的数据的海明距离为 1 的数，都能被纠正回来。</p>
-<p>而任何两个实际我们想要传输的数据，海明距离都至少要是 3。你可能会问了，为什么不能是 2 呢？因为如果是 2 的话，那么就会有一个出错的数，到两个正确的数据的海明距离都是 1。当我们看到这个出错的数的时候，我们就不知道究竟应该纠正到那一个数了。</p>
-<p>在引入了海明距离之后，我们就可以更形象地理解纠错码了。在没有纠错功能的情况下，我们看到的数据就好像是空间里面的一个一个点。这个时候，我们可以让数据之间的距离很紧凑，但是如果这些点的坐标稍稍有错，我们就可能搞错是哪一个点。</p>
-<p>在有了 1 位纠错功能之后，就好像我们把一个点变成了以这个点为中心，半径为 1 的球。只要坐标在这个球的范围之内，我们都知道实际要的数据就是球心的坐标。而各个数据球不能距离太近，不同的数据球之间要有 3 个单位的距离。</p>
-<img src="/img/computer_img/纠错形象.webp" alt="纠错形象" style="zoom:50%;" />
-
-
-
-<h2 id="总结延伸"><a href="#总结延伸" class="headerlink" title="总结延伸"></a>总结延伸</h2><p>好了，纠错码的内容到这里就讲完了。你可不要小看这个看起来简单的海明码。虽然它在上世纪 40 年代早早地就诞生了，不过直到今天的 ECC 内存里面，我们还在使用这个技术方案。而海明也因为海明码获得了图灵奖。</p>
-<p>通过在数据中添加多个冗余的校验码位，海明码不仅能够检测到数据中的错误，还能够在只有单个位的数据出错的时候，把错误的一位纠正过来。</p>
-<hr>
-<p>在理解和计算海明码的过程中，有一个很重要的点，就是不仅原来的数据位可能出错。我们新添加的校验位，一样可能会出现单比特翻转的错误。这也是为什么，7 位数据位用 3 位校验码位是不够的，而需要 4 位校验码位。</p>
-<p>实际的海明码编码的过程也并不复杂，我们通过用不同过的校验位，去匹配多个不同的数据组，确保任何一个数据位出错，都会产生一个多个校验码位出错的唯一组合。这样，在出错的时候，我们就可以反过来找到出错的数据位，并纠正过来。当只有一个校验码位出错的时候，我们就知道实际出错的是校验码位了。</p>
-]]></content>
-      <categories>
-        <category>计算机组成原理</category>
-      </categories>
-      <tags>
-        <tag>机器码</tag>
-        <tag>海明码</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>局部性原理</title>
-    <url>/posts/90cdc880/</url>
-    <content><![CDATA[<h1 id="局部性原理：数据库性能跟不上，加个缓存就好了？"><a href="#局部性原理：数据库性能跟不上，加个缓存就好了？" class="headerlink" title="局部性原理：数据库性能跟不上，加个缓存就好了？"></a>局部性原理：数据库性能跟不上，加个缓存就好了？</h1><p>平时进行服务端软件开发的时候，我们通常会把数据存储在数据库里。而服务端系统遇到的第一个性能瓶颈<span id="more"></span>，往往就发生在访问数据库的时候。 这个时候，大部分工程师和架构师会拿出一种叫作“缓存”的武器，通过使用 Redis 或者 Memcache 这样的开源软件，在数据库前面提供一层缓存的数据，来缓解数据库面临的压力，提升服务端的程序性能。</p>
-<img src="/img/computer_img/加一个缓存.webp" alt="加一个缓存" style="zoom:50%;" />
-
-<center>在数据库前添加数据缓存是常见的性能优化方式</center>
-
-<p>那么，不知道你有没有想过，这种添加缓存的策略一定是有效的吗？或者说，这种策略在什么情况下是有效的呢？如果从理论角度去分析，添加缓存一定是我们的最佳策略么？进一步地，如果我们对于访问性能的要求非常高，希望数据在 1 毫秒，乃至 100 微秒内完成处理，我们还能用这个添加缓存的策略么？</p>
-<h2 id="理解局部性原理"><a href="#理解局部性原理" class="headerlink" title="理解局部性原理"></a>理解局部性原理</h2><p>可以看到，不同的存储器设备之间，访问速度、价格和容量都有几十乃至上千倍的差异。</p>
-<img src="/img/computer_img/计算机组成/存储价目表.webp" alt="存储价目表" style="zoom:50%;" />
-
-<p>以上一讲的 Intel 8265U 的 CPU 为例，它的 L1 Cache 只有 256K，L2 Cache 有个 1MB，L3 Cache 有 12MB。一共 13MB 的存储空间，如果按照 7 美元 &#x2F;1MB 的价格计算，就要 91 美元。</p>
-<p>以上一讲的 Intel 8265U 的 CPU 为例，它的 L1 Cache 只有 256K，L2 Cache 有个 1MB，L3 Cache 有 12MB。一共 13MB 的存储空间，如果按照 7 美元 &#x2F;1MB 的价格计算，就要 91 美元。</p>
-<p>我们的内存有 8GB，容量是 CPU Cache 的 600 多倍，按照表上的价格差不多就是 120 美元。如果按照今天京东上的价格，恐怕不到 40 美元。128G 的 SSD 和 1T 的 HDD，现在的价格加起来也不会超过 100 美元。虽然容量是内存的 16 倍乃至 128 倍，但是它们的访问速度却不到内存的 1&#x2F;1000。</p>
-<p>性能和价格的巨大差异，给我们工程师带来了一个挑战：<strong>我们能不能既享受 CPU Cache 的速度，又享受内存、硬盘巨大的容量和低廉的价格呢？</strong></p>
-<p>想要同时享受到这三点，前辈们已经探索出了答案，那就是，存储器中数据的<strong>局部性原理（Principle of Locality）</strong>。我们可以利用这个局部性原理，来制定管理和访问数据的策略。这个局部性原理包括  <strong>时间局部性（temporal locality）</strong>和 <strong>空间局部性（spatial locality）</strong>这两种策略。</p>
-<ul>
-<li>时间局部性。这个策略是说，如果一个数据被访问了，那么它在短时间内还会被再次访问。用一个简单的例子给你解释下，你一下就能明白了。</li>
-</ul>
-<p>比如说，《哈利波特与魔法石》这本小说，我今天读了一会儿，没读完，明天还会继续读。同理，在一个电子商务型系统中，如果一个用户打开了 App，看到了首屏。我们推断他应该很快还会再次访问网站的其他内容或者页面，我们就将这个用户的个人信息，从存储在硬盘的数据库读取到内存的缓存中来。这利用的就是时间局部性。</p>
-<hr>
-<ul>
-<li>空间局部性。这个策略是说，如果一个数据被访问了，那么和它相邻的数据也很快会被访问。</li>
-</ul>
-<p>我们还拿刚才读《哈利波特与魔法石》的例子来说。我读完了这本书之后，感觉这书不错，所以就会借阅整套“哈利波特”。这就好比我们的程序，在访问了数组的首项之后，多半会循环访问它的下一项。因为，在存储数据的时候，数组内的多项数据会存储在相邻的位置。这就好比图书馆会把“哈利波特”系列放在一个书架上，摆放在一起，加载的时候，也会一并加载。我们去图书馆借书，往往会一次性把 7 本都借回来。</p>
-<hr>
-<blockquote>
-<p>有了这个局部性原理，我们不用再把所有数据都放在内存里，也不用都放在 HDD 硬盘上，<strong>而是把访问次数多的数据，放在贵但是快一点的存储器里，把访问次数少的数据，放在慢但是大一点的存储器里。</strong> 这样组合使用内存、SSD 硬盘以及 HDD 硬盘，使得我们可以用最低的成本提供实际所需要的数据存储、管理和访问的需求。</p>
-</blockquote>
-<h2 id="如何花最少的钱，装下亚马逊的所有商品？"><a href="#如何花最少的钱，装下亚马逊的所有商品？" class="headerlink" title="如何花最少的钱，装下亚马逊的所有商品？"></a>如何花最少的钱，装下亚马逊的所有商品？</h2><hr>
-<p>了解了局部性原理，下面我用一些真实世界中的数据举个例子，带你做个小小的思维体操，来看一看通过局部性原理，利用不同层次存储器的组合，究竟会有什么样的好处。</p>
-<p>我们现在要提供一个亚马逊这样的电商网站。我们假设里面有 6 亿件商品，如果每件商品需要 4MB 的存储空间（考虑到商品图片的话，4MB 已经是一个相对较小的估计了），那么一共需要 2400TB（  &#x3D;  6 亿  × 4MB）的数据存储。</p>
-<p>如果我们把数据都放在内存里面，那就需要 3600 万美元（  &#x3D;  2400TB&#x2F;1MB  × 0.015 美元  &#x3D;  3600 万美元）。但是，这 6 亿件商品中，不是每一件商品都会被经常访问。比如说，有 Kindle 电子书这样的热销商品，也一定有基本无人问津的商品，比如偏门的缅甸语词典。</p>
-<p>如果我们只在内存里放前 1% 的热门商品，也就是 600 万件热门商品，而把剩下的商品，放在机械式的 HDD 硬盘上，那么，我们需要的存储成本就下降到 45.6 万美元（ &#x3D; 3600 万美元 × 1% + 2400TB &#x2F; 1MB × 0.00004 美元），是原来成本的 1.3% 左右。</p>
-<p>这里我们用的就是时间局部性。<em>我们把有用户访问过的数据，加载到内存中，一旦内存里面放不下了，我们就把最长时间没有在内存中被访问过的数据，从内存中移走，</em>这个其实就是我们常用的 <strong>LRU（Least Recently Used）缓存算法</strong>。</p>
-<hr>
-<p>热门商品被访问得多，就会始终被保留在内存里，而冷门商品被访问得少，就只存放在 HDD 硬盘上，数据的读取也都是直接访问硬盘。即使加载到内存中，也会很快被移除。<strong>越是热门的商品，越容易在内存中找到，也就更好地利用了内存的随机访问性能。</strong> （缓存命中率）</p>
-<p>那么，只放 600 万件商品真的可以满足我们实际的线上服务请求吗？这个就要看 LRU 缓存策略的 <strong>缓存命中率</strong>（Hit Rate&#x2F;Hit Ratio）了，也就是访问的数据中，可以在我们设置的内存缓存中找到的，占有多大比例。</p>
-<p>内存的随机访问请求需要 100ns。这也就意味着，在极限情况下，内存可以支持 1000 万次随机访问。我们用了 24TB 内存，如果 8G 一条的话，意味着有 3000 条内存，可以支持每秒 300 亿次（ &#x3D; 24TB&#x2F;8GB × 1s&#x2F;100ns）访问。以亚马逊 2017 年 3 亿的用户数来看，我们估算每天的活跃用户为 1 亿，这 1 亿用户每人平均会访问 100 个商品，那么平均每秒访问的商品数量，就是 12 万次。</p>
-<p>但是如果数据没有命中内存，那么对应的数据请求就要访问到 HDD 磁盘了。刚才的图表中，我写了，一块 HDD 硬盘只能支撑每秒 100 次的随机访问，2400TB 的数据，以 4TB 一块磁盘来计算，有 600 块磁盘，也就是能支撑每秒 6 万次（ &#x3D; 2400TB&#x2F;4TB × 1s&#x2F;10ms ）的随机访问。</p>
-<p>这就意味着，所有的商品访问请求，都直接到了 HDD 磁盘，HDD 磁盘支撑不了这样的压力。我们至少要 50% 的缓存命中率，HDD 磁盘才能支撑对应的访问次数。不然的话，我们要么选择添加更多数量的 HDD 硬盘，做到每秒 12 万次的随机访问，或者将 HDD 替换成 SSD 硬盘，让单个硬盘可以支持更多的随机访问请求。</p>
-<hr>
-<p>当然，这里我们只是一个简单的估算。在实际的应用程序中，查看一个商品的数据可能意味着不止一次的随机内存或者随机磁盘的访问。对应的数据存储空间也不止要考虑数据，还需要考虑维护数据结构的空间，而缓存命中率和访问请求也要考虑均值和峰值问题。</p>
-<p>通过这个估算过程，你需要理解，如何进行存储器的硬件规划。你需要考虑硬件的成本、访问的数据量以及访问的数据分布，然后根据这些数据的估算，来组合不同的存储器，能用尽可能低的成本支撑所需要的服务器压力。而当你用上了数据访问的局部性原理，组合起了多种存储器，你也就理解了怎么基于存储器层次结构，来进行硬件规划了。</p>
-<h2 id="总结延伸"><a href="#总结延伸" class="headerlink" title="总结延伸"></a>总结延伸</h2><p>在实际的计算机日常的开发和应用中，我们对于数据的访问总是会存在一定的局部性。 有时候，这个局部性是时间局部性，就是我们最近访问过的数据还会被反复访问。有时候，这个局部性是空间局部性，就是我们最近访问过数据附近的数据很快会被访问到。</p>
-<p>而局部性的存在，使得我们可以在应用开发中使用缓存这个有利的武器。比如，<strong>通过将热点数据加载并保留在速度更快的存储设备里面，我们可以用更低的成本来支撑服务器。</strong></p>
-<hr>
-<p>通过亚马逊这个例子，我们可以看到，我们可以通过快速估算的方式，来判断这个添加缓存的策略是否能够满足我们的需求，以及在估算的服务器负载的情况下，需要规划多少硬件设备。这个“估算 + 规划”的能力，是每一个期望成长为架构师的工程师，必须掌握的能力。</p>
-]]></content>
-      <categories>
-        <category>计算机组成原理</category>
-      </categories>
-      <tags>
-        <tag>数据存储</tag>
       </tags>
   </entry>
   <entry>
@@ -1193,6 +1136,63 @@ SPEC 提供的 CPU 基准测试程序，就好像 CPU 届的“高考”，通�
       <tags>
         <tag>cache</tag>
         <tag> 虚拟内存</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>局部性原理</title>
+    <url>/posts/90cdc880/</url>
+    <content><![CDATA[<h1 id="局部性原理：数据库性能跟不上，加个缓存就好了？"><a href="#局部性原理：数据库性能跟不上，加个缓存就好了？" class="headerlink" title="局部性原理：数据库性能跟不上，加个缓存就好了？"></a>局部性原理：数据库性能跟不上，加个缓存就好了？</h1><p>平时进行服务端软件开发的时候，我们通常会把数据存储在数据库里。而服务端系统遇到的第一个性能瓶颈<span id="more"></span>，往往就发生在访问数据库的时候。 这个时候，大部分工程师和架构师会拿出一种叫作“缓存”的武器，通过使用 Redis 或者 Memcache 这样的开源软件，在数据库前面提供一层缓存的数据，来缓解数据库面临的压力，提升服务端的程序性能。</p>
+<img src="/img/computer_img/加一个缓存.webp" alt="加一个缓存" style="zoom:50%;" />
+
+<center>在数据库前添加数据缓存是常见的性能优化方式</center>
+
+<p>那么，不知道你有没有想过，这种添加缓存的策略一定是有效的吗？或者说，这种策略在什么情况下是有效的呢？如果从理论角度去分析，添加缓存一定是我们的最佳策略么？进一步地，如果我们对于访问性能的要求非常高，希望数据在 1 毫秒，乃至 100 微秒内完成处理，我们还能用这个添加缓存的策略么？</p>
+<h2 id="理解局部性原理"><a href="#理解局部性原理" class="headerlink" title="理解局部性原理"></a>理解局部性原理</h2><p>可以看到，不同的存储器设备之间，访问速度、价格和容量都有几十乃至上千倍的差异。</p>
+<img src="/img/computer_img/计算机组成/存储价目表.webp" alt="存储价目表" style="zoom:50%;" />
+
+<p>以上一讲的 Intel 8265U 的 CPU 为例，它的 L1 Cache 只有 256K，L2 Cache 有个 1MB，L3 Cache 有 12MB。一共 13MB 的存储空间，如果按照 7 美元 &#x2F;1MB 的价格计算，就要 91 美元。</p>
+<p>以上一讲的 Intel 8265U 的 CPU 为例，它的 L1 Cache 只有 256K，L2 Cache 有个 1MB，L3 Cache 有 12MB。一共 13MB 的存储空间，如果按照 7 美元 &#x2F;1MB 的价格计算，就要 91 美元。</p>
+<p>我们的内存有 8GB，容量是 CPU Cache 的 600 多倍，按照表上的价格差不多就是 120 美元。如果按照今天京东上的价格，恐怕不到 40 美元。128G 的 SSD 和 1T 的 HDD，现在的价格加起来也不会超过 100 美元。虽然容量是内存的 16 倍乃至 128 倍，但是它们的访问速度却不到内存的 1&#x2F;1000。</p>
+<p>性能和价格的巨大差异，给我们工程师带来了一个挑战：<strong>我们能不能既享受 CPU Cache 的速度，又享受内存、硬盘巨大的容量和低廉的价格呢？</strong></p>
+<p>想要同时享受到这三点，前辈们已经探索出了答案，那就是，存储器中数据的<strong>局部性原理（Principle of Locality）</strong>。我们可以利用这个局部性原理，来制定管理和访问数据的策略。这个局部性原理包括  <strong>时间局部性（temporal locality）</strong>和 <strong>空间局部性（spatial locality）</strong>这两种策略。</p>
+<ul>
+<li>时间局部性。这个策略是说，如果一个数据被访问了，那么它在短时间内还会被再次访问。用一个简单的例子给你解释下，你一下就能明白了。</li>
+</ul>
+<p>比如说，《哈利波特与魔法石》这本小说，我今天读了一会儿，没读完，明天还会继续读。同理，在一个电子商务型系统中，如果一个用户打开了 App，看到了首屏。我们推断他应该很快还会再次访问网站的其他内容或者页面，我们就将这个用户的个人信息，从存储在硬盘的数据库读取到内存的缓存中来。这利用的就是时间局部性。</p>
+<hr>
+<ul>
+<li>空间局部性。这个策略是说，如果一个数据被访问了，那么和它相邻的数据也很快会被访问。</li>
+</ul>
+<p>我们还拿刚才读《哈利波特与魔法石》的例子来说。我读完了这本书之后，感觉这书不错，所以就会借阅整套“哈利波特”。这就好比我们的程序，在访问了数组的首项之后，多半会循环访问它的下一项。因为，在存储数据的时候，数组内的多项数据会存储在相邻的位置。这就好比图书馆会把“哈利波特”系列放在一个书架上，摆放在一起，加载的时候，也会一并加载。我们去图书馆借书，往往会一次性把 7 本都借回来。</p>
+<hr>
+<blockquote>
+<p>有了这个局部性原理，我们不用再把所有数据都放在内存里，也不用都放在 HDD 硬盘上，<strong>而是把访问次数多的数据，放在贵但是快一点的存储器里，把访问次数少的数据，放在慢但是大一点的存储器里。</strong> 这样组合使用内存、SSD 硬盘以及 HDD 硬盘，使得我们可以用最低的成本提供实际所需要的数据存储、管理和访问的需求。</p>
+</blockquote>
+<h2 id="如何花最少的钱，装下亚马逊的所有商品？"><a href="#如何花最少的钱，装下亚马逊的所有商品？" class="headerlink" title="如何花最少的钱，装下亚马逊的所有商品？"></a>如何花最少的钱，装下亚马逊的所有商品？</h2><hr>
+<p>了解了局部性原理，下面我用一些真实世界中的数据举个例子，带你做个小小的思维体操，来看一看通过局部性原理，利用不同层次存储器的组合，究竟会有什么样的好处。</p>
+<p>我们现在要提供一个亚马逊这样的电商网站。我们假设里面有 6 亿件商品，如果每件商品需要 4MB 的存储空间（考虑到商品图片的话，4MB 已经是一个相对较小的估计了），那么一共需要 2400TB（  &#x3D;  6 亿  × 4MB）的数据存储。</p>
+<p>如果我们把数据都放在内存里面，那就需要 3600 万美元（  &#x3D;  2400TB&#x2F;1MB  × 0.015 美元  &#x3D;  3600 万美元）。但是，这 6 亿件商品中，不是每一件商品都会被经常访问。比如说，有 Kindle 电子书这样的热销商品，也一定有基本无人问津的商品，比如偏门的缅甸语词典。</p>
+<p>如果我们只在内存里放前 1% 的热门商品，也就是 600 万件热门商品，而把剩下的商品，放在机械式的 HDD 硬盘上，那么，我们需要的存储成本就下降到 45.6 万美元（ &#x3D; 3600 万美元 × 1% + 2400TB &#x2F; 1MB × 0.00004 美元），是原来成本的 1.3% 左右。</p>
+<p>这里我们用的就是时间局部性。<em>我们把有用户访问过的数据，加载到内存中，一旦内存里面放不下了，我们就把最长时间没有在内存中被访问过的数据，从内存中移走，</em>这个其实就是我们常用的 <strong>LRU（Least Recently Used）缓存算法</strong>。</p>
+<hr>
+<p>热门商品被访问得多，就会始终被保留在内存里，而冷门商品被访问得少，就只存放在 HDD 硬盘上，数据的读取也都是直接访问硬盘。即使加载到内存中，也会很快被移除。<strong>越是热门的商品，越容易在内存中找到，也就更好地利用了内存的随机访问性能。</strong> （缓存命中率）</p>
+<p>那么，只放 600 万件商品真的可以满足我们实际的线上服务请求吗？这个就要看 LRU 缓存策略的 <strong>缓存命中率</strong>（Hit Rate&#x2F;Hit Ratio）了，也就是访问的数据中，可以在我们设置的内存缓存中找到的，占有多大比例。</p>
+<p>内存的随机访问请求需要 100ns。这也就意味着，在极限情况下，内存可以支持 1000 万次随机访问。我们用了 24TB 内存，如果 8G 一条的话，意味着有 3000 条内存，可以支持每秒 300 亿次（ &#x3D; 24TB&#x2F;8GB × 1s&#x2F;100ns）访问。以亚马逊 2017 年 3 亿的用户数来看，我们估算每天的活跃用户为 1 亿，这 1 亿用户每人平均会访问 100 个商品，那么平均每秒访问的商品数量，就是 12 万次。</p>
+<p>但是如果数据没有命中内存，那么对应的数据请求就要访问到 HDD 磁盘了。刚才的图表中，我写了，一块 HDD 硬盘只能支撑每秒 100 次的随机访问，2400TB 的数据，以 4TB 一块磁盘来计算，有 600 块磁盘，也就是能支撑每秒 6 万次（ &#x3D; 2400TB&#x2F;4TB × 1s&#x2F;10ms ）的随机访问。</p>
+<p>这就意味着，所有的商品访问请求，都直接到了 HDD 磁盘，HDD 磁盘支撑不了这样的压力。我们至少要 50% 的缓存命中率，HDD 磁盘才能支撑对应的访问次数。不然的话，我们要么选择添加更多数量的 HDD 硬盘，做到每秒 12 万次的随机访问，或者将 HDD 替换成 SSD 硬盘，让单个硬盘可以支持更多的随机访问请求。</p>
+<hr>
+<p>当然，这里我们只是一个简单的估算。在实际的应用程序中，查看一个商品的数据可能意味着不止一次的随机内存或者随机磁盘的访问。对应的数据存储空间也不止要考虑数据，还需要考虑维护数据结构的空间，而缓存命中率和访问请求也要考虑均值和峰值问题。</p>
+<p>通过这个估算过程，你需要理解，如何进行存储器的硬件规划。你需要考虑硬件的成本、访问的数据量以及访问的数据分布，然后根据这些数据的估算，来组合不同的存储器，能用尽可能低的成本支撑所需要的服务器压力。而当你用上了数据访问的局部性原理，组合起了多种存储器，你也就理解了怎么基于存储器层次结构，来进行硬件规划了。</p>
+<h2 id="总结延伸"><a href="#总结延伸" class="headerlink" title="总结延伸"></a>总结延伸</h2><p>在实际的计算机日常的开发和应用中，我们对于数据的访问总是会存在一定的局部性。 有时候，这个局部性是时间局部性，就是我们最近访问过的数据还会被反复访问。有时候，这个局部性是空间局部性，就是我们最近访问过数据附近的数据很快会被访问到。</p>
+<p>而局部性的存在，使得我们可以在应用开发中使用缓存这个有利的武器。比如，<strong>通过将热点数据加载并保留在速度更快的存储设备里面，我们可以用更低的成本来支撑服务器。</strong></p>
+<hr>
+<p>通过亚马逊这个例子，我们可以看到，我们可以通过快速估算的方式，来判断这个添加缓存的策略是否能够满足我们的需求，以及在估算的服务器负载的情况下，需要规划多少硬件设备。这个“估算 + 规划”的能力，是每一个期望成长为架构师的工程师，必须掌握的能力。</p>
+]]></content>
+      <categories>
+        <category>计算机组成原理</category>
+      </categories>
+      <tags>
+        <tag>数据存储</tag>
       </tags>
   </entry>
   <entry>
