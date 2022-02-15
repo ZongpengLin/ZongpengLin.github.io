@@ -330,69 +330,6 @@ SPEC 提供的 CPU 基准测试程序，就好像 CPU 届的“高考”，通�
       </tags>
   </entry>
   <entry>
-    <title>ELF和静态链接</title>
-    <url>/posts/b778160a/</url>
-    <content><![CDATA[<h1 id="ELF和静态链接：为什么程序无法同时在Linux和Windows下运行？"><a href="#ELF和静态链接：为什么程序无法同时在Linux和Windows下运行？" class="headerlink" title="ELF和静态链接：为什么程序无法同时在Linux和Windows下运行？"></a>ELF和静态链接：为什么程序无法同时在Linux和Windows下运行？</h1><h2 id="编译、链接和装载：-拆解程序执行"><a href="#编译、链接和装载：-拆解程序执行" class="headerlink" title="编译、链接和装载： 拆解程序执行"></a>编译、链接和装载： 拆解程序执行</h2><p>之前，我们通过 gcc 生成的文件和 objdump 获取到的汇编指令都有些小小的问题，以add 函数示例，<span id="more"></span>拆分成两个文件 add_lib.c 和 link_example.c 。</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">// add_lib.c</span><br><span class="line">int add(int a, int b)</span><br><span class="line">&#123;</span><br><span class="line">    return a+b;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">// link_example.c</span><br><span class="line"></span><br><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">int main()</span><br><span class="line">&#123;</span><br><span class="line">    int a = 10;</span><br><span class="line">    int b = 5;</span><br><span class="line">    int c = add(a, b);</span><br><span class="line">    printf(&quot;c = %d\n&quot;, c);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>我们通过 gcc 来编译这两个文件，然后通过 objdump 命令看看它们的汇编代码。</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">$ gcc -g -c add_lib.c link_example.c</span><br><span class="line">$ objdump -d -M intel -S add_lib.o</span><br><span class="line">$ objdump -d -M intel -S link_example.o</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">add_lib.o:     file format elf64-x86-64</span><br><span class="line">Disassembly of section .text:</span><br><span class="line">0000000000000000 &lt;add&gt;:</span><br><span class="line">   0:   55                      push   rbp</span><br><span class="line">   1:   48 89 e5                mov    rbp,rsp</span><br><span class="line">   4:   89 7d fc                mov    DWORD PTR [rbp-0x4],edi</span><br><span class="line">   7:   89 75 f8                mov    DWORD PTR [rbp-0x8],esi</span><br><span class="line">   a:   8b 55 fc                mov    edx,DWORD PTR [rbp-0x4]</span><br><span class="line">   d:   8b 45 f8                mov    eax,DWORD PTR [rbp-0x8]</span><br><span class="line">  10:   01 d0                   add    eax,edx</span><br><span class="line">  12:   5d                      pop    rbp</span><br><span class="line">  13:   c3                      ret    </span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">link_example.o:     file format elf64-x86-64</span><br><span class="line">Disassembly of section .text:</span><br><span class="line">0000000000000000 &lt;main&gt;:</span><br><span class="line">   0:   55                      push   rbp</span><br><span class="line">   1:   48 89 e5                mov    rbp,rsp</span><br><span class="line">   4:   48 83 ec 10             sub    rsp,0x10</span><br><span class="line">   8:   c7 45 fc 0a 00 00 00    mov    DWORD PTR [rbp-0x4],0xa</span><br><span class="line">   f:   c7 45 f8 05 00 00 00    mov    DWORD PTR [rbp-0x8],0x5</span><br><span class="line">  16:   8b 55 f8                mov    edx,DWORD PTR [rbp-0x8]</span><br><span class="line">  19:   8b 45 fc                mov    eax,DWORD PTR [rbp-0x4]</span><br><span class="line">  1c:   89 d6                   mov    esi,edx</span><br><span class="line">  1e:   89 c7                   mov    edi,eax</span><br><span class="line">  20:   b8 00 00 00 00          mov    eax,0x0</span><br><span class="line">  25:   e8 00 00 00 00          call   2a &lt;main+0x2a&gt;</span><br><span class="line">  2a:   89 45 f4                mov    DWORD PTR [rbp-0xc],eax</span><br><span class="line">  2d:   8b 45 f4                mov    eax,DWORD PTR [rbp-0xc]</span><br><span class="line">  30:   89 c6                   mov    esi,eax</span><br><span class="line">  32:   48 8d 3d 00 00 00 00    lea    rdi,[rip+0x0]        # 39 &lt;main+0x39&gt;</span><br><span class="line">  39:   b8 00 00 00 00          mov    eax,0x0</span><br><span class="line">  3e:   e8 00 00 00 00          call   43 &lt;main+0x43&gt;</span><br><span class="line">  43:   b8 00 00 00 00          mov    eax,0x0</span><br><span class="line">  48:   c9                      leave  </span><br><span class="line">  49:   c3                      ret    </span><br></pre></td></tr></table></figure>
-
-<p>既然代码已经被我们“编译”成了指令，我们不妨尝试运行一下 .&#x2F;link_example.o。不幸的是，文件没有执行权限，我们遇到一个 Permission denied 错误。即使通过 chmod 命令赋予 link_example.o 文件可执行的权限，运行.&#x2F;link_example.o 仍然只会得到一条 cannot execute binary file: Exec format error 的错误。</p>
-<p>我们再仔细看一下 objdump 出来的两个文件的代码，会发现两个程序的地址都是从 0 开始的。如果地址是一样的，程序如果需要通过 call 指令调用函数的话，它怎么知道应该跳转到哪一个文件里呢？</p>
-<p>这么说吧，无论是这里的运行报错，还是 objdump 出来的汇编代码里面的重复地址，都是因为 add_lib.o 以及 link_example.o 并不是一个<strong>可执行文件</strong>（Executable Program），而是<strong>目标文件（</strong>Object File）。只有通过链接器（Linker）把多个目标文件以及调用的各种函数库链接起来，才能得到一个可执行文件。</p>
-<p>我们通过 gcc 的 -o 参数，可以生成对应的可执行文件，对应执行之后，就可以得到这个简单的加法调用函数的结果。</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">$ gcc -o link-example add_lib.o link_example.o</span><br><span class="line">$ ./link_example</span><br><span class="line">c = 15</span><br></pre></td></tr></table></figure>
-
-<h2 id="“C-语言代码-汇编代码-机器码”-的过程"><a href="#“C-语言代码-汇编代码-机器码”-的过程" class="headerlink" title="“C 语言代码 - 汇编代码 - 机器码” 的过程"></a>“C 语言代码 - 汇编代码 - 机器码” 的过程</h2><p>实际上，“C 语言代码 - 汇编代码 - 机器码” 这个过程，在我们的计算机上进行的时候是由两部分组成的。</p>
-<ul>
-<li><p>第一部分： 由编译（Compile）、汇编（Assemble）以及链接（Link）三个阶段组成。之后生成一个可执行文件。</p>
-</li>
-<li><p>第二部分，我们通过装载器（Loader）把可执行文件装载（Load）到内存中。CPU 从内存中读取指令和数据，开始真正执行程序。</p>
-<img src="/img/computer_img/装载.webp" alt="装载" style="zoom:33%;" /></li>
-</ul>
-<h2 id="ELF-格式和链接：理解链接过程"><a href="#ELF-格式和链接：理解链接过程" class="headerlink" title="ELF 格式和链接：理解链接过程"></a>ELF 格式和链接：理解链接过程</h2><p>程序最终是通过装载器变成指令和数据的，所以其实我们生成的可执行代码也并不仅仅是一条条的指令。我们还是通过 objdump 指令，把可执行文件的内容拿出来看看。</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">link_example:     file format elf64-x86-64</span><br><span class="line">Disassembly of section .init:</span><br><span class="line">...</span><br><span class="line">Disassembly of section .plt:</span><br><span class="line">...</span><br><span class="line">Disassembly of section .plt.got:</span><br><span class="line">...</span><br><span class="line">Disassembly of section .text:</span><br><span class="line">...</span><br><span class="line"></span><br><span class="line"> 6b0:   55                      push   rbp</span><br><span class="line"> 6b1:   48 89 e5                mov    rbp,rsp</span><br><span class="line"> 6b4:   89 7d fc                mov    DWORD PTR [rbp-0x4],edi</span><br><span class="line"> 6b7:   89 75 f8                mov    DWORD PTR [rbp-0x8],esi</span><br><span class="line"> 6ba:   8b 55 fc                mov    edx,DWORD PTR [rbp-0x4]</span><br><span class="line"> 6bd:   8b 45 f8                mov    eax,DWORD PTR [rbp-0x8]</span><br><span class="line"> 6c0:   01 d0                   add    eax,edx</span><br><span class="line"> 6c2:   5d                      pop    rbp</span><br><span class="line"> 6c3:   c3                      ret    </span><br><span class="line">00000000000006c4 &lt;main&gt;:</span><br><span class="line"> 6c4:   55                      push   rbp</span><br><span class="line"> 6c5:   48 89 e5                mov    rbp,rsp</span><br><span class="line"> 6c8:   48 83 ec 10             sub    rsp,0x10</span><br><span class="line"> 6cc:   c7 45 fc 0a 00 00 00    mov    DWORD PTR [rbp-0x4],0xa</span><br><span class="line"> 6d3:   c7 45 f8 05 00 00 00    mov    DWORD PTR [rbp-0x8],0x5</span><br><span class="line"> 6da:   8b 55 f8                mov    edx,DWORD PTR [rbp-0x8]</span><br><span class="line"> 6dd:   8b 45 fc                mov    eax,DWORD PTR [rbp-0x4]</span><br><span class="line"> 6e0:   89 d6                   mov    esi,edx</span><br><span class="line"> 6e2:   89 c7                   mov    edi,eax</span><br><span class="line"> 6e4:   b8 00 00 00 00          mov    eax,0x0</span><br><span class="line"> 6e9:   e8 c2 ff ff ff          call   6b0 &lt;add&gt;</span><br><span class="line"> ------------------------------------------------</span><br><span class="line"> 6ee:   89 45 f4                mov    DWORD PTR [rbp-0xc],eax</span><br><span class="line"> 6f1:   8b 45 f4                mov    eax,DWORD PTR [rbp-0xc]</span><br><span class="line"> 6f4:   89 c6                   mov    esi,eax</span><br><span class="line"> 6f6:   48 8d 3d 97 00 00 00    lea    rdi,[rip+0x97]        # 794 &lt;_IO_stdin_used+0x4&gt;</span><br><span class="line"> 6fd:   b8 00 00 00 00          mov    eax,0x0</span><br><span class="line"> 702:   e8 59 fe ff ff          call   560 &lt;printf@plt&gt;</span><br><span class="line"> 707:   b8 00 00 00 00          mov    eax,0x0</span><br><span class="line"> 70c:   c9                      leave  </span><br><span class="line"> 70d:   c3                      ret    </span><br><span class="line"> 70e:   66 90                   xchg   ax,ax</span><br><span class="line">...</span><br><span class="line">Disassembly of section .fini:</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
-
-<p>你会发现，可执行代码 dump 出来内容，和之前的目标代码长得差不多，但是长了很多。因为在 Linux 下，可执行文件和目标文件所使用的都是一种叫<strong>ELF（Execuatable and Linkable File Format）</strong>的文件格式，中文名叫可执行与可链接文件格式，这里面不仅存放了编译成的汇编指令，还保留了很多别的数据。</p>
-<p>比如我们过去所有 objdump 出来的代码里，你都可以看到对应的函数名称，像 add、main 等等，乃至你自己定义的全局可以访问的变量名称，都存放在这个 ELF 格式文件里。这些名字和他们对应的地址，在ELF 文件里，存储在一个叫作符号表（Symbols Table）的位置里。符号表相当于一个地址簿，把它们关联了起来。</p>
-<p>只关注和我们的 add 以及 main 函数相关的部分。你会发现，这里面，main 函数里调用 add 的跳转地址，不再是下一条指令的地址，而是 add 函数的入口地址了，这就是ELF 格式和链接器的功劳。</p>
-<img src="/img/computer_img/ELF 格式.webp" alt="ELF 格式" style="zoom:33%;" />
-
-<p>ELF 文件格式把各种信息，分成一个一个的 Section 保存起来。ELF 有一个基本的文件头（File Header）,用来表示这个文件的基本属性，比如是否是可执行文件，对应的 CPU、操作系统等等。除了这些基本属性之外，大部分程序还有这么一些 Section：</p>
-<ol>
-<li><p>text Section: 代码段或者指令段（Code Section）,用来保存程序的代码和指令；</p>
-</li>
-<li><p>data Section ,也叫数据段（Data Section）,用来保存程序里设置好的初始化数据信息。</p>
-</li>
-<li><p>.rel.text.Section ,也叫重定位表。表里保留的是当前的文件里面，哪些跳转地址是我们不知道的。比如上面的 link_example.o 里面，我们在 main 函数里面调用了 add 和 printf 这两个函数，但是在链接发生之前，我们并不知道该跳转到哪里，这些信息就存在重定位表里；</p>
-</li>
-<li><p>最后是 .symtab Section ,也叫符号表。符号表保留了我们所说的当前文件里面定义的函数名称和对应地址的地址簿。</p>
-</li>
-</ol>
-<h2 id="链接器工作原理"><a href="#链接器工作原理" class="headerlink" title="链接器工作原理"></a>链接器工作原理</h2><p>链接器会扫描所有输入的目标文件，然后把所有<strong>符号表</strong>里的信息收集起来，构成一个全局的符号表。然后再根据<strong>重定位表</strong>，把所有不确定要跳转地址的代码，根据符号表里的存储地址，进行一次修正。最后，把所有的目标文件的对应段进行一次合并，变成了最终的可执行代码。<em>这也是为什么，可执行文件里面的函数调用的地址是正确的。</em></p>
-<img src="/img/computer_img/ELF 链接过程.webp" alt="ELF 链接过程" style="zoom: 33%;" />
-
-<p><strong>最后</strong>，在链接器把程序变成可执行文件之后，要装载器去执行程序就容易多了。装载器不再需要考虑地址跳转的问题，只需要解析 ELF 文件，把对应的指令和数据，加载到内存里面供 CPU 执行就可以了。</p>
-<h2 id="总结延伸："><a href="#总结延伸：" class="headerlink" title="总结延伸："></a>总结延伸：</h2><p>什么同样一个程序，在 Linux 下可以执行而在 Windows 下不能执行了。其中一个非常重要的原因就是，两个操作系统下可执行文件的格式不一样。Linux 下的 ELF 文件格式，而 Windows 的可执行文件格式是一种叫作 PE（Portable Executable Format）的文件格式。Linux 下的装载器只能解析 ELF 格式而不能解析 PE 格式。</p>
-<p>如果我们有一个可以能够解析PE 格式的装载器，我们就有可能在 Linux 下运行 Windows 程序。</p>
-<p>对于 ELF 格式的文件，为了能够实现这样一个<em><strong>静态链接</strong></em>的机制，里面不只是简单罗列了程序所需要执行的指令，还会包括链接所需要的重定位表和符号表。</p>
-]]></content>
-      <categories>
-        <category>计算机组成原理</category>
-      </categories>
-      <tags>
-        <tag>程序</tag>
-        <tag>链接</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>程序装载</title>
     <url>/posts/f17b55f/</url>
     <content><![CDATA[<h1 id="程序装载：“640K内存”真的不够用么？"><a href="#程序装载：“640K内存”真的不够用么？" class="headerlink" title="程序装载：“640K内存”真的不够用么？"></a>程序装载：“640K内存”真的不够用么？</h1><h2 id="程序装载面临的挑战"><a href="#程序装载面临的挑战" class="headerlink" title="程序装载面临的挑战"></a>程序装载面临的挑战</h2><p>通过链接器，把多个文件合并为一个最终可执行文件。在执行这些可执行文件的时候，就是通过一个装载器，解析ELF 或 PE 格式的可执行文件<span id="more"></span>。装载器把对应的指令和数据加到内存中，让CPU  去执行。</p>
@@ -513,8 +450,71 @@ SPEC 提供的 CPU 基准测试程序，就好像 CPU 届的“高考”，通�
         <category>计算机组成原理</category>
       </categories>
       <tags>
-        <tag>链接</tag>
         <tag>虚拟内存</tag>
+        <tag>链接</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>ELF和静态链接</title>
+    <url>/posts/b778160a/</url>
+    <content><![CDATA[<h1 id="ELF和静态链接：为什么程序无法同时在Linux和Windows下运行？"><a href="#ELF和静态链接：为什么程序无法同时在Linux和Windows下运行？" class="headerlink" title="ELF和静态链接：为什么程序无法同时在Linux和Windows下运行？"></a>ELF和静态链接：为什么程序无法同时在Linux和Windows下运行？</h1><h2 id="编译、链接和装载：-拆解程序执行"><a href="#编译、链接和装载：-拆解程序执行" class="headerlink" title="编译、链接和装载： 拆解程序执行"></a>编译、链接和装载： 拆解程序执行</h2><p>之前，我们通过 gcc 生成的文件和 objdump 获取到的汇编指令都有些小小的问题，以add 函数示例，<span id="more"></span>拆分成两个文件 add_lib.c 和 link_example.c 。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">// add_lib.c</span><br><span class="line">int add(int a, int b)</span><br><span class="line">&#123;</span><br><span class="line">    return a+b;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">// link_example.c</span><br><span class="line"></span><br><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">int main()</span><br><span class="line">&#123;</span><br><span class="line">    int a = 10;</span><br><span class="line">    int b = 5;</span><br><span class="line">    int c = add(a, b);</span><br><span class="line">    printf(&quot;c = %d\n&quot;, c);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>我们通过 gcc 来编译这两个文件，然后通过 objdump 命令看看它们的汇编代码。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">$ gcc -g -c add_lib.c link_example.c</span><br><span class="line">$ objdump -d -M intel -S add_lib.o</span><br><span class="line">$ objdump -d -M intel -S link_example.o</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">add_lib.o:     file format elf64-x86-64</span><br><span class="line">Disassembly of section .text:</span><br><span class="line">0000000000000000 &lt;add&gt;:</span><br><span class="line">   0:   55                      push   rbp</span><br><span class="line">   1:   48 89 e5                mov    rbp,rsp</span><br><span class="line">   4:   89 7d fc                mov    DWORD PTR [rbp-0x4],edi</span><br><span class="line">   7:   89 75 f8                mov    DWORD PTR [rbp-0x8],esi</span><br><span class="line">   a:   8b 55 fc                mov    edx,DWORD PTR [rbp-0x4]</span><br><span class="line">   d:   8b 45 f8                mov    eax,DWORD PTR [rbp-0x8]</span><br><span class="line">  10:   01 d0                   add    eax,edx</span><br><span class="line">  12:   5d                      pop    rbp</span><br><span class="line">  13:   c3                      ret    </span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">link_example.o:     file format elf64-x86-64</span><br><span class="line">Disassembly of section .text:</span><br><span class="line">0000000000000000 &lt;main&gt;:</span><br><span class="line">   0:   55                      push   rbp</span><br><span class="line">   1:   48 89 e5                mov    rbp,rsp</span><br><span class="line">   4:   48 83 ec 10             sub    rsp,0x10</span><br><span class="line">   8:   c7 45 fc 0a 00 00 00    mov    DWORD PTR [rbp-0x4],0xa</span><br><span class="line">   f:   c7 45 f8 05 00 00 00    mov    DWORD PTR [rbp-0x8],0x5</span><br><span class="line">  16:   8b 55 f8                mov    edx,DWORD PTR [rbp-0x8]</span><br><span class="line">  19:   8b 45 fc                mov    eax,DWORD PTR [rbp-0x4]</span><br><span class="line">  1c:   89 d6                   mov    esi,edx</span><br><span class="line">  1e:   89 c7                   mov    edi,eax</span><br><span class="line">  20:   b8 00 00 00 00          mov    eax,0x0</span><br><span class="line">  25:   e8 00 00 00 00          call   2a &lt;main+0x2a&gt;</span><br><span class="line">  2a:   89 45 f4                mov    DWORD PTR [rbp-0xc],eax</span><br><span class="line">  2d:   8b 45 f4                mov    eax,DWORD PTR [rbp-0xc]</span><br><span class="line">  30:   89 c6                   mov    esi,eax</span><br><span class="line">  32:   48 8d 3d 00 00 00 00    lea    rdi,[rip+0x0]        # 39 &lt;main+0x39&gt;</span><br><span class="line">  39:   b8 00 00 00 00          mov    eax,0x0</span><br><span class="line">  3e:   e8 00 00 00 00          call   43 &lt;main+0x43&gt;</span><br><span class="line">  43:   b8 00 00 00 00          mov    eax,0x0</span><br><span class="line">  48:   c9                      leave  </span><br><span class="line">  49:   c3                      ret    </span><br></pre></td></tr></table></figure>
+
+<p>既然代码已经被我们“编译”成了指令，我们不妨尝试运行一下 .&#x2F;link_example.o。不幸的是，文件没有执行权限，我们遇到一个 Permission denied 错误。即使通过 chmod 命令赋予 link_example.o 文件可执行的权限，运行.&#x2F;link_example.o 仍然只会得到一条 cannot execute binary file: Exec format error 的错误。</p>
+<p>我们再仔细看一下 objdump 出来的两个文件的代码，会发现两个程序的地址都是从 0 开始的。如果地址是一样的，程序如果需要通过 call 指令调用函数的话，它怎么知道应该跳转到哪一个文件里呢？</p>
+<p>这么说吧，无论是这里的运行报错，还是 objdump 出来的汇编代码里面的重复地址，都是因为 add_lib.o 以及 link_example.o 并不是一个<strong>可执行文件</strong>（Executable Program），而是<strong>目标文件（</strong>Object File）。只有通过链接器（Linker）把多个目标文件以及调用的各种函数库链接起来，才能得到一个可执行文件。</p>
+<p>我们通过 gcc 的 -o 参数，可以生成对应的可执行文件，对应执行之后，就可以得到这个简单的加法调用函数的结果。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">$ gcc -o link-example add_lib.o link_example.o</span><br><span class="line">$ ./link_example</span><br><span class="line">c = 15</span><br></pre></td></tr></table></figure>
+
+<h2 id="“C-语言代码-汇编代码-机器码”-的过程"><a href="#“C-语言代码-汇编代码-机器码”-的过程" class="headerlink" title="“C 语言代码 - 汇编代码 - 机器码” 的过程"></a>“C 语言代码 - 汇编代码 - 机器码” 的过程</h2><p>实际上，“C 语言代码 - 汇编代码 - 机器码” 这个过程，在我们的计算机上进行的时候是由两部分组成的。</p>
+<ul>
+<li><p>第一部分： 由编译（Compile）、汇编（Assemble）以及链接（Link）三个阶段组成。之后生成一个可执行文件。</p>
+</li>
+<li><p>第二部分，我们通过装载器（Loader）把可执行文件装载（Load）到内存中。CPU 从内存中读取指令和数据，开始真正执行程序。</p>
+<img src="/img/computer_img/装载.webp" alt="装载" style="zoom:33%;" /></li>
+</ul>
+<h2 id="ELF-格式和链接：理解链接过程"><a href="#ELF-格式和链接：理解链接过程" class="headerlink" title="ELF 格式和链接：理解链接过程"></a>ELF 格式和链接：理解链接过程</h2><p>程序最终是通过装载器变成指令和数据的，所以其实我们生成的可执行代码也并不仅仅是一条条的指令。我们还是通过 objdump 指令，把可执行文件的内容拿出来看看。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">link_example:     file format elf64-x86-64</span><br><span class="line">Disassembly of section .init:</span><br><span class="line">...</span><br><span class="line">Disassembly of section .plt:</span><br><span class="line">...</span><br><span class="line">Disassembly of section .plt.got:</span><br><span class="line">...</span><br><span class="line">Disassembly of section .text:</span><br><span class="line">...</span><br><span class="line"></span><br><span class="line"> 6b0:   55                      push   rbp</span><br><span class="line"> 6b1:   48 89 e5                mov    rbp,rsp</span><br><span class="line"> 6b4:   89 7d fc                mov    DWORD PTR [rbp-0x4],edi</span><br><span class="line"> 6b7:   89 75 f8                mov    DWORD PTR [rbp-0x8],esi</span><br><span class="line"> 6ba:   8b 55 fc                mov    edx,DWORD PTR [rbp-0x4]</span><br><span class="line"> 6bd:   8b 45 f8                mov    eax,DWORD PTR [rbp-0x8]</span><br><span class="line"> 6c0:   01 d0                   add    eax,edx</span><br><span class="line"> 6c2:   5d                      pop    rbp</span><br><span class="line"> 6c3:   c3                      ret    </span><br><span class="line">00000000000006c4 &lt;main&gt;:</span><br><span class="line"> 6c4:   55                      push   rbp</span><br><span class="line"> 6c5:   48 89 e5                mov    rbp,rsp</span><br><span class="line"> 6c8:   48 83 ec 10             sub    rsp,0x10</span><br><span class="line"> 6cc:   c7 45 fc 0a 00 00 00    mov    DWORD PTR [rbp-0x4],0xa</span><br><span class="line"> 6d3:   c7 45 f8 05 00 00 00    mov    DWORD PTR [rbp-0x8],0x5</span><br><span class="line"> 6da:   8b 55 f8                mov    edx,DWORD PTR [rbp-0x8]</span><br><span class="line"> 6dd:   8b 45 fc                mov    eax,DWORD PTR [rbp-0x4]</span><br><span class="line"> 6e0:   89 d6                   mov    esi,edx</span><br><span class="line"> 6e2:   89 c7                   mov    edi,eax</span><br><span class="line"> 6e4:   b8 00 00 00 00          mov    eax,0x0</span><br><span class="line"> 6e9:   e8 c2 ff ff ff          call   6b0 &lt;add&gt;</span><br><span class="line"> ------------------------------------------------</span><br><span class="line"> 6ee:   89 45 f4                mov    DWORD PTR [rbp-0xc],eax</span><br><span class="line"> 6f1:   8b 45 f4                mov    eax,DWORD PTR [rbp-0xc]</span><br><span class="line"> 6f4:   89 c6                   mov    esi,eax</span><br><span class="line"> 6f6:   48 8d 3d 97 00 00 00    lea    rdi,[rip+0x97]        # 794 &lt;_IO_stdin_used+0x4&gt;</span><br><span class="line"> 6fd:   b8 00 00 00 00          mov    eax,0x0</span><br><span class="line"> 702:   e8 59 fe ff ff          call   560 &lt;printf@plt&gt;</span><br><span class="line"> 707:   b8 00 00 00 00          mov    eax,0x0</span><br><span class="line"> 70c:   c9                      leave  </span><br><span class="line"> 70d:   c3                      ret    </span><br><span class="line"> 70e:   66 90                   xchg   ax,ax</span><br><span class="line">...</span><br><span class="line">Disassembly of section .fini:</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+
+<p>你会发现，可执行代码 dump 出来内容，和之前的目标代码长得差不多，但是长了很多。因为在 Linux 下，可执行文件和目标文件所使用的都是一种叫<strong>ELF（Execuatable and Linkable File Format）</strong>的文件格式，中文名叫可执行与可链接文件格式，这里面不仅存放了编译成的汇编指令，还保留了很多别的数据。</p>
+<p>比如我们过去所有 objdump 出来的代码里，你都可以看到对应的函数名称，像 add、main 等等，乃至你自己定义的全局可以访问的变量名称，都存放在这个 ELF 格式文件里。这些名字和他们对应的地址，在ELF 文件里，存储在一个叫作符号表（Symbols Table）的位置里。符号表相当于一个地址簿，把它们关联了起来。</p>
+<p>只关注和我们的 add 以及 main 函数相关的部分。你会发现，这里面，main 函数里调用 add 的跳转地址，不再是下一条指令的地址，而是 add 函数的入口地址了，这就是ELF 格式和链接器的功劳。</p>
+<img src="/img/computer_img/ELF 格式.webp" alt="ELF 格式" style="zoom:33%;" />
+
+<p>ELF 文件格式把各种信息，分成一个一个的 Section 保存起来。ELF 有一个基本的文件头（File Header）,用来表示这个文件的基本属性，比如是否是可执行文件，对应的 CPU、操作系统等等。除了这些基本属性之外，大部分程序还有这么一些 Section：</p>
+<ol>
+<li><p>text Section: 代码段或者指令段（Code Section）,用来保存程序的代码和指令；</p>
+</li>
+<li><p>data Section ,也叫数据段（Data Section）,用来保存程序里设置好的初始化数据信息。</p>
+</li>
+<li><p>.rel.text.Section ,也叫重定位表。表里保留的是当前的文件里面，哪些跳转地址是我们不知道的。比如上面的 link_example.o 里面，我们在 main 函数里面调用了 add 和 printf 这两个函数，但是在链接发生之前，我们并不知道该跳转到哪里，这些信息就存在重定位表里；</p>
+</li>
+<li><p>最后是 .symtab Section ,也叫符号表。符号表保留了我们所说的当前文件里面定义的函数名称和对应地址的地址簿。</p>
+</li>
+</ol>
+<h2 id="链接器工作原理"><a href="#链接器工作原理" class="headerlink" title="链接器工作原理"></a>链接器工作原理</h2><p>链接器会扫描所有输入的目标文件，然后把所有<strong>符号表</strong>里的信息收集起来，构成一个全局的符号表。然后再根据<strong>重定位表</strong>，把所有不确定要跳转地址的代码，根据符号表里的存储地址，进行一次修正。最后，把所有的目标文件的对应段进行一次合并，变成了最终的可执行代码。<em>这也是为什么，可执行文件里面的函数调用的地址是正确的。</em></p>
+<img src="/img/computer_img/ELF 链接过程.webp" alt="ELF 链接过程" style="zoom: 33%;" />
+
+<p><strong>最后</strong>，在链接器把程序变成可执行文件之后，要装载器去执行程序就容易多了。装载器不再需要考虑地址跳转的问题，只需要解析 ELF 文件，把对应的指令和数据，加载到内存里面供 CPU 执行就可以了。</p>
+<h2 id="总结延伸："><a href="#总结延伸：" class="headerlink" title="总结延伸："></a>总结延伸：</h2><p>什么同样一个程序，在 Linux 下可以执行而在 Windows 下不能执行了。其中一个非常重要的原因就是，两个操作系统下可执行文件的格式不一样。Linux 下的 ELF 文件格式，而 Windows 的可执行文件格式是一种叫作 PE（Portable Executable Format）的文件格式。Linux 下的装载器只能解析 ELF 格式而不能解析 PE 格式。</p>
+<p>如果我们有一个可以能够解析PE 格式的装载器，我们就有可能在 Linux 下运行 Windows 程序。</p>
+<p>对于 ELF 格式的文件，为了能够实现这样一个<em><strong>静态链接</strong></em>的机制，里面不只是简单罗列了程序所需要执行的指令，还会包括链接所需要的重定位表和符号表。</p>
+]]></content>
+      <categories>
+        <category>计算机组成原理</category>
+      </categories>
+      <tags>
+        <tag>链接</tag>
+        <tag>程序</tag>
       </tags>
   </entry>
   <entry>
@@ -644,73 +644,6 @@ SPEC 提供的 CPU 基准测试程序，就好像 CPU 届的“高考”，通�
       </tags>
   </entry>
   <entry>
-    <title>SSD硬盘（下）</title>
-    <url>/posts/158723cb/</url>
-    <content><![CDATA[<h1 id="SSD硬盘（下）：如何完成性能优化的KPI？"><a href="#SSD硬盘（下）：如何完成性能优化的KPI？" class="headerlink" title="SSD硬盘（下）：如何完成性能优化的KPI？"></a>SSD硬盘（下）：如何完成性能优化的KPI？</h1><p>如果你平时用的是 Windows 电脑，你会发现，用了 SSD 的系统盘，就不能用磁盘碎片整理功能。    这是因为，一旦主动去运行磁盘碎片整理功能，就会发生一次块的擦除<span id="more"></span>，对应块的寿命就少了一点点。</p>
-<p>我们的操作系统上，并没有 SSD 硬盘上各个块目前已经擦写的情况和寿命，所以它对待 SSD 硬盘和普通的机械硬盘没有什么区别。</p>
-<p>我们日常使用 PC 进行软件开发的时候，会先在硬盘上装上操作系统和常用软件，比如 Office，或者工程师们会装上 VS Code、WebStorm 这样的集成开发环境。这些软件所在的块，写入一次之后，就不太会擦除了，所以<strong>就只有读的需求</strong>。</p>
-<p>一旦开始开发，我们就会不断添加新的代码文件，还会不断修改已经有的代码文件。因为 SSD 硬盘没有<strong>覆写（Override）</strong>的功能，所以，这个过程中，其实我们是在反复地写入新的文件，然后再把原来的文件标记成逻辑上删除的状态。  等 SSD 里面空的块少了，我们会用“垃圾回收”的方式，进行擦除。这样，我们的擦除会反复发生在这些用来存放数据的地方。</p>
-<img src="/img/computer_img/SSD 读写区.webp" alt="SSD 读写区" style="zoom:50%;" />
-
-<p>有一天，这些块的擦除次数到了，变成了坏块。但是，我们安装操作系统和软件的地方还没有坏，而这块硬盘的可以用的容量却变小了。</p>
-<hr>
-<h2 id="磨损均衡、TRIM-和写入放大效应"><a href="#磨损均衡、TRIM-和写入放大效应" class="headerlink" title="磨损均衡、TRIM 和写入放大效应"></a>磨损均衡、TRIM 和写入放大效应</h2><h3 id="FTL-和磨损均衡"><a href="#FTL-和磨损均衡" class="headerlink" title="FTL 和磨损均衡"></a>FTL 和磨损均衡</h3><p>那么，我们有没有什么办法，不让这些坏块那么早就出现呢？我们能不能，匀出一些存放操作系统的块的擦写次数，给到这些存放数据的地方呢？</p>
-<p>相信你一定想到了，其实我们要的就是想一个办法，让 SSD 硬盘各个块的擦除次数，均匀分摊到各个块上。这个策略呢，就叫作<strong>磨损均衡</strong>（Wear-Leveling）。</p>
-<p>实现这个技术的核心办法，和我们前面讲过的虚拟内存一样，就是添加一个间接层。这个间接层，就是我们上一讲给你卖的那个关子，就是 FTL 这个<strong>闪存转换层</strong>。</p>
-<img src="/img/computer_img/FTL 闪寸转换层.webp" alt="FTL 闪寸转换层" style="zoom:50%;" />
-
-<p>就像在管理杯纯的时候，我们通过一个页表映射虚拟内存页和物理页一样，在 FTL 里面，存放了 <strong>逻辑块地址</strong>（Logical Block Address ）到 <strong>物理块地址</strong> 的映射。</p>
-<p>操作系统访问的硬盘地址，其实都是逻辑地址。只有通过 FTL 转换之后，才会变成实际的物理地址，找到对应的块进行访问。操作系统本身，不需要去考虑块的磨损程度，只要和操作机械硬盘一样来读写数据就好了。</p>
-<hr>
-<p>操作系统所有对于 SSD 硬盘的读写请求，都要经过 FTL。FTL 里面又有逻辑块对应的物理块，所以 FTL 能够记录下来，每个物理块被擦写的次数。<em>如果一个物理块被擦写的次数多了，FTL 就可以将这个物理块，挪到一个擦写次数少的物理块上。但是，逻辑块不用变，操作系统也不需要知道这个变化。</em></p>
-<p>这也是我们在设计大型系统中的一个典型思路，<em><strong>也就是各层之间是隔离的，操作系统不需要考虑底层的硬件是什么，</strong></em>完全交由硬件的控制电路里面的 FTL，来管理对于实际物理硬件的写入。</p>
-<h3 id="TRIM-指令的支持"><a href="#TRIM-指令的支持" class="headerlink" title="TRIM 指令的支持"></a>TRIM 指令的支持</h3><p>不过，操作系统不去关心实际底层的硬件是什么，在 SSD 硬盘的使用上，也会带来一个问题。这个问题就是，操作系统的逻辑层和 SSD 的逻辑层里的块状态，是不匹配的。</p>
-<p>我们在操作系统里面去删除一个文件，其实并没有真的在物理层面去删除这个文件，只是在文件系统里面，把对应的 inode 里面的元信息清理掉，这代表这个 inode 还可以继续使用，可以写入新的数据。这个时候，实际物理层面的对应的存储空间，在操作系统里面被标记成可以写入了。</p>
-<p>所以，其实我们日常的文件删除，都只是一个操作系统层面的逻辑删除。这也是为什么，很多时候我们不小心删除了对应的文件，我们可以通过各种恢复软件，把数据找回来。同样的，这也是为什么，如果我们想要删除干净数据，需要用各种“文件粉碎”的功能才行。</p>
-<p>这个删除的逻辑在机械硬盘层面没有问题，因为文件被标记成可以写入，后续的写入可以直接覆写这个位置。但是，在 SSD 硬盘上就不一样了。我在这里放了一张详细的示意图。我们下面一起来看看具体是怎么回事儿。</p>
-<img src="/img/computer_img/ssd 删除.webp" alt="ssd 删除" style="zoom:50%;" />
-
-<p>一开始，操作系统里面有好几个文件，不同的文件我用不同的颜色标记出来了。下面的 SSD 的逻辑块里面占用的页，我们也用同样的颜色标记出来文件占用的对应页。</p>
-<p>当我们在操作系统里面，删除掉一个刚刚下载的文件，比如标记成黄色 openjdk.exe 这样一个 jdk 的安装文件，在操作系统里面，对应的 inode 里面，就没有文件的元信息。</p>
-<p>但是，这个时候，我们的 SSD 的逻辑块层面，其实并不知道这个事情。所以在，逻辑块层面，openjdk.exe 仍然是占用了对应的空间。对应的物理页，也仍然被认为是被占用了的。</p>
-<p>为了解决这个问题，现在的操作系统和 SSD 的主控芯片，都支持 TRIM 命令。这个命令可以在文件被删除的时候，让操作系统去通知 SSD 硬盘，对应的逻辑块已经标记成已删除了。现在的 SSD 硬盘都已经支持了 TRIM 命令。无论是 Linux、Windows 还是 MacOS，这些操作系统也都已经支持了 TRIM 命令了。</p>
-<hr>
-<h3 id="写入放大"><a href="#写入放大" class="headerlink" title="写入放大"></a>写入放大</h3><p>其实，TRIM 命令的发明，也反应了一个使用 SSD 硬盘的问题，那就是，SSD 硬盘容易越用越慢。</p>
-<p>当 SSD 硬盘的存储空间被占用得越来越多，每一次写入新数据，我们都可能没有足够的空白。我们可能不得不去进行垃圾回收，合并一些块里面的页，然后再擦除掉一些页，才能匀出一些空间来。</p>
-<p>这个时候，从应用层或者操作系统层面来看，我们可能只是写入了一个 4KB 或者 4MB 的数据。但是，实际通过 FTL 之后，我们可能要去搬运 8MB、16MB 甚至更多的数据。</p>
-<p>我们通过 <strong>“实际的闪存写入的数据量 &#x2F; 系统通过 FTL 写入的数据量 &#x3D; 写入放大”</strong> ，可以得到，写入放大的倍数越多，意味着实际的 SSD 性能也就越差，会远远比不上实际 SSD 硬盘标称的指标。</p>
-<p>解决写入放大，需要我们在后台定时进行垃圾回收，在硬盘比较空闲的时候，就把搬运数据、擦除数据、刘处空白的块的工作做完，而不是等实际数据写入的时候 ，在进行这样的操作。</p>
-<hr>
-<h2 id="AeroSpike：如何最大化-SSD-的使用效率？"><a href="#AeroSpike：如何最大化-SSD-的使用效率？" class="headerlink" title="AeroSpike：如何最大化 SSD 的使用效率？"></a>AeroSpike：如何最大化 SSD 的使用效率？</h2><p>讲到这里，相信你也发现了，想要把 SSD 硬盘用好，其实没有那么简单。如果我们只是简单地拿一块 SSD 硬盘替换掉原来的 HDD 硬盘，而不是从应用层面考虑任何 SSD 硬盘特性的话，我们多半还是没法获得想要的性能提升。</p>
-<p>不过，既然清楚了 SSD 硬盘的各种特性，我们就可以依据这些特性，来设计我们的应用。接下来，我就带你一起看一看，AeroSpike 这个专门针对 SSD 硬盘特性设计的  <strong>Key-Value 数据库（键值对数据库）</strong>，是怎么利用这些物理特性的。</p>
-<p>首先，AeroSpike 操作 SSD 硬盘，并没有通过操作系统的文件系统。而是直接操作 SSD 里面的块和页。因为操作系统里面的文件系统，对于 KV 数据库来说，只是让我们多了一层间接层，只会降低性能，对我们没有什么实际的作用。</p>
-<p>其次，AeroSpike 在读写数据的时候，做了两个优化。在写入数据的时候，AeroSpike 尽可能去写一个较大的数据块，而不是频繁的去写很多小的数据块，这样，磁盘就不太容易频繁出现磁盘碎片，而且一次性写入一个大的数据块， 也更容易利用好顺序写入的性能优势。AeroSpike 写入的一个数据块，是 128 KB ,远比一个页的 4KB 要大得多。</p>
-<p>另外，在读取数据的时候，AeroSpike 倒是可以读取 512 字节（Bytes）这样的小数据。  因为 SSD 的随机读取性能很好，也不像写入数据那样有擦除寿命问题。<strong>而且，很多时候我们读取的数据是键值对里面的值的数据，这些数据要在网络上传输。</strong>如果一次性必须读出比较大的数据，就会导致我们的网络带宽不够用。</p>
-<p>因为 AeroSpike 是一个对于响应时间要求很高的实时 KV 数据库，如果出现了<em>严重的写放大效应</em>，会导致写入数据的响应时间大幅度变长。所以 AeroSpike 做了这样几个动作：</p>
-<ul>
-<li>第一个是持续地进行磁盘碎片整理。AeroSpike 用了所谓的高水位（High Watermark）算法。其实这个算法很简单，就是一旦一个物理块里面的数据碎片超过 50%，就把这个物理块搬运压缩，然后进行数据擦除，确保磁盘始终有足够的空间可以写入。</li>
-<li>第二个是在 AeroSpike 给出的最佳实践中，为了保障数据库的性能，建议你只用到 SSD 硬盘标定容量的一半。也就是说，我们人为地给 SSD 硬盘预留了 50% 的预留空间，以确保 SSD 硬盘的写放大效应尽可能小，不会影响数据库的访问性能。</li>
-</ul>
-<img src="/img/computer_img/SSD AeroSpike.webp" alt="SSD AeroSpike" style="zoom:50%;" />
-
-<p>正是因为做了这种种的优化，在 NoSQL 数据库刚刚兴起的时候，AeroSpike 的性能把 Cassandra、MongoDB 这些数据库远远甩在身后，和这些数据库之间的性能差距，有时候会到达一个数量级。 <em>这也让 AeroSpike 成为了当时高性能 KV 数据库的标杆。</em>你可以看一看 InfoQ 出的这个 <a href="https://www.infoq.com/news/2013/04/NoSQL-Benchmark/">Benchmark</a>，里面有 2013 年的时候，这几个 NoSQL 数据库巨大的性能差异。</p>
-<h2 id="总结延伸"><a href="#总结延伸" class="headerlink" title="总结延伸"></a>总结延伸</h2><p>因为 SSD 硬盘的使用寿命，受限于块的擦除次数，所以我们需要通过一个磨损均衡的策略，来管理 SSD 硬盘的各个块的擦除次数。我们通过在逻辑块地址和物理块地址之间，引入 FTL 这个映射层，使得操作系统无需关心物理块的擦写次数，而是由 FTL 里的软件算法，来协调到底每一次写入应该磨损哪一块。</p>
-<p>除了磨损均衡之外，操作系统和 SSD 硬件的特性还有一个不匹配的地方。那就是，<em>操作系统在删除数据的时候，并没有真的删除物理层面的数据，而只是修改了 inode 里面的数据。这个“伪删除”，使得 SSD 硬盘在逻辑和物理层面，都没有意识到有些块其实已经被删除了。</em>这就导致在垃圾回收的时候，会浪费很多不必要的读写资源。</p>
-<p>SSD 这个需要进行垃圾回收的特性，使得我们在写入数据的时候，会遇到写入放大。明明我们只是写入了 4MB 的数据，可能在 SSD 的硬件层面，实际写入了 8MB、16MB 乃至更多的数据。</p>
-<p>针对这些特性，AeroSpike，这个专门针对 SSD 硬盘特性的 KV 数据库，设计了很多的优化点，包括跳过文件系统直写硬盘、写大块读小块、用高水位算法持续进行磁盘碎片整理，以及只使用 SSD 硬盘的一半空间。这些策略，使得 AeroSpike 的性能，在早年间远远超过了 Cassandra 等其他 NoSQL 数据库。</p>
-<blockquote>
-<p>可以看到，针对硬件特性设计的软件，才能最大化发挥我们的硬件性能。</p>
-</blockquote>
-]]></content>
-      <categories>
-        <category>计算机组成原理</category>
-      </categories>
-      <tags>
-        <tag>存储器</tag>
-        <tag>SSD</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>DMA(Direct Memory Access)</title>
     <url>/posts/ee2bfcc7/</url>
     <content><![CDATA[<h1 id="DMA：为什么Kafka这么快？"><a href="#DMA：为什么Kafka这么快？" class="headerlink" title="DMA：为什么Kafka这么快？"></a>DMA：为什么Kafka这么快？</h1><p>过去几年里，整个计算机产业界，都在尝试不停地提升 I&#x2F;O 设备的速度。把 HDD 硬盘换成 SSD 硬盘，我们仍然觉得不够快；用 PCI Express 接口的 SSD 硬盘替代 SATA 接口的 SSD 硬盘<span id="more"></span>，我们还是觉得不够快，所以，现在就有了傲腾（Optane）这样的技术。</p>
@@ -806,6 +739,186 @@ SPEC 提供的 CPU 基准测试程序，就好像 CPU 届的“高考”，通�
       <tags>
         <tag>存储器</tag>
         <tag>Kafka</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>数据完整性（上）</title>
+    <url>/posts/9527a54e/</url>
+    <content><![CDATA[<h1 id="数据完整性（上）：硬件坏了怎么办？"><a href="#数据完整性（上）：硬件坏了怎么办？" class="headerlink" title="数据完整性（上）：硬件坏了怎么办？"></a>数据完整性（上）：硬件坏了怎么办？</h1><h2 id="问题引人"><a href="#问题引人" class="headerlink" title="问题引人"></a>问题引人</h2><p>当时，我正在 MediaV 带领一个 20 多人的团队，负责公司的广告数据和机器学习算法。其中有一部分工作，就是用 Hadoop 集群处理所有的数据和报表业务。<span id="more"></span>当时我们的业务增长很快，所以会频繁地往 Hadoop 集群里面添置机器。2012 年的时候，国内的云计算平台还不太成熟，所以我们都是自己采购硬件，放在托管的数据中心里面。</p>
+<p>那个时候，我们的 Hadoop 集群服务器，在从 100 台服务器往 1000 台服务器走。我们觉得，像 Dell 这样品牌厂商的服务器太贵了，而且能够提供的硬件配置和我们的期望也有差异。于是，运维的同学开始和 OEM 厂商合作，自己定制服务器，批量采购硬盘、内存。</p>
+<p>那个时候，大家都听过 Google 早期发展时，为了降低成本买了很多二手的硬件来降低成本，通过分布式的方式来保障系统的可靠性的办法。虽然我们还没有抠门到去买二手硬件，不过当时，我们选择购买了普通的机械硬盘，而不是企业级的、用在数据中心的机械硬盘；采购了普通的内存条，而不是带 ECC 纠错的服务器内存条，想着能省一点儿是一点儿。</p>
+<h2 id="单比特翻转：软件解决不了的硬件错误"><a href="#单比特翻转：软件解决不了的硬件错误" class="headerlink" title="单比特翻转：软件解决不了的硬件错误"></a>单比特翻转：软件解决不了的硬件错误</h2><p>忽然有一天，我们最大的、每小时执行一次的数据处理报表应用，完成时间变得比平时晚了不少。一开始，我们并没有太在意，毕竟当时数据量每天都在增长，慢一点就慢一点了。但是，接着糟糕的事情开始发生了。</p>
+<p>一方面，我们发现，报表任务有时候在一个小时之内执行不完，接着，偶尔整个报表任务会执行失败。于是，我们不得不停下手头开发的工作，开始排查这个问题。</p>
+<p>用过 Hadoop 的话，你可能知道，作为一个分布式的应用，考虑到硬件的故障，Hadoop 本身会在特定节点计算出错的情况下，重试整个计算过程。之前的报表跑得慢，就是因为有些节点的计算任务失败过，只是在重试之后又成功了。进一步分析，我们发现，程序的错误非常奇怪。有些数据计算的结果，比如“34+23”，结果应该是“57”，但是却变成了一个美元符号“$”。</p>
+<p>前前后后折腾了一周，我们发现，从日志上看，大部分出错的任务都在几个固定的硬件节点上。</p>
+<p>另一方面，我们发现，问题出现在我们新的一批自己定制的硬件上架之后。于是，和运维团队的同事沟通近期的硬件变更，并且翻阅大量 Hadoop 社区的邮件组列表之后，我们有了一个大胆的推测。</p>
+<p>我们推测，这个错误，来自我们自己定制的硬件。定制的硬件没有使用 ECC 内存，在大量的数据中，内存中出现了<strong>单比特翻转（</strong>Single-Bit Flip）这个传说中的硬件错误。</p>
+<p>那这个符号是怎么来的呢？是由于内存中的一个整数字符，遇到了一次单比特翻转转化而来的。 它的 ASCII 码二进制表示是 0010 0100，所以它完全可能来自 0011 0100 遇到一次在第 4 个比特的单比特翻转，也就是从整数“4”变过来的。但是我们也只能推测是这个错误，而不能确信是这个错误。因为单比特翻转是一个随机现象，我们没法稳定复现这个问题。</p>
+<img src="/img/computer_img/单比特翻转.webp" alt="单比特翻转" style="zoom:50%;" />
+
+<p><strong>ECC 内存</strong> 的全称是 Error-Correcting Code memory，中文名字叫作纠错内存。顾名思义，就是在内存里面出现错误的时候，能够自己纠正过来。</p>
+<p>在和运维同学沟通之后，我们把所有自己定制的服务器的内存替换成了 ECC 内存，之后这个问题就消失了。这也使得我们基本确信，问题的来源就是因为没有使用 ECC 内存。</p>
+<hr>
+<h2 id="奇偶校验和校验位：捕捉错误的好办法"><a href="#奇偶校验和校验位：捕捉错误的好办法" class="headerlink" title="奇偶校验和校验位：捕捉错误的好办法"></a>奇偶校验和校验位：捕捉错误的好办法</h2><p>其实，内存里面的单比特翻转或者错误，并不是一个特别罕见的现象。无论是因为内存的制造质量造成的漏电，还是外部的射线，都有一定的概率，会造成单比特错误。而内存层面的数据出错，软件工程师并不知道，而且这个出错很有可能是随机的。遇上随机出现难以重现的错误，大家肯定受不了。我们必须要有一个办法，避免这个问题。</p>
+<p>其实，在 ECC 内存发明之前，工程师们已经开始通过<strong>奇偶校验</strong>的方式，来发现这些错误。</p>
+<p>奇偶校验的思路很简单。我们把内存里面的 N 位比特当成是一组。常见的，比如 8 位就是一个字节。然后，用额外的一位去记录，这 8 个比特里面有奇数个 1 还是偶数个 1。如果是奇数个 1，那额外的一位就记录为 1；如果是偶数个 1，那额外的一位就记录成 0。那额外的一位，我们就称之为<strong>校验码位</strong>。</p>
+<img src="/img/computer_img/奇偶校验.webp" alt="奇偶校验" style="zoom:50%;" />
+
+<p>如果在这个字节里面，我们不幸发生了单比特翻转，那么数据位计算得到的校验码，就和实际校验位里面的数据不一样。我们的内存就知道出错了。</p>
+<p>除此之外，校验位有一个很大的优点，就是计算非常快，往往只需要遍历一遍需要校验的数据，通过一个 O(N) 的时间复杂度的算法，就能把校验结果计算出来。</p>
+<p>校验码比方说，我们下载一些软件的时候，你会看到，除了下载的包文件，还会有对应的 MD5 这样的哈希值或者循环冗余编码（CRC）的校验文件。这样，当我们把对应的软件下载下来之后，我们可以计算一下对应软件的校验码，和官方提供的校验码去做个比对，看看是不是一样。思路，在很多地方都会用到。</p>
+<p>如果不一样，你就不能轻易去安装这个软件了。因为有可能，这个软件包是坏的。但是，还有一种更危险的情况，就是你下载的这个软件包，可能是被人植入了后门的。安装上了之后，你的计算机的安全性就没有保障了。</p>
+<p>不过，使用奇偶校验，还是有两个比较大的缺陷。</p>
+<ul>
+<li>一、就是奇偶校验只能解决遇到单个位的错误，或者说奇数个位的错误。如果出现 2 个位进行了翻转，那么这个字节的校验位计算结果其实没有变，我们的校验位自然也就不能发现这个错误。</li>
+<li>二、它只能发现错误，但是不能纠正错误。所以，即使在内存里面发现数据错误了，我们也只能中止程序，而不能让程序继续正常地运行下去。如果这个只是我们的个人电脑，做一些无关紧要的应用，这倒是无所谓了。</li>
+</ul>
+<p>但是，你想一下，如果你在服务器上进行某个复杂的计算任务，这个计算已经跑了一周乃至一个月了，还有两三天就跑完了。这个时候，出现内存里面的错误，要再从头跑起，估计你内心是崩溃的。</p>
+<p>所以，我们需要一个比简单的校验码更好的解决方案，一个能够发现更多位的错误，并且能够把这些错误纠正过来的解决方案，也就是工程师们发明的 ECC 内存所使用的解决方案。</p>
+<p>我们不仅能捕捉到错误，还要能够纠正发生的错误。这个策略，我们通常叫作纠错码（Error Correcting Code）。它还有一个升级版本，叫作纠删码（Erasure Code），不仅能够纠正错误，还能够在错误不能纠正的时候，直接把数据删除。无论是我们的 ECC 内存，还是网络传输，乃至硬盘的 RAID，其实都利用了纠错码和纠删码的相关技术。</p>
+<p>我们怎么通过算法，怎么配置硬件，使得我们不仅能够发现单个位的错误，而能发现更多位的错误。</p>
+<hr>
+<h2 id="总结延伸"><a href="#总结延伸" class="headerlink" title="总结延伸"></a>总结延伸</h2><p>我给你介绍了我自己亲身经历的一个硬件错误带来的 Bug。由于没有采用 ECC 内存，导致我们的数据处理中，出现了大量的单比特数据翻转的错误。这些硬件带来的错误，其实我们没有办法在软件层面解决。</p>
+<p>如果对于硬件以及硬件本身的原理不够熟悉，恐怕这个问题的解决方案还是遥遥无期。如果你对计算机组成原理有所了解，并能够意识到，在硬件的存储层有着数据验证和纠错的需求，那你就能在有限的时间内定位到问题所在。</p>
+<p>进一步地，简单介绍了奇偶校验，也就是如何通过冗余的一位数据，发现在硬件层面出现的位错误。但是，奇偶校验以及其他的校验码，只能发现错误，没有办法纠正错误。所以，下一讲，我们一起来看看，怎么利用纠错码这样的方式，来解决问题。</p>
+]]></content>
+      <categories>
+        <category>计算机组成原理</category>
+      </categories>
+      <tags>
+        <tag>存储器</tag>
+        <tag>奇偶校验</tag>
+        <tag>校验位</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>SSD硬盘（上）</title>
+    <url>/posts/ad3b44ae/</url>
+    <content><![CDATA[<h1 id="SSD硬盘（上）：如何完成性能优化的KPI？"><a href="#SSD硬盘（上）：如何完成性能优化的KPI？" class="headerlink" title="SSD硬盘（上）：如何完成性能优化的KPI？"></a>SSD硬盘（上）：如何完成性能优化的KPI？</h1><blockquote>
+<p>随着智能手机的出现，互联网用户在 2008 年之后开始爆发性增长，大家在网上花的时间也越来越多。这也就意味着，隐藏在精美 App 和网页之后的服务端数据请求量<span id="more"></span>，呈数量级的上升。无论是用 10000 转的企业级机械硬盘，还是用 t Stroking 这样的方式进一步提升 IOPS，HDD 硬盘已经满足不了我们的需求了。上面这些优化措施，无非就是，把 IOPS 从 100 提升到 300、500 也就到头了。</p>
+<p>SSD 硬盘在 2010 年前后，进入了主流的商业应用。我们在第 44 讲看过，一块普通的 SSD 硬盘，可以轻松支撑 10000 乃至 20000 的 IOPS。那个时候，不少互联网公司想要完成性能优化的 KPI，最后的解决方案都变成了换 SSD 的硬盘。如果这还不够，那就换上使用 PCI Express 接口的 SSD。</p>
+</blockquote>
+<h2 id="SSD-的读写原理"><a href="#SSD-的读写原理" class="headerlink" title="SSD 的读写原理"></a>SSD 的读写原理</h2><p>SSD 没有像机械硬盘那样的寻道过程，所以它的随机读写都更快。我在下面列了一个表格，对比了一下 SSD 和机械硬盘的优缺点。<br><img src="/img/computer_img/SSD.webp" alt="SSD" style="zoom:50%;" /></p>
+<p>你会发现，不管是机械硬盘不擅长的随机读写，还是它本身已经表现不错的顺序写入，SSD 在这些方面都要比 HDD 强。不过，有一点，机械硬盘要远强于 SSD，那就是耐用性。如果我们需要频繁地重复写入删除数据，那么机械硬盘要比 SSD 性价比高很多。</p>
+<p>要想知道为什么 SSD 的耐用性不太好，我们先要理解 SSD 硬盘的存储和读写原理。我们之前说过，CPU Cache 用的 SRAM 是用一个电容来存放一个比特的数据。<strong>对于 SSD 硬盘，我们也可以先简单地认为，它是由一个电容加上一个电压计组合在一起，记录了一个或者多个比特。</strong></p>
+<h2 id="SLC、MLC、TLC-和-QLC"><a href="#SLC、MLC、TLC-和-QLC" class="headerlink" title="SLC、MLC、TLC 和 QLC"></a>SLC、MLC、TLC 和 QLC</h2><p>能够记录一个比特很容易理解。给电容里面充上电有电压的时候就是 1，给电容放电里面没有电就是 0。采用这样方式存储数据的 SSD 硬盘，我们一般称之为使用了 SLC 的颗粒，全称是 Single-Level Cell，也就是一个存储单元中只有一位数据。</p>
+<img src="/img/computer_img/SSD电容.webp" alt="SSD电容" style="zoom:50%;" />
+
+<p>但是，这样的方式会遇到和 CPU Cache 类似的问题，那就是，同样的面积下，能够存放下的元器件是有限的。如果只用 SLC，我们就会遇到，存储容量上不去，并且价格下不来的问题。于是呢，硬件工程师们就陆续发明了 MLC（Multi-Level Cell）、TLC（Triple-Level Cell）以及 QLC（Quad-Level Cell），也就是能在一个电容里面存下 2 个、3 个乃至 4 个比特。</p>
+<img src="/img/computer_img/电压比特.webp" alt="电压比特" style="zoom:50%;" />
+
+<p>只有一个电容，我们怎么能够表示更多的比特呢？别忘了，这里我们还有一个电压计。4 个比特一共可以从 0000-1111 表示 16 个不同的数。那么，如果我们能往电容里面充电的时候，充上 15 个不同的电压，并且我们电压计能够区分出这 15 个不同的电压。加上电容被放空代表的 0，就能够代表从 0000-1111 这样 4 个比特了。</p>
+<p>不过，要想表示 15 个不同的电压，充电和读取的时候，对于精度的要求就会更高。这会导致充电和读取的时候都更慢，所以 QLC 的 SSD 的读写速度，要比 SLC 的慢上好几倍。如果你想要知道是什么样的物理原理导致这个 QLC 更慢，可以去读一读这篇<a href="https://www.anandtech.com/show/5067/understanding-tlc-nand/2">文章</a>。</p>
+<hr>
+<h2 id="P-x2F-E-擦写问题"><a href="#P-x2F-E-擦写问题" class="headerlink" title="P&#x2F;E 擦写问题"></a>P&#x2F;E 擦写问题</h2><p>如果我们去看一看 SSD 硬盘的硬件构造，可以看到，它大概是自顶向下是这么构成的。</p>
+<img src="/img/computer_img/SSD 物理构造.webp" alt="SSD 物理构造" style="zoom:50%;" />
+
+<p>首先，自然和其他的 I&#x2F;O 设备一样，它有对应的接口和控制电路。现在的 SSD 硬盘用的是 SATA 或者 PCI Express 接口。在控制电路里，有一个很重要的模块，叫作 FTL（Flash-Translation Layer），也就是闪存转换层。这个可以说是 SSD 硬盘的一个核心模块，SSD 硬盘性能的好坏，很大程度上也取决于 FTL 的算法好不好。现在容我卖个关子，我们晚一会儿仔细讲 FTL 的功能。</p>
+<p>接下来是实际 I&#x2F;O 设备，它其实和机械硬盘很像。现在新的大容量 SSD 硬盘都是 3D 封装的了，也就是说，是由很多个裸片（Die）叠在一起的，就好像我们的机械硬盘把很多个盘面（Platter）叠放再一起一样，这样可以在同样的空间下放下更多的容量。</p>
+<img src="/img/computer_img/SSD盘面.webp" alt="SSD盘面" style="zoom:50%;" />
+
+<p>接下来，一张裸片上可以放多个平面（Plane），一般一个平面上的存储容量大概在 GB 级别。一个平面上面，会划分成很多个块（Block），一般一个块（Block）的存储大小， 通常几百 KB 到几 MB 大小。一个块里面，还会区分很多个页（Page），就和我们内存里面的页一样，一个页的大小通常是 4KB。</p>
+<p>在这一层一层的结构里面，处在最下面的两层块和页非常重要</p>
+<p>对于 SSD 硬盘来说，数据的写入叫作 Program。写入不能像机械硬盘一样，通过<strong>覆写（Overwrite）</strong>来进行的，而是要先去<strong>擦除（Erase）</strong>，然后再写入。</p>
+<p>SSD 的读取和写入的基本单位，不是一个比特（bit）或者一个字节（byte），而是一个<strong>页（Page）</strong>。SSD 的擦除单位就更夸张了，我们不仅不能按照比特或者字节来擦除，连按照页来擦除都不行，我们必须按照<strong>块</strong>来擦除。</p>
+<p><em>而且，你必须记住的一点是，SSD 的使用寿命，其实是每一个块（Block）的擦除的次数。</em>（你可以把 SSD 硬盘的一个平面看成是一张白纸。我们在上面写入数据，就好像用铅笔在白纸上写字。如果想要把已经写过字的地方写入新的数据，我们先要用橡皮把已经写好的字擦掉。但是，如果频繁擦同一个地方，那这个地方就会破掉，之后就没有办法再写字了。）</p>
+<blockquote>
+<p>我们上面说的 SLC 的芯片，可以擦除的次数大概在 10 万次，MLC 就在 1 万次左右，而 TLC 和 QLC 就只在几千次了。这也是为什么，你去购买 SSD 硬盘，会看到同样的容量的价格差别很大，因为它们的芯片颗粒和寿命完全不一样。</p>
+</blockquote>
+<hr>
+<h2 id="SSD-读写的生命周期"><a href="#SSD-读写的生命周期" class="headerlink" title="SSD 读写的生命周期"></a>SSD 读写的生命周期</h2><ul>
+<li>我用三种颜色分别来表示 SSD 硬盘里面的页的不同状态，白色代表这个页从来没有写入过数据，绿色代表里面写入的是有效的数据，红色代表里面的数据，在我们的操作系统看来已经是删除的了。</li>
+</ul>
+<img src="/img/computer_img/SSD 擦写.webp" alt="SSD 擦写" style="zoom:67%;" />
+
+<p>一开始，所有块的每一个页都是白色的。随着我们开始往里面写数据，里面的有些页就变成了绿色。</p>
+<p>然后，因为我们删除了硬盘上的一些文件，所以有些页变成了红色。但是这些红色的页，并不能再次写入数据。因为 SSD 硬盘不能单独擦除一个页，必须一次性擦除整个块，所以新的数据，我们只能往后面的白色的页里面写。这些散落在各个绿色空间里面的红色空洞，就好像硬盘碎片。</p>
+<p>如果有哪一个块的数据一次性全部被标红了，那我们就可以把整个块进行擦除。它就又会变成白色，可以重新一页一页往里面写数据。这种情况其实也会经常发生。毕竟一个块不大，也就在几百 KB 到几 MB。你删除一个几 MB 的文件，数据又是连续存储的，自然会导致整个块可以被擦除。</p>
+<p>随着硬盘里面的数据越来越多，红色空洞占的地方也会越来越多。于是，你会发现，我们就要没有白色的空页去写入数据了。这个时候，我们要做一次类似于 Windows 里面“磁盘碎片整理”或者 Java 里面的“内存垃圾回收”工作。   <em><strong>找一个红色空洞最多的块，把里面的绿色数据，挪到另一个块里面去，然后把整个块擦除，变成白色，可以重新写入数据。</strong></em></p>
+<p>不过，这个“磁盘碎片整理”或者“内存垃圾回收”的工作，我们不能太主动、太频繁地去做。因为 SSD 的擦除次数是有限的。如果动不动就搞个磁盘碎片整理，那么我们的 SSD 硬盘很快就会报废了。</p>
+<p>说到这里，你可能要问了，这是不是说，我们的 SSD 硬盘的容量是用不满的？因为我们总会遇到一些红色空洞？</p>
+<p>没错，一块 SSD 的硬盘容量，是没办法完全用满的。   不过，为了不得罪消费者，生产 SSD 硬盘的厂商，其实是预留了一部分空间，<em><strong>专门用来做这个“磁盘碎片整理”工作的。一块标成 240G 的 SSD 硬盘，往往实际有 256G 的硬盘空间。</strong></em>     SSD 硬盘通过我们的控制芯片电路，把多出来的硬盘空间，用来进行各种数据的闪转腾挪，让你能够写满那 240G 的空间。这个多出来的 16G 空间，叫作<strong>预留空间</strong>（Over Provisioning），一般 SSD 的硬盘的预留空间都在 7%-15% 左右。</p>
+<h2 id="总结延伸"><a href="#总结延伸" class="headerlink" title="总结延伸"></a>总结延伸</h2><hr>
+<p>到这里，相信你对 SSD 硬盘的写入和擦除的原理已经清楚了，也明白了 SSD 硬盘的使用寿命受限于可以擦除的次数。</p>
+<p>仔细想一想，你会发现 SSD 硬盘，特别适合读多写少的应用。在日常应用里面，我们的系统盘适合用 SSD。但是，如果我们用 SSD 做专门的下载盘，一直下载各种影音数据，然后刻盘备份就不太好了，特别是现在 QLC 颗粒的 SSD，它只有几千次可擦写的寿命啊。</p>
+<ul>
+<li>在数据中心里面，SSD 的应用场景也是适合读多写少的场景。</li>
+<li>我们拿 SSD 硬盘用来做数据库，存放电商网站的商品信息很合适。但是，用来作为 Hadoop 这样的 Map-Reduce 应用的数据盘就不行了。因为 Map-Reduce 任务会大量在任务中间向硬盘写入中间数据再删除掉，这样用不了多久，SSD 硬盘的寿命就会到了</li>
+</ul>
+]]></content>
+      <categories>
+        <category>计算机组成原理</category>
+      </categories>
+      <tags>
+        <tag>存储器</tag>
+        <tag>SSD</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>SSD硬盘（下）</title>
+    <url>/posts/158723cb/</url>
+    <content><![CDATA[<h1 id="SSD硬盘（下）：如何完成性能优化的KPI？"><a href="#SSD硬盘（下）：如何完成性能优化的KPI？" class="headerlink" title="SSD硬盘（下）：如何完成性能优化的KPI？"></a>SSD硬盘（下）：如何完成性能优化的KPI？</h1><p>如果你平时用的是 Windows 电脑，你会发现，用了 SSD 的系统盘，就不能用磁盘碎片整理功能。    这是因为，一旦主动去运行磁盘碎片整理功能，就会发生一次块的擦除<span id="more"></span>，对应块的寿命就少了一点点。</p>
+<p>我们的操作系统上，并没有 SSD 硬盘上各个块目前已经擦写的情况和寿命，所以它对待 SSD 硬盘和普通的机械硬盘没有什么区别。</p>
+<p>我们日常使用 PC 进行软件开发的时候，会先在硬盘上装上操作系统和常用软件，比如 Office，或者工程师们会装上 VS Code、WebStorm 这样的集成开发环境。这些软件所在的块，写入一次之后，就不太会擦除了，所以<strong>就只有读的需求</strong>。</p>
+<p>一旦开始开发，我们就会不断添加新的代码文件，还会不断修改已经有的代码文件。因为 SSD 硬盘没有<strong>覆写（Override）</strong>的功能，所以，这个过程中，其实我们是在反复地写入新的文件，然后再把原来的文件标记成逻辑上删除的状态。  等 SSD 里面空的块少了，我们会用“垃圾回收”的方式，进行擦除。这样，我们的擦除会反复发生在这些用来存放数据的地方。</p>
+<img src="/img/computer_img/SSD 读写区.webp" alt="SSD 读写区" style="zoom:50%;" />
+
+<p>有一天，这些块的擦除次数到了，变成了坏块。但是，我们安装操作系统和软件的地方还没有坏，而这块硬盘的可以用的容量却变小了。</p>
+<hr>
+<h2 id="磨损均衡、TRIM-和写入放大效应"><a href="#磨损均衡、TRIM-和写入放大效应" class="headerlink" title="磨损均衡、TRIM 和写入放大效应"></a>磨损均衡、TRIM 和写入放大效应</h2><h3 id="FTL-和磨损均衡"><a href="#FTL-和磨损均衡" class="headerlink" title="FTL 和磨损均衡"></a>FTL 和磨损均衡</h3><p>那么，我们有没有什么办法，不让这些坏块那么早就出现呢？我们能不能，匀出一些存放操作系统的块的擦写次数，给到这些存放数据的地方呢？</p>
+<p>相信你一定想到了，其实我们要的就是想一个办法，让 SSD 硬盘各个块的擦除次数，均匀分摊到各个块上。这个策略呢，就叫作<strong>磨损均衡</strong>（Wear-Leveling）。</p>
+<p>实现这个技术的核心办法，和我们前面讲过的虚拟内存一样，就是添加一个间接层。这个间接层，就是我们上一讲给你卖的那个关子，就是 FTL 这个<strong>闪存转换层</strong>。</p>
+<img src="/img/computer_img/FTL 闪寸转换层.webp" alt="FTL 闪寸转换层" style="zoom:50%;" />
+
+<p>就像在管理杯纯的时候，我们通过一个页表映射虚拟内存页和物理页一样，在 FTL 里面，存放了 <strong>逻辑块地址</strong>（Logical Block Address ）到 <strong>物理块地址</strong> 的映射。</p>
+<p>操作系统访问的硬盘地址，其实都是逻辑地址。只有通过 FTL 转换之后，才会变成实际的物理地址，找到对应的块进行访问。操作系统本身，不需要去考虑块的磨损程度，只要和操作机械硬盘一样来读写数据就好了。</p>
+<hr>
+<p>操作系统所有对于 SSD 硬盘的读写请求，都要经过 FTL。FTL 里面又有逻辑块对应的物理块，所以 FTL 能够记录下来，每个物理块被擦写的次数。<em>如果一个物理块被擦写的次数多了，FTL 就可以将这个物理块，挪到一个擦写次数少的物理块上。但是，逻辑块不用变，操作系统也不需要知道这个变化。</em></p>
+<p>这也是我们在设计大型系统中的一个典型思路，<em><strong>也就是各层之间是隔离的，操作系统不需要考虑底层的硬件是什么，</strong></em>完全交由硬件的控制电路里面的 FTL，来管理对于实际物理硬件的写入。</p>
+<h3 id="TRIM-指令的支持"><a href="#TRIM-指令的支持" class="headerlink" title="TRIM 指令的支持"></a>TRIM 指令的支持</h3><p>不过，操作系统不去关心实际底层的硬件是什么，在 SSD 硬盘的使用上，也会带来一个问题。这个问题就是，操作系统的逻辑层和 SSD 的逻辑层里的块状态，是不匹配的。</p>
+<p>我们在操作系统里面去删除一个文件，其实并没有真的在物理层面去删除这个文件，只是在文件系统里面，把对应的 inode 里面的元信息清理掉，这代表这个 inode 还可以继续使用，可以写入新的数据。这个时候，实际物理层面的对应的存储空间，在操作系统里面被标记成可以写入了。</p>
+<p>所以，其实我们日常的文件删除，都只是一个操作系统层面的逻辑删除。这也是为什么，很多时候我们不小心删除了对应的文件，我们可以通过各种恢复软件，把数据找回来。同样的，这也是为什么，如果我们想要删除干净数据，需要用各种“文件粉碎”的功能才行。</p>
+<p>这个删除的逻辑在机械硬盘层面没有问题，因为文件被标记成可以写入，后续的写入可以直接覆写这个位置。但是，在 SSD 硬盘上就不一样了。我在这里放了一张详细的示意图。我们下面一起来看看具体是怎么回事儿。</p>
+<img src="/img/computer_img/ssd 删除.webp" alt="ssd 删除" style="zoom:50%;" />
+
+<p>一开始，操作系统里面有好几个文件，不同的文件我用不同的颜色标记出来了。下面的 SSD 的逻辑块里面占用的页，我们也用同样的颜色标记出来文件占用的对应页。</p>
+<p>当我们在操作系统里面，删除掉一个刚刚下载的文件，比如标记成黄色 openjdk.exe 这样一个 jdk 的安装文件，在操作系统里面，对应的 inode 里面，就没有文件的元信息。</p>
+<p>但是，这个时候，我们的 SSD 的逻辑块层面，其实并不知道这个事情。所以在，逻辑块层面，openjdk.exe 仍然是占用了对应的空间。对应的物理页，也仍然被认为是被占用了的。</p>
+<p>为了解决这个问题，现在的操作系统和 SSD 的主控芯片，都支持 TRIM 命令。这个命令可以在文件被删除的时候，让操作系统去通知 SSD 硬盘，对应的逻辑块已经标记成已删除了。现在的 SSD 硬盘都已经支持了 TRIM 命令。无论是 Linux、Windows 还是 MacOS，这些操作系统也都已经支持了 TRIM 命令了。</p>
+<hr>
+<h3 id="写入放大"><a href="#写入放大" class="headerlink" title="写入放大"></a>写入放大</h3><p>其实，TRIM 命令的发明，也反应了一个使用 SSD 硬盘的问题，那就是，SSD 硬盘容易越用越慢。</p>
+<p>当 SSD 硬盘的存储空间被占用得越来越多，每一次写入新数据，我们都可能没有足够的空白。我们可能不得不去进行垃圾回收，合并一些块里面的页，然后再擦除掉一些页，才能匀出一些空间来。</p>
+<p>这个时候，从应用层或者操作系统层面来看，我们可能只是写入了一个 4KB 或者 4MB 的数据。但是，实际通过 FTL 之后，我们可能要去搬运 8MB、16MB 甚至更多的数据。</p>
+<p>我们通过 <strong>“实际的闪存写入的数据量 &#x2F; 系统通过 FTL 写入的数据量 &#x3D; 写入放大”</strong> ，可以得到，写入放大的倍数越多，意味着实际的 SSD 性能也就越差，会远远比不上实际 SSD 硬盘标称的指标。</p>
+<p>解决写入放大，需要我们在后台定时进行垃圾回收，在硬盘比较空闲的时候，就把搬运数据、擦除数据、刘处空白的块的工作做完，而不是等实际数据写入的时候 ，在进行这样的操作。</p>
+<hr>
+<h2 id="AeroSpike：如何最大化-SSD-的使用效率？"><a href="#AeroSpike：如何最大化-SSD-的使用效率？" class="headerlink" title="AeroSpike：如何最大化 SSD 的使用效率？"></a>AeroSpike：如何最大化 SSD 的使用效率？</h2><p>讲到这里，相信你也发现了，想要把 SSD 硬盘用好，其实没有那么简单。如果我们只是简单地拿一块 SSD 硬盘替换掉原来的 HDD 硬盘，而不是从应用层面考虑任何 SSD 硬盘特性的话，我们多半还是没法获得想要的性能提升。</p>
+<p>不过，既然清楚了 SSD 硬盘的各种特性，我们就可以依据这些特性，来设计我们的应用。接下来，我就带你一起看一看，AeroSpike 这个专门针对 SSD 硬盘特性设计的  <strong>Key-Value 数据库（键值对数据库）</strong>，是怎么利用这些物理特性的。</p>
+<p>首先，AeroSpike 操作 SSD 硬盘，并没有通过操作系统的文件系统。而是直接操作 SSD 里面的块和页。因为操作系统里面的文件系统，对于 KV 数据库来说，只是让我们多了一层间接层，只会降低性能，对我们没有什么实际的作用。</p>
+<p>其次，AeroSpike 在读写数据的时候，做了两个优化。在写入数据的时候，AeroSpike 尽可能去写一个较大的数据块，而不是频繁的去写很多小的数据块，这样，磁盘就不太容易频繁出现磁盘碎片，而且一次性写入一个大的数据块， 也更容易利用好顺序写入的性能优势。AeroSpike 写入的一个数据块，是 128 KB ,远比一个页的 4KB 要大得多。</p>
+<p>另外，在读取数据的时候，AeroSpike 倒是可以读取 512 字节（Bytes）这样的小数据。  因为 SSD 的随机读取性能很好，也不像写入数据那样有擦除寿命问题。<strong>而且，很多时候我们读取的数据是键值对里面的值的数据，这些数据要在网络上传输。</strong>如果一次性必须读出比较大的数据，就会导致我们的网络带宽不够用。</p>
+<p>因为 AeroSpike 是一个对于响应时间要求很高的实时 KV 数据库，如果出现了<em>严重的写放大效应</em>，会导致写入数据的响应时间大幅度变长。所以 AeroSpike 做了这样几个动作：</p>
+<ul>
+<li>第一个是持续地进行磁盘碎片整理。AeroSpike 用了所谓的高水位（High Watermark）算法。其实这个算法很简单，就是一旦一个物理块里面的数据碎片超过 50%，就把这个物理块搬运压缩，然后进行数据擦除，确保磁盘始终有足够的空间可以写入。</li>
+<li>第二个是在 AeroSpike 给出的最佳实践中，为了保障数据库的性能，建议你只用到 SSD 硬盘标定容量的一半。也就是说，我们人为地给 SSD 硬盘预留了 50% 的预留空间，以确保 SSD 硬盘的写放大效应尽可能小，不会影响数据库的访问性能。</li>
+</ul>
+<img src="/img/computer_img/SSD AeroSpike.webp" alt="SSD AeroSpike" style="zoom:50%;" />
+
+<p>正是因为做了这种种的优化，在 NoSQL 数据库刚刚兴起的时候，AeroSpike 的性能把 Cassandra、MongoDB 这些数据库远远甩在身后，和这些数据库之间的性能差距，有时候会到达一个数量级。 <em>这也让 AeroSpike 成为了当时高性能 KV 数据库的标杆。</em>你可以看一看 InfoQ 出的这个 <a href="https://www.infoq.com/news/2013/04/NoSQL-Benchmark/">Benchmark</a>，里面有 2013 年的时候，这几个 NoSQL 数据库巨大的性能差异。</p>
+<h2 id="总结延伸"><a href="#总结延伸" class="headerlink" title="总结延伸"></a>总结延伸</h2><p>因为 SSD 硬盘的使用寿命，受限于块的擦除次数，所以我们需要通过一个磨损均衡的策略，来管理 SSD 硬盘的各个块的擦除次数。我们通过在逻辑块地址和物理块地址之间，引入 FTL 这个映射层，使得操作系统无需关心物理块的擦写次数，而是由 FTL 里的软件算法，来协调到底每一次写入应该磨损哪一块。</p>
+<p>除了磨损均衡之外，操作系统和 SSD 硬件的特性还有一个不匹配的地方。那就是，<em>操作系统在删除数据的时候，并没有真的删除物理层面的数据，而只是修改了 inode 里面的数据。这个“伪删除”，使得 SSD 硬盘在逻辑和物理层面，都没有意识到有些块其实已经被删除了。</em>这就导致在垃圾回收的时候，会浪费很多不必要的读写资源。</p>
+<p>SSD 这个需要进行垃圾回收的特性，使得我们在写入数据的时候，会遇到写入放大。明明我们只是写入了 4MB 的数据，可能在 SSD 的硬件层面，实际写入了 8MB、16MB 乃至更多的数据。</p>
+<p>针对这些特性，AeroSpike，这个专门针对 SSD 硬盘特性的 KV 数据库，设计了很多的优化点，包括跳过文件系统直写硬盘、写大块读小块、用高水位算法持续进行磁盘碎片整理，以及只使用 SSD 硬盘的一半空间。这些策略，使得 AeroSpike 的性能，在早年间远远超过了 Cassandra 等其他 NoSQL 数据库。</p>
+<blockquote>
+<p>可以看到，针对硬件特性设计的软件，才能最大化发挥我们的硬件性能。</p>
+</blockquote>
+]]></content>
+      <categories>
+        <category>计算机组成原理</category>
+      </categories>
+      <tags>
+        <tag>存储器</tag>
+        <tag>SSD</tag>
       </tags>
   </entry>
   <entry>
@@ -1008,194 +1121,6 @@ SPEC 提供的 CPU 基准测试程序，就好像 CPU 届的“高考”，通�
       </tags>
   </entry>
   <entry>
-    <title>SSD硬盘（上）</title>
-    <url>/posts/ad3b44ae/</url>
-    <content><![CDATA[<h1 id="SSD硬盘（上）：如何完成性能优化的KPI？"><a href="#SSD硬盘（上）：如何完成性能优化的KPI？" class="headerlink" title="SSD硬盘（上）：如何完成性能优化的KPI？"></a>SSD硬盘（上）：如何完成性能优化的KPI？</h1><blockquote>
-<p>随着智能手机的出现，互联网用户在 2008 年之后开始爆发性增长，大家在网上花的时间也越来越多。这也就意味着，隐藏在精美 App 和网页之后的服务端数据请求量<span id="more"></span>，呈数量级的上升。无论是用 10000 转的企业级机械硬盘，还是用 t Stroking 这样的方式进一步提升 IOPS，HDD 硬盘已经满足不了我们的需求了。上面这些优化措施，无非就是，把 IOPS 从 100 提升到 300、500 也就到头了。</p>
-<p>SSD 硬盘在 2010 年前后，进入了主流的商业应用。我们在第 44 讲看过，一块普通的 SSD 硬盘，可以轻松支撑 10000 乃至 20000 的 IOPS。那个时候，不少互联网公司想要完成性能优化的 KPI，最后的解决方案都变成了换 SSD 的硬盘。如果这还不够，那就换上使用 PCI Express 接口的 SSD。</p>
-</blockquote>
-<h2 id="SSD-的读写原理"><a href="#SSD-的读写原理" class="headerlink" title="SSD 的读写原理"></a>SSD 的读写原理</h2><p>SSD 没有像机械硬盘那样的寻道过程，所以它的随机读写都更快。我在下面列了一个表格，对比了一下 SSD 和机械硬盘的优缺点。<br><img src="/img/computer_img/SSD.webp" alt="SSD" style="zoom:50%;" /></p>
-<p>你会发现，不管是机械硬盘不擅长的随机读写，还是它本身已经表现不错的顺序写入，SSD 在这些方面都要比 HDD 强。不过，有一点，机械硬盘要远强于 SSD，那就是耐用性。如果我们需要频繁地重复写入删除数据，那么机械硬盘要比 SSD 性价比高很多。</p>
-<p>要想知道为什么 SSD 的耐用性不太好，我们先要理解 SSD 硬盘的存储和读写原理。我们之前说过，CPU Cache 用的 SRAM 是用一个电容来存放一个比特的数据。<strong>对于 SSD 硬盘，我们也可以先简单地认为，它是由一个电容加上一个电压计组合在一起，记录了一个或者多个比特。</strong></p>
-<h2 id="SLC、MLC、TLC-和-QLC"><a href="#SLC、MLC、TLC-和-QLC" class="headerlink" title="SLC、MLC、TLC 和 QLC"></a>SLC、MLC、TLC 和 QLC</h2><p>能够记录一个比特很容易理解。给电容里面充上电有电压的时候就是 1，给电容放电里面没有电就是 0。采用这样方式存储数据的 SSD 硬盘，我们一般称之为使用了 SLC 的颗粒，全称是 Single-Level Cell，也就是一个存储单元中只有一位数据。</p>
-<img src="/img/computer_img/SSD电容.webp" alt="SSD电容" style="zoom:50%;" />
-
-<p>但是，这样的方式会遇到和 CPU Cache 类似的问题，那就是，同样的面积下，能够存放下的元器件是有限的。如果只用 SLC，我们就会遇到，存储容量上不去，并且价格下不来的问题。于是呢，硬件工程师们就陆续发明了 MLC（Multi-Level Cell）、TLC（Triple-Level Cell）以及 QLC（Quad-Level Cell），也就是能在一个电容里面存下 2 个、3 个乃至 4 个比特。</p>
-<img src="/img/computer_img/电压比特.webp" alt="电压比特" style="zoom:50%;" />
-
-<p>只有一个电容，我们怎么能够表示更多的比特呢？别忘了，这里我们还有一个电压计。4 个比特一共可以从 0000-1111 表示 16 个不同的数。那么，如果我们能往电容里面充电的时候，充上 15 个不同的电压，并且我们电压计能够区分出这 15 个不同的电压。加上电容被放空代表的 0，就能够代表从 0000-1111 这样 4 个比特了。</p>
-<p>不过，要想表示 15 个不同的电压，充电和读取的时候，对于精度的要求就会更高。这会导致充电和读取的时候都更慢，所以 QLC 的 SSD 的读写速度，要比 SLC 的慢上好几倍。如果你想要知道是什么样的物理原理导致这个 QLC 更慢，可以去读一读这篇<a href="https://www.anandtech.com/show/5067/understanding-tlc-nand/2">文章</a>。</p>
-<hr>
-<h2 id="P-x2F-E-擦写问题"><a href="#P-x2F-E-擦写问题" class="headerlink" title="P&#x2F;E 擦写问题"></a>P&#x2F;E 擦写问题</h2><p>如果我们去看一看 SSD 硬盘的硬件构造，可以看到，它大概是自顶向下是这么构成的。</p>
-<img src="/img/computer_img/SSD 物理构造.webp" alt="SSD 物理构造" style="zoom:50%;" />
-
-<p>首先，自然和其他的 I&#x2F;O 设备一样，它有对应的接口和控制电路。现在的 SSD 硬盘用的是 SATA 或者 PCI Express 接口。在控制电路里，有一个很重要的模块，叫作 FTL（Flash-Translation Layer），也就是闪存转换层。这个可以说是 SSD 硬盘的一个核心模块，SSD 硬盘性能的好坏，很大程度上也取决于 FTL 的算法好不好。现在容我卖个关子，我们晚一会儿仔细讲 FTL 的功能。</p>
-<p>接下来是实际 I&#x2F;O 设备，它其实和机械硬盘很像。现在新的大容量 SSD 硬盘都是 3D 封装的了，也就是说，是由很多个裸片（Die）叠在一起的，就好像我们的机械硬盘把很多个盘面（Platter）叠放再一起一样，这样可以在同样的空间下放下更多的容量。</p>
-<img src="/img/computer_img/SSD盘面.webp" alt="SSD盘面" style="zoom:50%;" />
-
-<p>接下来，一张裸片上可以放多个平面（Plane），一般一个平面上的存储容量大概在 GB 级别。一个平面上面，会划分成很多个块（Block），一般一个块（Block）的存储大小， 通常几百 KB 到几 MB 大小。一个块里面，还会区分很多个页（Page），就和我们内存里面的页一样，一个页的大小通常是 4KB。</p>
-<p>在这一层一层的结构里面，处在最下面的两层块和页非常重要</p>
-<p>对于 SSD 硬盘来说，数据的写入叫作 Program。写入不能像机械硬盘一样，通过<strong>覆写（Overwrite）</strong>来进行的，而是要先去<strong>擦除（Erase）</strong>，然后再写入。</p>
-<p>SSD 的读取和写入的基本单位，不是一个比特（bit）或者一个字节（byte），而是一个<strong>页（Page）</strong>。SSD 的擦除单位就更夸张了，我们不仅不能按照比特或者字节来擦除，连按照页来擦除都不行，我们必须按照<strong>块</strong>来擦除。</p>
-<p><em>而且，你必须记住的一点是，SSD 的使用寿命，其实是每一个块（Block）的擦除的次数。</em>（你可以把 SSD 硬盘的一个平面看成是一张白纸。我们在上面写入数据，就好像用铅笔在白纸上写字。如果想要把已经写过字的地方写入新的数据，我们先要用橡皮把已经写好的字擦掉。但是，如果频繁擦同一个地方，那这个地方就会破掉，之后就没有办法再写字了。）</p>
-<blockquote>
-<p>我们上面说的 SLC 的芯片，可以擦除的次数大概在 10 万次，MLC 就在 1 万次左右，而 TLC 和 QLC 就只在几千次了。这也是为什么，你去购买 SSD 硬盘，会看到同样的容量的价格差别很大，因为它们的芯片颗粒和寿命完全不一样。</p>
-</blockquote>
-<hr>
-<h2 id="SSD-读写的生命周期"><a href="#SSD-读写的生命周期" class="headerlink" title="SSD 读写的生命周期"></a>SSD 读写的生命周期</h2><ul>
-<li>我用三种颜色分别来表示 SSD 硬盘里面的页的不同状态，白色代表这个页从来没有写入过数据，绿色代表里面写入的是有效的数据，红色代表里面的数据，在我们的操作系统看来已经是删除的了。</li>
-</ul>
-<img src="/img/computer_img/SSD 擦写.webp" alt="SSD 擦写" style="zoom:67%;" />
-
-<p>一开始，所有块的每一个页都是白色的。随着我们开始往里面写数据，里面的有些页就变成了绿色。</p>
-<p>然后，因为我们删除了硬盘上的一些文件，所以有些页变成了红色。但是这些红色的页，并不能再次写入数据。因为 SSD 硬盘不能单独擦除一个页，必须一次性擦除整个块，所以新的数据，我们只能往后面的白色的页里面写。这些散落在各个绿色空间里面的红色空洞，就好像硬盘碎片。</p>
-<p>如果有哪一个块的数据一次性全部被标红了，那我们就可以把整个块进行擦除。它就又会变成白色，可以重新一页一页往里面写数据。这种情况其实也会经常发生。毕竟一个块不大，也就在几百 KB 到几 MB。你删除一个几 MB 的文件，数据又是连续存储的，自然会导致整个块可以被擦除。</p>
-<p>随着硬盘里面的数据越来越多，红色空洞占的地方也会越来越多。于是，你会发现，我们就要没有白色的空页去写入数据了。这个时候，我们要做一次类似于 Windows 里面“磁盘碎片整理”或者 Java 里面的“内存垃圾回收”工作。   <em><strong>找一个红色空洞最多的块，把里面的绿色数据，挪到另一个块里面去，然后把整个块擦除，变成白色，可以重新写入数据。</strong></em></p>
-<p>不过，这个“磁盘碎片整理”或者“内存垃圾回收”的工作，我们不能太主动、太频繁地去做。因为 SSD 的擦除次数是有限的。如果动不动就搞个磁盘碎片整理，那么我们的 SSD 硬盘很快就会报废了。</p>
-<p>说到这里，你可能要问了，这是不是说，我们的 SSD 硬盘的容量是用不满的？因为我们总会遇到一些红色空洞？</p>
-<p>没错，一块 SSD 的硬盘容量，是没办法完全用满的。   不过，为了不得罪消费者，生产 SSD 硬盘的厂商，其实是预留了一部分空间，<em><strong>专门用来做这个“磁盘碎片整理”工作的。一块标成 240G 的 SSD 硬盘，往往实际有 256G 的硬盘空间。</strong></em>     SSD 硬盘通过我们的控制芯片电路，把多出来的硬盘空间，用来进行各种数据的闪转腾挪，让你能够写满那 240G 的空间。这个多出来的 16G 空间，叫作<strong>预留空间</strong>（Over Provisioning），一般 SSD 的硬盘的预留空间都在 7%-15% 左右。</p>
-<h2 id="总结延伸"><a href="#总结延伸" class="headerlink" title="总结延伸"></a>总结延伸</h2><hr>
-<p>到这里，相信你对 SSD 硬盘的写入和擦除的原理已经清楚了，也明白了 SSD 硬盘的使用寿命受限于可以擦除的次数。</p>
-<p>仔细想一想，你会发现 SSD 硬盘，特别适合读多写少的应用。在日常应用里面，我们的系统盘适合用 SSD。但是，如果我们用 SSD 做专门的下载盘，一直下载各种影音数据，然后刻盘备份就不太好了，特别是现在 QLC 颗粒的 SSD，它只有几千次可擦写的寿命啊。</p>
-<ul>
-<li>在数据中心里面，SSD 的应用场景也是适合读多写少的场景。</li>
-<li>我们拿 SSD 硬盘用来做数据库，存放电商网站的商品信息很合适。但是，用来作为 Hadoop 这样的 Map-Reduce 应用的数据盘就不行了。因为 Map-Reduce 任务会大量在任务中间向硬盘写入中间数据再删除掉，这样用不了多久，SSD 硬盘的寿命就会到了</li>
-</ul>
-]]></content>
-      <categories>
-        <category>计算机组成原理</category>
-      </categories>
-      <tags>
-        <tag>存储器</tag>
-        <tag>SSD</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>数据完整性（上）</title>
-    <url>/posts/9527a54e/</url>
-    <content><![CDATA[<h1 id="数据完整性（上）：硬件坏了怎么办？"><a href="#数据完整性（上）：硬件坏了怎么办？" class="headerlink" title="数据完整性（上）：硬件坏了怎么办？"></a>数据完整性（上）：硬件坏了怎么办？</h1><h2 id="问题引人"><a href="#问题引人" class="headerlink" title="问题引人"></a>问题引人</h2><p>当时，我正在 MediaV 带领一个 20 多人的团队，负责公司的广告数据和机器学习算法。其中有一部分工作，就是用 Hadoop 集群处理所有的数据和报表业务。<span id="more"></span>当时我们的业务增长很快，所以会频繁地往 Hadoop 集群里面添置机器。2012 年的时候，国内的云计算平台还不太成熟，所以我们都是自己采购硬件，放在托管的数据中心里面。</p>
-<p>那个时候，我们的 Hadoop 集群服务器，在从 100 台服务器往 1000 台服务器走。我们觉得，像 Dell 这样品牌厂商的服务器太贵了，而且能够提供的硬件配置和我们的期望也有差异。于是，运维的同学开始和 OEM 厂商合作，自己定制服务器，批量采购硬盘、内存。</p>
-<p>那个时候，大家都听过 Google 早期发展时，为了降低成本买了很多二手的硬件来降低成本，通过分布式的方式来保障系统的可靠性的办法。虽然我们还没有抠门到去买二手硬件，不过当时，我们选择购买了普通的机械硬盘，而不是企业级的、用在数据中心的机械硬盘；采购了普通的内存条，而不是带 ECC 纠错的服务器内存条，想着能省一点儿是一点儿。</p>
-<h2 id="单比特翻转：软件解决不了的硬件错误"><a href="#单比特翻转：软件解决不了的硬件错误" class="headerlink" title="单比特翻转：软件解决不了的硬件错误"></a>单比特翻转：软件解决不了的硬件错误</h2><p>忽然有一天，我们最大的、每小时执行一次的数据处理报表应用，完成时间变得比平时晚了不少。一开始，我们并没有太在意，毕竟当时数据量每天都在增长，慢一点就慢一点了。但是，接着糟糕的事情开始发生了。</p>
-<p>一方面，我们发现，报表任务有时候在一个小时之内执行不完，接着，偶尔整个报表任务会执行失败。于是，我们不得不停下手头开发的工作，开始排查这个问题。</p>
-<p>用过 Hadoop 的话，你可能知道，作为一个分布式的应用，考虑到硬件的故障，Hadoop 本身会在特定节点计算出错的情况下，重试整个计算过程。之前的报表跑得慢，就是因为有些节点的计算任务失败过，只是在重试之后又成功了。进一步分析，我们发现，程序的错误非常奇怪。有些数据计算的结果，比如“34+23”，结果应该是“57”，但是却变成了一个美元符号“$”。</p>
-<p>前前后后折腾了一周，我们发现，从日志上看，大部分出错的任务都在几个固定的硬件节点上。</p>
-<p>另一方面，我们发现，问题出现在我们新的一批自己定制的硬件上架之后。于是，和运维团队的同事沟通近期的硬件变更，并且翻阅大量 Hadoop 社区的邮件组列表之后，我们有了一个大胆的推测。</p>
-<p>我们推测，这个错误，来自我们自己定制的硬件。定制的硬件没有使用 ECC 内存，在大量的数据中，内存中出现了<strong>单比特翻转（</strong>Single-Bit Flip）这个传说中的硬件错误。</p>
-<p>那这个符号是怎么来的呢？是由于内存中的一个整数字符，遇到了一次单比特翻转转化而来的。 它的 ASCII 码二进制表示是 0010 0100，所以它完全可能来自 0011 0100 遇到一次在第 4 个比特的单比特翻转，也就是从整数“4”变过来的。但是我们也只能推测是这个错误，而不能确信是这个错误。因为单比特翻转是一个随机现象，我们没法稳定复现这个问题。</p>
-<img src="/img/computer_img/单比特翻转.webp" alt="单比特翻转" style="zoom:50%;" />
-
-<p><strong>ECC 内存</strong> 的全称是 Error-Correcting Code memory，中文名字叫作纠错内存。顾名思义，就是在内存里面出现错误的时候，能够自己纠正过来。</p>
-<p>在和运维同学沟通之后，我们把所有自己定制的服务器的内存替换成了 ECC 内存，之后这个问题就消失了。这也使得我们基本确信，问题的来源就是因为没有使用 ECC 内存。</p>
-<hr>
-<h2 id="奇偶校验和校验位：捕捉错误的好办法"><a href="#奇偶校验和校验位：捕捉错误的好办法" class="headerlink" title="奇偶校验和校验位：捕捉错误的好办法"></a>奇偶校验和校验位：捕捉错误的好办法</h2><p>其实，内存里面的单比特翻转或者错误，并不是一个特别罕见的现象。无论是因为内存的制造质量造成的漏电，还是外部的射线，都有一定的概率，会造成单比特错误。而内存层面的数据出错，软件工程师并不知道，而且这个出错很有可能是随机的。遇上随机出现难以重现的错误，大家肯定受不了。我们必须要有一个办法，避免这个问题。</p>
-<p>其实，在 ECC 内存发明之前，工程师们已经开始通过<strong>奇偶校验</strong>的方式，来发现这些错误。</p>
-<p>奇偶校验的思路很简单。我们把内存里面的 N 位比特当成是一组。常见的，比如 8 位就是一个字节。然后，用额外的一位去记录，这 8 个比特里面有奇数个 1 还是偶数个 1。如果是奇数个 1，那额外的一位就记录为 1；如果是偶数个 1，那额外的一位就记录成 0。那额外的一位，我们就称之为<strong>校验码位</strong>。</p>
-<img src="/img/computer_img/奇偶校验.webp" alt="奇偶校验" style="zoom:50%;" />
-
-<p>如果在这个字节里面，我们不幸发生了单比特翻转，那么数据位计算得到的校验码，就和实际校验位里面的数据不一样。我们的内存就知道出错了。</p>
-<p>除此之外，校验位有一个很大的优点，就是计算非常快，往往只需要遍历一遍需要校验的数据，通过一个 O(N) 的时间复杂度的算法，就能把校验结果计算出来。</p>
-<p>校验码比方说，我们下载一些软件的时候，你会看到，除了下载的包文件，还会有对应的 MD5 这样的哈希值或者循环冗余编码（CRC）的校验文件。这样，当我们把对应的软件下载下来之后，我们可以计算一下对应软件的校验码，和官方提供的校验码去做个比对，看看是不是一样。思路，在很多地方都会用到。</p>
-<p>如果不一样，你就不能轻易去安装这个软件了。因为有可能，这个软件包是坏的。但是，还有一种更危险的情况，就是你下载的这个软件包，可能是被人植入了后门的。安装上了之后，你的计算机的安全性就没有保障了。</p>
-<p>不过，使用奇偶校验，还是有两个比较大的缺陷。</p>
-<ul>
-<li>一、就是奇偶校验只能解决遇到单个位的错误，或者说奇数个位的错误。如果出现 2 个位进行了翻转，那么这个字节的校验位计算结果其实没有变，我们的校验位自然也就不能发现这个错误。</li>
-<li>二、它只能发现错误，但是不能纠正错误。所以，即使在内存里面发现数据错误了，我们也只能中止程序，而不能让程序继续正常地运行下去。如果这个只是我们的个人电脑，做一些无关紧要的应用，这倒是无所谓了。</li>
-</ul>
-<p>但是，你想一下，如果你在服务器上进行某个复杂的计算任务，这个计算已经跑了一周乃至一个月了，还有两三天就跑完了。这个时候，出现内存里面的错误，要再从头跑起，估计你内心是崩溃的。</p>
-<p>所以，我们需要一个比简单的校验码更好的解决方案，一个能够发现更多位的错误，并且能够把这些错误纠正过来的解决方案，也就是工程师们发明的 ECC 内存所使用的解决方案。</p>
-<p>我们不仅能捕捉到错误，还要能够纠正发生的错误。这个策略，我们通常叫作纠错码（Error Correcting Code）。它还有一个升级版本，叫作纠删码（Erasure Code），不仅能够纠正错误，还能够在错误不能纠正的时候，直接把数据删除。无论是我们的 ECC 内存，还是网络传输，乃至硬盘的 RAID，其实都利用了纠错码和纠删码的相关技术。</p>
-<p>我们怎么通过算法，怎么配置硬件，使得我们不仅能够发现单个位的错误，而能发现更多位的错误。</p>
-<hr>
-<h2 id="总结延伸"><a href="#总结延伸" class="headerlink" title="总结延伸"></a>总结延伸</h2><p>我给你介绍了我自己亲身经历的一个硬件错误带来的 Bug。由于没有采用 ECC 内存，导致我们的数据处理中，出现了大量的单比特数据翻转的错误。这些硬件带来的错误，其实我们没有办法在软件层面解决。</p>
-<p>如果对于硬件以及硬件本身的原理不够熟悉，恐怕这个问题的解决方案还是遥遥无期。如果你对计算机组成原理有所了解，并能够意识到，在硬件的存储层有着数据验证和纠错的需求，那你就能在有限的时间内定位到问题所在。</p>
-<p>进一步地，简单介绍了奇偶校验，也就是如何通过冗余的一位数据，发现在硬件层面出现的位错误。但是，奇偶校验以及其他的校验码，只能发现错误，没有办法纠正错误。所以，下一讲，我们一起来看看，怎么利用纠错码这样的方式，来解决问题。</p>
-]]></content>
-      <categories>
-        <category>计算机组成原理</category>
-      </categories>
-      <tags>
-        <tag>存储器</tag>
-        <tag>奇偶校验</tag>
-        <tag>校验位</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>高速缓存（上）</title>
-    <url>/posts/dccb8a89/</url>
-    <content><![CDATA[<h1 id="高速缓存（上）：“4毫秒”究竟值多少钱？"><a href="#高速缓存（上）：“4毫秒”究竟值多少钱？" class="headerlink" title="高速缓存（上）：“4毫秒”究竟值多少钱？"></a>高速缓存（上）：“4毫秒”究竟值多少钱？</h1><p>这一节内容开始之前，我们先来看一个 3 行的小程序。你可以猜一猜，这个程序里的循环 1 和循环 2，运行所花费的时间会差多少？<span id="more"></span>你可以先思考几分钟，然后再看我下面的解释。</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">int[] arr = new int[64 * 1024 * 1024];</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">// 循环1</span><br><span class="line">for (int i = 0; i &lt; arr.length; i++) arr[i] *= 3;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">// 循环2</span><br><span class="line">for (int i = 0; i &lt; arr.length; i += 16) arr[i] *= 3</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p>在这段 Java 程序中，我们首先构造了一个 64×1024×1024 大小的整型数组。在循环 1 里，我们遍历整个数组，将数组中每一项的值变成了原来的 3 倍；在循环 2 里，我们每隔 16 个索引访问一个数组元素，将这一项的值变成了原来的 3 倍。</p>
-<p>按道理来说，循环 2 只访问循环 1 中 1&#x2F;16 的数组元素，只进行了循环 1 中 1&#x2F;16 的乘法计算，那循环 2 花费的时间应该是循环 1 的 1&#x2F;16 左右。但是实际上，循环 1 在我的电脑上运行需要 50 毫秒，循环 2 只需要 46 毫秒。这两个循环花费时间之差在 15% 之内。</p>
-<hr>
-<p>为什么会有这 15% 的差异呢？这和我们今天要讲的 CPU Cache 有关。之前我们看到了内存和硬盘之间存在的巨大性能差异。在 CPU 眼里，内存也慢得不行。于是，聪明的工程师们就在 CPU 里面嵌入了 CPU Cache（高速缓存），来解决这一问题。</p>
-<h2 id="我们为什么需要高速缓存"><a href="#我们为什么需要高速缓存" class="headerlink" title="我们为什么需要高速缓存?"></a>我们为什么需要高速缓存?</h2><p>按照摩尔定律，CPU 的访问速度每 18 个月便会翻一番，相当于每年增长 60%。内存的访问速度虽然也在不断增长，却远没有这么快，每年只增长 7% 左右。而这两个增长速度的差异，使得 CPU 性能和内存访问性能的差距不断拉大。到今天来看，一次内存的访问，大约需要 120 个 CPU Cycle，这也意味着，在今天，CPU 和内存的访问速度已经有了 120 倍的差距。</p>
-<p>如果拿我们现实生活来打个比方的话，CPU 的速度好比风驰电掣的高铁，每小时 350 公里，然而，它却只能等着旁边腿脚不太灵便的老太太，也就是内存，以每小时 3 公里的速度缓慢步行。因为 CPU 需要执行的指令、需要访问的数据，都在这个速度不到自己 1% 的内存里。</p>
-<img src="/img/computer_img/CPU和内存性能差异.webp" alt="CPU和内存性能差异" style="zoom:50%;" />
-
-
-
-<p>为了弥补两者之间的性能差异，我们能真实地把 CPU 的性能提升用起来，而不是让它在那儿空转，我们在现代 CPU 中引入了高速缓存。</p>
-<p>从 CPU Cache 被加入到现有的 CPU 里开始，内存中的指令、数据，会被加载到 L1-L3 Cache 中，而不是直接由 CPU 访问内存去拿。在 95% 的情况下，CPU 都只需要访问 L1-L3 Cache，从里面读取指令和数据，而无需访问内存。要注意的是，要注意的是，这里我们说的 CPU  cache 或者 L1&#x2F;L3  Cache，不是一个单纯的、概念上的缓存（比如之前我们说的拿内存作为硬盘的缓存）），而是指特定的由 SRAM 组成的物理芯片。 </p>
-<p>这里是一张 Intel CPU 的放大照片。这里面大片的长方形芯片，就是这个 CPU 使用的 20MB 的  L3 Cache。</p>
-<img src="/img/computer_img/SRAM缓存.webp" alt="SRAM缓存" style="zoom:50%;" />
-
-<p> 这一讲一开始的程序里，运行程序的时间主要花在将对应的数据从内存中读取出来，加载到CPU cache 里。 CPU 从内存中读取数据到 CPU Cache 的过程中，是<strong>一小块一小块来读取数据的</strong>（是一小块一小块来读取数据的），而不是按照单个数组元素来读取数据的。这样一小块一小块的数据，在 CPU Cache 里面，我们把它叫作  <strong>Cache Line（缓存块）</strong>。</p>
-<p>在我们日常使用的 Intel 服务器或者 PC 里，Cache Line 的大小通常是 64 字节。而在上面的循环 2 里面，我们每隔 16 个整型数计算一次，16 个整型数正好是 64 个字节。于是，循环 1 和循环 2，需要把同样数量的 Cache Line 数据从内存中读取到 CPU Cache 中，最终两个程序花费的时间就差别不大了。</p>
-<p>知道了为什么需要 CPU Cache，接下来，我们就来看一看，CPU 究竟是如何访问 CPU Cache 的，以及 CPU Cache 是如何组织数据，使得 CPU 可以找到自己想要访问的数据的。    因为 Cache 作为“缓存”的意思，在很多别的存储设备里面都会用到。为了避免你混淆，在表示抽象的“缓存“概念时，用中文的“缓存”；如果是 CPU Cache，我会用“高速缓存“或者英文的“Cache”，来表示。</p>
-<h2 id="Cache-的数据结构和读取过程是什么样的？"><a href="#Cache-的数据结构和读取过程是什么样的？" class="headerlink" title="Cache 的数据结构和读取过程是什么样的？"></a>Cache 的数据结构和读取过程是什么样的？</h2><p>现代 CPU 进行数据读取的时候，无论数据是否已经存储在 Cache 中，CPU 始终会首先访问 Cache。只有当 CPU 在 Cache 中找不到数据的时候，才会去访问内存，并将读取到的数据写入 Cache 之中。  当时间局部性原理起作用后，这个最近刚刚被访问的数据，会很快再次被访问。而 Cache 的访问速度远远快于内存，这样，CPU 花在等待内存访问上的时间就大大变短了。</p>
-<img src="/img/computer_img/访问cache.webp" alt="访问cache" style="zoom:50%;" />
-
-<p>这样的访问机制，和我们自己在开发应用系统的时候，“使用内存作为硬盘的缓存”的逻辑是一样的。在各类基准测试（Benchmark）和实际应用场景中，CPU Cache 的命中率通常能达到 95% 以上。</p>
-<p>问题来了，CPU 如何知道要访问的内存数据，存储在 Cache 的哪个位置呢？接下来，我就从最基本的直接映射 Cache（Direct Mapped Cache）说起，带你来看整个 Cache 的数据结构和访问逻辑。</p>
-<h3 id="直接映射-Cache"><a href="#直接映射-Cache" class="headerlink" title="直接映射 Cache"></a>直接映射 Cache</h3><p>CPU 访问内存数据，是一小块一小块数据来读取的。对于读取内存中的数据，我们首先拿到的是数据所在的内存块（Block）的地址。 而直接映射 Cache 采用的策略，就是确保任何一个内存块的地址，始终映射到一个固定的 <strong>CPU Cache</strong> 地址（Cache Line）。而这个映射关系，通常用 mod 运算（求余运算）来实现。下面我举个例子帮你理解一下。</p>
-<p>比如说，我们的主内存被分成 0～31 号这样 32 个块。我们一共有 8个缓存块。用户想要访问第 21 号内存块。如果 21 号内存块内容在缓存块中的话，它一定在 5 号缓存块（21 mod 8 &#x3D; 5）中。</p>
-<img src="/img/computer_img/直接映射cache.webp" alt="直接映射cache" style="zoom:50%;" />
-
-
-
-<p>实际计算中，有一个小小的技巧，通常我们会把缓存块的数量设置成 2 的 N 次方。这样在计算取模的时候，可以直接取地址的低 N 位，也就是二进制里面的后几位。比如这里的 8 个缓存块，就是 2 的 3 次方。那么，在对 21 取模的时候，可以对 21 的 2 进制表示 10101 取地址的低三位，也就是 101，对应的 5，就是对应的缓存块地址。</p>
-<img src="/img/computer_img/低3位cache.webp" alt="低3位cache" style="zoom:33%;" />
-
-<p>取 Block 地址的低位，就能得到对应的 Cache Line 地址，除了 21 号内存块外，13 号、5 号等很多内存块的数据，都对应着 5 号缓存块中。既然如此，假如现在 CPU 想要读取 21 号内存块，在读取到 5 号缓存块的时候，我们怎么知道里面的数据，究竟是不是 21 号对应的数据呢？</p>
-<hr>
-<p>这个时候，在对应的缓存块中，我们会存储一个<strong>组标记</strong>（Tag）。这个组标记会记录，当前缓存块内存存储的数据对应的内存块，而缓存块本身的地址表示访问地址的低 N 位。就像上面的例子，21 的低 3 位 101，缓存块本身的地址已经涵盖了对应的信息、对应的组标记，我们只需要记录 21 剩余的高 2 位的信息，也就是 10 就可以了。</p>
-<p>除了组标记信息之外，缓存块中还有两个数据。一个自然是从主内存中加载来的实际存放的数据，另一个是<strong>有效位</strong>（valid bit），它其实就是用来标记，对应的缓存块中的数据是否是有效的，确保不是机器刚刚启动时候的空数据 。 <em>如果有效位是 0，无论其中的组标记和 Cache Line 里的数据内容是什么，CPU 都不会管这些数据，而要直接访问内存，重新加载数据。</em></p>
-<hr>
-<p>CPU 在读取数据的时候，并不是要读取一整个 Block，而是读取一个他需要的数据片段。这样的数据，我们叫作 CPU 里的一个字（Word）。具体是哪个字，就用这个字在整个 Block 里面的位置来决定。这个位置，我们叫作偏移量（Offset）</p>
-<p>总结一下，<strong>一个内存的访问地址，最终包括高位代表的组标记、低位代表的索引，以及在对应的 Data Block 中定位对应字的位置偏移量。</strong></p>
-<img src="/img/computer_img/内存地址到Cache Line.webp" alt="内存地址到Cache Line" style="zoom:50%;" />
-
-<center>内存地址到 Cache Line 的关系</center>
-
-<p>而内存地址对应到 Cache 里的数据结构，则多了一个有效位和对应的数据，由“索引 + 有效位 + 组标记 + 数据”组成。如果内存中的数据已经在 CPU Cache 里了，那一个内存地址的访问，就会经历这样 4 个步骤：</p>
-<ol>
-<li>根据内存地址的低位，计算在 Cache 中的索引；</li>
-<li>判断有效位，确认 Cache 中的数据是有效的；</li>
-<li>对比内存访问地址的高位，和 Cache 中的组标记，确认 Cache 中的数据就是我们要访问的内存数据，从 Cache Line 中读取到对应的数据块（Data Block）；</li>
-<li>根据内存地址的 Offset 位，从 Data Block 中，读取希望读取到的字。</li>
-</ol>
-<p>如果在 2、3 这两个步骤中，CPU 发现，Cache 中的数据并不是要访问的内存地址的数据，那CPU 就会访问内存，并把对应的Block Data 更新到 Cache Line 中，同时更新对应的有效位和组标记的数据。</p>
-<hr>
-<p>讲到这里，相信你明白现代 CPU，是如何通过直接映射 Cache，来定位一个内存访问地址在 Cache 中的位置了。其实，除了直接映射 Cache 之外，我们常见的缓存放置策略还有全相连 Cache（Fully Associative Cache）、组相连 Cache（Set Associative Cache）。这几种策略的数据结构都是相似的，理解了最简单的直接映射 Cache，其他的策略你很容易就能理解了。</p>
-<h2 id="减少-4-毫秒，公司挣了多少钱"><a href="#减少-4-毫秒，公司挣了多少钱" class="headerlink" title="减少 4 毫秒，公司挣了多少钱?"></a>减少 4 毫秒，公司挣了多少钱?</h2><p>讲了 CPU 和内存之间的性能差异，以及我们如何通过 CPU Cache 来尽可能解决这两者之间的性能鸿沟。你可能要问了，这样做的意义和价值究竟是什么？毕竟，一次内存的访问，只不过需要 100 纳秒而已。1 秒钟时间内，足有 1000 万个 100 纳秒。别着急，我们先来看一个故事。</p>
-<p>2008 年，一家叫作 Spread Networks 的通信公司花费 3 亿美元，做了一个光缆建设项目。目标是建设一条从芝加哥到新泽西，总长 1331 公里的光缆线路。建设这条线路的目的，其实是为了将两地之间原有的网络访问延时，从 17 毫秒降低到 13 毫秒。</p>
-<p>你可能会说，仅仅缩短了 4 毫秒时间啊，却花费 3 个亿，真的值吗？为这 4 毫秒时间买单的，其实是一批高频交易公司。它们以 5 年 1400 万美元的价格，使用这条线路。利用这短短的 4 毫秒的时间优势，这些公司通过高性能的计算机程序，在芝加哥和新泽西两地的交易所进行高频套利，以获得每年以 10 亿美元计的利润。现在你还觉得这个不值得吗？</p>
-<p>其实，只要 350 微秒的差异，就足够高频交易公司用来进行无风险套利了。而 350 微秒，如果用来进行 100 纳秒一次的内存访问，大约只够进行 3500 次。而引入 CPU Cache 之后，我们可以进行的数据访问次数，提升了数十倍，使得各种交易策略成为可能。</p>
-<h2 id="总结延伸"><a href="#总结延伸" class="headerlink" title="总结延伸"></a>总结延伸</h2><p>很多时候，程序的性能瓶颈，来自使用 DRAM 芯片的内存访问速度。</p>
-<p>根据摩尔定律，自上世纪 80 年代以来，CPU 和内存的性能鸿沟越拉越大。于是，现代 CPU 的设计者们，直接在 CPU 中嵌入了使用更高性能的 SRAM 芯片的 Cache，来弥补这一性能差异。通过巧妙地将内存地址，拆分成“索引 + 组标记 + 偏移量”的方式，使得我们可以将很大的内存地址，映射到很小的 CPU Cache 地址里。而 CPU Cache 带来的毫秒乃至微秒级别的性能差异，又能带来巨大的商业利益。</p>
-<p>在搞清楚从内存加载数据到 Cache，以及从 Cache 里读取到想要的数据之后，我们又要面临一个新的挑战了。CPU 不仅要读数据，还需要写数据，我们不能只把数据写入到 Cache 里面就结束了。下一讲会来说 CPU 要写入数据的时候，怎么既不牺牲性能，又能保持数据的一致性。</p>
-]]></content>
-      <categories>
-        <category>计算机组成原理</category>
-      </categories>
-      <tags>
-        <tag>cache</tag>
-        <tag> 虚拟内存</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>高速缓存（下）</title>
     <url>/posts/6477edec/</url>
     <content><![CDATA[<h1 id="高速缓存（下）：你确定你的数据更新了么？"><a href="#高速缓存（下）：你确定你的数据更新了么？" class="headerlink" title="高速缓存（下）：你确定你的数据更新了么？"></a>高速缓存（下）：你确定你的数据更新了么？</h1><p>面试过大量的 Java 工程师。对于一些表示自己深入了解和擅长多线程的同学，我经常会问这样一个面试题：<strong>“volatile 这个关键字有什么作用？”</strong><span id="more"></span><br>就我面试过的工程师而言，即使是工作了多年的 Java 工程师，也很少有人能准确说出 volatile 这个关键字的含义。这里面最常见的理解错误有两个，一个是把 volatile 当成一种锁机制，认为给变量加上了 volatile，就好像是给函数加了 sychronized 关键字一样，不同的线程对于特定变量的访问会去加锁；    另一个是把 volatile 当成一种原子化的操作机制，认为加了 volatile 之后，对于一个变量的自增的操作就会变成原子性的了。</p>
@@ -1283,6 +1208,81 @@ SPEC 提供的 CPU 基准测试程序，就好像 CPU 届的“高考”，通�
       </tags>
   </entry>
   <entry>
+    <title>高速缓存（上）</title>
+    <url>/posts/dccb8a89/</url>
+    <content><![CDATA[<h1 id="高速缓存（上）：“4毫秒”究竟值多少钱？"><a href="#高速缓存（上）：“4毫秒”究竟值多少钱？" class="headerlink" title="高速缓存（上）：“4毫秒”究竟值多少钱？"></a>高速缓存（上）：“4毫秒”究竟值多少钱？</h1><p>这一节内容开始之前，我们先来看一个 3 行的小程序。你可以猜一猜，这个程序里的循环 1 和循环 2，运行所花费的时间会差多少？<span id="more"></span>你可以先思考几分钟，然后再看我下面的解释。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">int[] arr = new int[64 * 1024 * 1024];</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">// 循环1</span><br><span class="line">for (int i = 0; i &lt; arr.length; i++) arr[i] *= 3;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">// 循环2</span><br><span class="line">for (int i = 0; i &lt; arr.length; i += 16) arr[i] *= 3</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>在这段 Java 程序中，我们首先构造了一个 64×1024×1024 大小的整型数组。在循环 1 里，我们遍历整个数组，将数组中每一项的值变成了原来的 3 倍；在循环 2 里，我们每隔 16 个索引访问一个数组元素，将这一项的值变成了原来的 3 倍。</p>
+<p>按道理来说，循环 2 只访问循环 1 中 1&#x2F;16 的数组元素，只进行了循环 1 中 1&#x2F;16 的乘法计算，那循环 2 花费的时间应该是循环 1 的 1&#x2F;16 左右。但是实际上，循环 1 在我的电脑上运行需要 50 毫秒，循环 2 只需要 46 毫秒。这两个循环花费时间之差在 15% 之内。</p>
+<hr>
+<p>为什么会有这 15% 的差异呢？这和我们今天要讲的 CPU Cache 有关。之前我们看到了内存和硬盘之间存在的巨大性能差异。在 CPU 眼里，内存也慢得不行。于是，聪明的工程师们就在 CPU 里面嵌入了 CPU Cache（高速缓存），来解决这一问题。</p>
+<h2 id="我们为什么需要高速缓存"><a href="#我们为什么需要高速缓存" class="headerlink" title="我们为什么需要高速缓存?"></a>我们为什么需要高速缓存?</h2><p>按照摩尔定律，CPU 的访问速度每 18 个月便会翻一番，相当于每年增长 60%。内存的访问速度虽然也在不断增长，却远没有这么快，每年只增长 7% 左右。而这两个增长速度的差异，使得 CPU 性能和内存访问性能的差距不断拉大。到今天来看，一次内存的访问，大约需要 120 个 CPU Cycle，这也意味着，在今天，CPU 和内存的访问速度已经有了 120 倍的差距。</p>
+<p>如果拿我们现实生活来打个比方的话，CPU 的速度好比风驰电掣的高铁，每小时 350 公里，然而，它却只能等着旁边腿脚不太灵便的老太太，也就是内存，以每小时 3 公里的速度缓慢步行。因为 CPU 需要执行的指令、需要访问的数据，都在这个速度不到自己 1% 的内存里。</p>
+<img src="/img/computer_img/CPU和内存性能差异.webp" alt="CPU和内存性能差异" style="zoom:50%;" />
+
+
+
+<p>为了弥补两者之间的性能差异，我们能真实地把 CPU 的性能提升用起来，而不是让它在那儿空转，我们在现代 CPU 中引入了高速缓存。</p>
+<p>从 CPU Cache 被加入到现有的 CPU 里开始，内存中的指令、数据，会被加载到 L1-L3 Cache 中，而不是直接由 CPU 访问内存去拿。在 95% 的情况下，CPU 都只需要访问 L1-L3 Cache，从里面读取指令和数据，而无需访问内存。要注意的是，要注意的是，这里我们说的 CPU  cache 或者 L1&#x2F;L3  Cache，不是一个单纯的、概念上的缓存（比如之前我们说的拿内存作为硬盘的缓存）），而是指特定的由 SRAM 组成的物理芯片。 </p>
+<p>这里是一张 Intel CPU 的放大照片。这里面大片的长方形芯片，就是这个 CPU 使用的 20MB 的  L3 Cache。</p>
+<img src="/img/computer_img/SRAM缓存.webp" alt="SRAM缓存" style="zoom:50%;" />
+
+<p> 这一讲一开始的程序里，运行程序的时间主要花在将对应的数据从内存中读取出来，加载到CPU cache 里。 CPU 从内存中读取数据到 CPU Cache 的过程中，是<strong>一小块一小块来读取数据的</strong>（是一小块一小块来读取数据的），而不是按照单个数组元素来读取数据的。这样一小块一小块的数据，在 CPU Cache 里面，我们把它叫作  <strong>Cache Line（缓存块）</strong>。</p>
+<p>在我们日常使用的 Intel 服务器或者 PC 里，Cache Line 的大小通常是 64 字节。而在上面的循环 2 里面，我们每隔 16 个整型数计算一次，16 个整型数正好是 64 个字节。于是，循环 1 和循环 2，需要把同样数量的 Cache Line 数据从内存中读取到 CPU Cache 中，最终两个程序花费的时间就差别不大了。</p>
+<p>知道了为什么需要 CPU Cache，接下来，我们就来看一看，CPU 究竟是如何访问 CPU Cache 的，以及 CPU Cache 是如何组织数据，使得 CPU 可以找到自己想要访问的数据的。    因为 Cache 作为“缓存”的意思，在很多别的存储设备里面都会用到。为了避免你混淆，在表示抽象的“缓存“概念时，用中文的“缓存”；如果是 CPU Cache，我会用“高速缓存“或者英文的“Cache”，来表示。</p>
+<h2 id="Cache-的数据结构和读取过程是什么样的？"><a href="#Cache-的数据结构和读取过程是什么样的？" class="headerlink" title="Cache 的数据结构和读取过程是什么样的？"></a>Cache 的数据结构和读取过程是什么样的？</h2><p>现代 CPU 进行数据读取的时候，无论数据是否已经存储在 Cache 中，CPU 始终会首先访问 Cache。只有当 CPU 在 Cache 中找不到数据的时候，才会去访问内存，并将读取到的数据写入 Cache 之中。  当时间局部性原理起作用后，这个最近刚刚被访问的数据，会很快再次被访问。而 Cache 的访问速度远远快于内存，这样，CPU 花在等待内存访问上的时间就大大变短了。</p>
+<img src="/img/computer_img/访问cache.webp" alt="访问cache" style="zoom:50%;" />
+
+<p>这样的访问机制，和我们自己在开发应用系统的时候，“使用内存作为硬盘的缓存”的逻辑是一样的。在各类基准测试（Benchmark）和实际应用场景中，CPU Cache 的命中率通常能达到 95% 以上。</p>
+<p>问题来了，CPU 如何知道要访问的内存数据，存储在 Cache 的哪个位置呢？接下来，我就从最基本的直接映射 Cache（Direct Mapped Cache）说起，带你来看整个 Cache 的数据结构和访问逻辑。</p>
+<h3 id="直接映射-Cache"><a href="#直接映射-Cache" class="headerlink" title="直接映射 Cache"></a>直接映射 Cache</h3><p>CPU 访问内存数据，是一小块一小块数据来读取的。对于读取内存中的数据，我们首先拿到的是数据所在的内存块（Block）的地址。 而直接映射 Cache 采用的策略，就是确保任何一个内存块的地址，始终映射到一个固定的 <strong>CPU Cache</strong> 地址（Cache Line）。而这个映射关系，通常用 mod 运算（求余运算）来实现。下面我举个例子帮你理解一下。</p>
+<p>比如说，我们的主内存被分成 0～31 号这样 32 个块。我们一共有 8个缓存块。用户想要访问第 21 号内存块。如果 21 号内存块内容在缓存块中的话，它一定在 5 号缓存块（21 mod 8 &#x3D; 5）中。</p>
+<img src="/img/computer_img/直接映射cache.webp" alt="直接映射cache" style="zoom:50%;" />
+
+
+
+<p>实际计算中，有一个小小的技巧，通常我们会把缓存块的数量设置成 2 的 N 次方。这样在计算取模的时候，可以直接取地址的低 N 位，也就是二进制里面的后几位。比如这里的 8 个缓存块，就是 2 的 3 次方。那么，在对 21 取模的时候，可以对 21 的 2 进制表示 10101 取地址的低三位，也就是 101，对应的 5，就是对应的缓存块地址。</p>
+<img src="/img/computer_img/低3位cache.webp" alt="低3位cache" style="zoom:33%;" />
+
+<p>取 Block 地址的低位，就能得到对应的 Cache Line 地址，除了 21 号内存块外，13 号、5 号等很多内存块的数据，都对应着 5 号缓存块中。既然如此，假如现在 CPU 想要读取 21 号内存块，在读取到 5 号缓存块的时候，我们怎么知道里面的数据，究竟是不是 21 号对应的数据呢？</p>
+<hr>
+<p>这个时候，在对应的缓存块中，我们会存储一个<strong>组标记</strong>（Tag）。这个组标记会记录，当前缓存块内存存储的数据对应的内存块，而缓存块本身的地址表示访问地址的低 N 位。就像上面的例子，21 的低 3 位 101，缓存块本身的地址已经涵盖了对应的信息、对应的组标记，我们只需要记录 21 剩余的高 2 位的信息，也就是 10 就可以了。</p>
+<p>除了组标记信息之外，缓存块中还有两个数据。一个自然是从主内存中加载来的实际存放的数据，另一个是<strong>有效位</strong>（valid bit），它其实就是用来标记，对应的缓存块中的数据是否是有效的，确保不是机器刚刚启动时候的空数据 。 <em>如果有效位是 0，无论其中的组标记和 Cache Line 里的数据内容是什么，CPU 都不会管这些数据，而要直接访问内存，重新加载数据。</em></p>
+<hr>
+<p>CPU 在读取数据的时候，并不是要读取一整个 Block，而是读取一个他需要的数据片段。这样的数据，我们叫作 CPU 里的一个字（Word）。具体是哪个字，就用这个字在整个 Block 里面的位置来决定。这个位置，我们叫作偏移量（Offset）</p>
+<p>总结一下，<strong>一个内存的访问地址，最终包括高位代表的组标记、低位代表的索引，以及在对应的 Data Block 中定位对应字的位置偏移量。</strong></p>
+<img src="/img/computer_img/内存地址到Cache Line.webp" alt="内存地址到Cache Line" style="zoom:50%;" />
+
+<center>内存地址到 Cache Line 的关系</center>
+
+<p>而内存地址对应到 Cache 里的数据结构，则多了一个有效位和对应的数据，由“索引 + 有效位 + 组标记 + 数据”组成。如果内存中的数据已经在 CPU Cache 里了，那一个内存地址的访问，就会经历这样 4 个步骤：</p>
+<ol>
+<li>根据内存地址的低位，计算在 Cache 中的索引；</li>
+<li>判断有效位，确认 Cache 中的数据是有效的；</li>
+<li>对比内存访问地址的高位，和 Cache 中的组标记，确认 Cache 中的数据就是我们要访问的内存数据，从 Cache Line 中读取到对应的数据块（Data Block）；</li>
+<li>根据内存地址的 Offset 位，从 Data Block 中，读取希望读取到的字。</li>
+</ol>
+<p>如果在 2、3 这两个步骤中，CPU 发现，Cache 中的数据并不是要访问的内存地址的数据，那CPU 就会访问内存，并把对应的Block Data 更新到 Cache Line 中，同时更新对应的有效位和组标记的数据。</p>
+<hr>
+<p>讲到这里，相信你明白现代 CPU，是如何通过直接映射 Cache，来定位一个内存访问地址在 Cache 中的位置了。其实，除了直接映射 Cache 之外，我们常见的缓存放置策略还有全相连 Cache（Fully Associative Cache）、组相连 Cache（Set Associative Cache）。这几种策略的数据结构都是相似的，理解了最简单的直接映射 Cache，其他的策略你很容易就能理解了。</p>
+<h2 id="减少-4-毫秒，公司挣了多少钱"><a href="#减少-4-毫秒，公司挣了多少钱" class="headerlink" title="减少 4 毫秒，公司挣了多少钱?"></a>减少 4 毫秒，公司挣了多少钱?</h2><p>讲了 CPU 和内存之间的性能差异，以及我们如何通过 CPU Cache 来尽可能解决这两者之间的性能鸿沟。你可能要问了，这样做的意义和价值究竟是什么？毕竟，一次内存的访问，只不过需要 100 纳秒而已。1 秒钟时间内，足有 1000 万个 100 纳秒。别着急，我们先来看一个故事。</p>
+<p>2008 年，一家叫作 Spread Networks 的通信公司花费 3 亿美元，做了一个光缆建设项目。目标是建设一条从芝加哥到新泽西，总长 1331 公里的光缆线路。建设这条线路的目的，其实是为了将两地之间原有的网络访问延时，从 17 毫秒降低到 13 毫秒。</p>
+<p>你可能会说，仅仅缩短了 4 毫秒时间啊，却花费 3 个亿，真的值吗？为这 4 毫秒时间买单的，其实是一批高频交易公司。它们以 5 年 1400 万美元的价格，使用这条线路。利用这短短的 4 毫秒的时间优势，这些公司通过高性能的计算机程序，在芝加哥和新泽西两地的交易所进行高频套利，以获得每年以 10 亿美元计的利润。现在你还觉得这个不值得吗？</p>
+<p>其实，只要 350 微秒的差异，就足够高频交易公司用来进行无风险套利了。而 350 微秒，如果用来进行 100 纳秒一次的内存访问，大约只够进行 3500 次。而引入 CPU Cache 之后，我们可以进行的数据访问次数，提升了数十倍，使得各种交易策略成为可能。</p>
+<h2 id="总结延伸"><a href="#总结延伸" class="headerlink" title="总结延伸"></a>总结延伸</h2><p>很多时候，程序的性能瓶颈，来自使用 DRAM 芯片的内存访问速度。</p>
+<p>根据摩尔定律，自上世纪 80 年代以来，CPU 和内存的性能鸿沟越拉越大。于是，现代 CPU 的设计者们，直接在 CPU 中嵌入了使用更高性能的 SRAM 芯片的 Cache，来弥补这一性能差异。通过巧妙地将内存地址，拆分成“索引 + 组标记 + 偏移量”的方式，使得我们可以将很大的内存地址，映射到很小的 CPU Cache 地址里。而 CPU Cache 带来的毫秒乃至微秒级别的性能差异，又能带来巨大的商业利益。</p>
+<p>在搞清楚从内存加载数据到 Cache，以及从 Cache 里读取到想要的数据之后，我们又要面临一个新的挑战了。CPU 不仅要读数据，还需要写数据，我们不能只把数据写入到 Cache 里面就结束了。下一讲会来说 CPU 要写入数据的时候，怎么既不牺牲性能，又能保持数据的一致性。</p>
+]]></content>
+      <categories>
+        <category>计算机组成原理</category>
+      </categories>
+      <tags>
+        <tag>cache</tag>
+        <tag> 虚拟内存</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>MESI协议</title>
     <url>/posts/a2fa04e/</url>
     <content><![CDATA[<h1 id="MESI协议：如何让多核CPU的高速缓存保持一致？"><a href="#MESI协议：如何让多核CPU的高速缓存保持一致？" class="headerlink" title="MESI协议：如何让多核CPU的高速缓存保持一致？"></a>MESI协议：如何让多核CPU的高速缓存保持一致？</h1><p>多核 CPU 有很多好处，其中最重要的一个就是，它使得我们在不能提升 CPU 的主频之后，找到了另一种提升 CPU 吞吐率<span id="more"></span>的办法。</p>
@@ -1353,64 +1353,6 @@ SPEC 提供的 CPU 基准测试程序，就好像 CPU 届的“高考”，通�
       <tags>
         <tag>缓存一致性</tag>
       </tags>
-  </entry>
-  <entry>
-    <title>总线-计算机内部的高速公路</title>
-    <url>/posts/d6a63846/</url>
-    <content><![CDATA[<h1 id="总线：计算机内部的高速公路"><a href="#总线：计算机内部的高速公路" class="headerlink" title="总线：计算机内部的高速公路"></a>总线：计算机内部的高速公路</h1><p>CPU所代表的控制器和运算器，要和存储器，也就是我们的主内存，以及输入和输出设备进行通信。 那问题来了，CP U从我们的键盘、鼠标接收输入信号，向显示器输出信号，这之间究竟是怎么通信的呢<span id="more"></span>？换句话说，计算机是用什么样的方式来完成，CPU 和内存、以及外部输入输出设备的通信呢？</p>
-<hr>
-<h2 id="降低复杂性：总线的设计思路来源"><a href="#降低复杂性：总线的设计思路来源" class="headerlink" title="降低复杂性：总线的设计思路来源"></a>降低复杂性：总线的设计思路来源</h2><p>计算机里其实有很多不同的硬件设备，除了 CPU 和内存之外，我们还有大量的输入输出设备。可以说，你计算机上的每一个接口，键盘、鼠标、显示器、硬盘，乃至通过 USB 接口连接的各种外部设备，都对应了一个设备或者模块。</p>
-<p>如果各个设备间的通信，都是互相之间单独进行的。如果我们有 N 个不同的设备，他们之间需要各自单独连接，那么系统复杂度就会变成 N2。每一个设备或者功能电路模块，都要和其他 N−1 个设备去通信。<u>为了简化系统的复杂度，我们就引入了总线，把这个 N2 的复杂度，变成一个 N 的复杂度。</u></p>
-<p>与其让各个设备之间互相单独通信，不如我们去设计一个公用的线路。</p>
-<blockquote>
-<p>CPU 想要和什么设备通信，通信的指令是什么，对应的数据是什么，都发送到这个线路上；设备要向 CPU 发送什么信息呢，也发送到这个线路上。这个线路就好像一个高速公路，各个设备和其他设备之间，不需要单独建公路，只建一条小路通向这条高速公路就好了。</p>
-</blockquote>
-<img src="/img/computer_img/总线降低复杂度.webp" alt="总线降低复杂度" style="zoom:50%;" />
-
-<p>这个设计思路，就是我们今天要说的总线（Bus）。</p>
-<p>总线，其实就是一组线路。我们的 CPU、内存以及输入和输出设备，都是通过这组线路，进行相互间通信的。总线的英文叫作 <strong>Bus</strong>，就是一辆公交车。这个名字很好地描述了总线的含义。我们的“公交车”的各个站点，就是各个接入设备。要想向一个设备传输数据，我们只要把数据放上公交车，在对应的车站下车就可以了。</p>
-<p>其实，对应的设计思路，在软件开发中也是非常常见的。我们在做大型系统开发的过程中，经常会用到一种叫作<a href="https://dzone.com/articles/design-patterns-event-bus"><strong>事件总线</strong></a>（Event Bus）的设计模式。</p>
-<p>进行大规模应用系统开发的时候，系统中的各个组件之间也需要相互通信。模块之间如果是两两之间单独去定义协议，这个软件系统一样会遇到一个复杂度变成了 N2 的问题。所以常见的一个解决方案，就是事件总线这个设计模式。</p>
-<p>在事件总线这个设计模式里，各个模块触发对应的事件，并把事件对象发送到总线上。 也就是说，每个模块就是一个发布者。而每个模块也会把自己注册到总线上，去监听总线上的事件，并根据事件的对象类型或者是对象内容，来决定自己是否要进行特定的处理或者响应。<br><img src="/img/computer_img/事件总线.webp" alt="事件总线" style="zoom:50%;" /></p>
-<p>这样的设计下，注册在总线上的各个模块就是松耦合的。模块互相之间并没有依赖关系。无论代码的维护，还是未来的扩展，都会很方便。</p>
-<p><strong>发布者、订阅者</strong></p>
-<h2 id="理解总线：-三种线路和多总线架构"><a href="#理解总线：-三种线路和多总线架构" class="headerlink" title="理解总线： 三种线路和多总线架构"></a>理解总线： 三种线路和多总线架构</h2><p>现代的 Intel CPU 的体系结构里面，通常有好几条总线。</p>
-<p>首先，CPU 和内存以及高速缓存通信的总线，这里面通常有两种总线。</p>
-<p>这种方式，我们称之为<strong>双独立总线</strong> （Dual Independent Bus，缩写为 DIB）。CPU 里，有一个快速的<strong>本地总线（</strong>Local Bus），以及一个速度相对较慢的<strong>前端总线</strong>（Front-side Bus）。</p>
-<p>在前面几讲刚刚讲过，现代的 CPU 里，通常有专门的高速缓存芯片。这里的高速本地总线，就是用来和高速缓存通信的。而前端总线，则是用来和主内存以及输入输出设备通信的。有时候，我们会把本地总线也叫作后端总线（Back-side Bus），和前面的前端总线对应起来。而前端总线也有很多其他名字，比如处理器总线（Processor Bus）、内存总线（Memory Bus）。</p>
-<p>除了前端总线呢，我们常常还会听到 PCI 总线、I&#x2F;O 总线或者系统总线（System Bus）。看到这么多总线的名字，你是不是已经有点晕了。这些名词确实容易混为一谈。其实各种总线的命名一直都很混乱，我们不如直接来看一看 <strong>CPU 的硬件架构图</strong>。对照图来看，一切问题就都清楚了。</p>
-<p>CPU 里面的北桥芯片，把我们上面说的前端总线，一分为二，变成了三个总线。</p>
-<img src="/img/computer_img/双独立总线.webp" alt="双独立总线" style="zoom:50%;" />
-
-<p>我们的前端总线，其实就是 <strong>系统总线</strong> 。CPU 里面的内存接口，直接和系统总线通信，然后系统总线再接入一个 I&#x2F;O 桥接器（I&#x2F;O Bridge）。这个 I&#x2F;O 桥接器，一边接入了我们的内存总线，使得我们的 CPU 和内存通信；另一边呢，又接入了一个 I&#x2F;O 总线，用来连接 I&#x2F;O 设备。</p>
-<hr>
-<p>事实上，真实的计算机里，这个总线层面拆分得更细。根据不同的设备，还会分成独立的 PCI 总线、ISA 总线等等。</p>
-<img src="/img/computer_img/总线细分.webp" alt="总线细分" style="zoom:50%;" />
-
-
-
-<p>在物理层面，其实我们完全可以把总线看作一组“电线”。不过呢，这些电线之间也是有分工的，我们通常有三类线路。</p>
-<ol>
-<li><p>数据线（Data Bus），用来传输实际的数据信息，也就是实际上了公交车的“人”。</p>
-</li>
-<li><p>地址线（Address Bus），用来确定到底把数据传输到哪里去，是内存的某个位置，还是某一个 I&#x2F;O 设备。这个其实就相当于拿了个纸条，写下了上面的人要下车的站点。</p>
-</li>
-<li><p>控制线（Control Bus），用来控制对于总线的访问。虽然我们把总线比喻成了一辆公交车。那么有人想要做公交车的时候，需要告诉公交车司机，这个就是我们的控制信号。</p>
-</li>
-</ol>
-<ul>
-<li>尽管总线减少客设备之间的耦合，降低了系统设计的复杂度，但同时带来了一个问题，就是总线不能同时给多个设备提供通信功能。</li>
-</ul>
-<p>我们的总线是很多个设备公用的，那多个设备都想要用总线，我们就需要有一个机制，去决定这种情况下，到底把总线给哪一个设备用。这个机制，就叫作总线裁决（Bus Arbitraction）。总线裁决的机制有很多种不同的实现，如果你对这个实现的细节感兴趣，可以去看一看 <a href="https://en.wikipedia.org/wiki/Arbiter_(electronics)">Wiki</a> 里面关于裁决器的对应条目，这里我们就不多说了。</p>
-<h2 id="总线延伸"><a href="#总线延伸" class="headerlink" title="总线延伸"></a>总线延伸</h2><p>讲解了计算机里各个不同的组件之间用来通信的渠道，也就是总线。总线的设计思路，核心是为了减少多个模块之间交互的复杂性和耦合度。实际上，总线这个设计思路在我们的软件开发过程中也经常会被用到。事件总线就是我们常见的一个设计模式，通常事件总线也会和订阅者发布者模式结合起来，成为大型系统的各个松耦合的模块之间交互的一种主要模式。</p>
-<p>在实际的硬件层面，总线其实就是一组连接电路的线路。因为不同设备之间的速度有差异，所以一台计算机里往往会有多个总线。  常见的就有在 CPU 内部和高速缓存通信的本地总线，以及和外部 I&#x2F;O 设备以及内存通信的前端总线。</p>
-<p>前端总线通常也被叫作<strong>系统总线</strong>。它可以通过一个 I&#x2F;O 桥接器，拆分成两个总线，分别来和 I&#x2F;O 设备以及内存通信。自然，这样拆开的两个总线，就叫作 I&#x2F;O 总线和内存总线<u>。总线本身的电路功能，又可以拆分成用来传输数据的数据线、用来传输地址的地址线，以及用来传输控制信号的控制线。</u></p>
-<hr>
-<p>总线是一个各个接入的设备公用的线路，所以自然会在各个设备之间争夺总线所有权的情况。于是，我们需要一个机制来决定让谁来使用总线，这个决策机制就是总线裁决。</p>
-]]></content>
-      <categories>
-        <category>计算机组成原理</category>
-      </categories>
   </entry>
   <entry>
     <title>理解内存</title>
@@ -1518,6 +1460,64 @@ SPEC 提供的 CPU 基准测试程序，就好像 CPU 届的“高考”，通�
         <tag>TLB</tag>
         <tag>内存安全</tag>
       </tags>
+  </entry>
+  <entry>
+    <title>总线-计算机内部的高速公路</title>
+    <url>/posts/d6a63846/</url>
+    <content><![CDATA[<h1 id="总线：计算机内部的高速公路"><a href="#总线：计算机内部的高速公路" class="headerlink" title="总线：计算机内部的高速公路"></a>总线：计算机内部的高速公路</h1><p>CPU所代表的控制器和运算器，要和存储器，也就是我们的主内存，以及输入和输出设备进行通信。 那问题来了，CP U从我们的键盘、鼠标接收输入信号，向显示器输出信号，这之间究竟是怎么通信的呢<span id="more"></span>？换句话说，计算机是用什么样的方式来完成，CPU 和内存、以及外部输入输出设备的通信呢？</p>
+<hr>
+<h2 id="降低复杂性：总线的设计思路来源"><a href="#降低复杂性：总线的设计思路来源" class="headerlink" title="降低复杂性：总线的设计思路来源"></a>降低复杂性：总线的设计思路来源</h2><p>计算机里其实有很多不同的硬件设备，除了 CPU 和内存之外，我们还有大量的输入输出设备。可以说，你计算机上的每一个接口，键盘、鼠标、显示器、硬盘，乃至通过 USB 接口连接的各种外部设备，都对应了一个设备或者模块。</p>
+<p>如果各个设备间的通信，都是互相之间单独进行的。如果我们有 N 个不同的设备，他们之间需要各自单独连接，那么系统复杂度就会变成 N2。每一个设备或者功能电路模块，都要和其他 N−1 个设备去通信。<u>为了简化系统的复杂度，我们就引入了总线，把这个 N2 的复杂度，变成一个 N 的复杂度。</u></p>
+<p>与其让各个设备之间互相单独通信，不如我们去设计一个公用的线路。</p>
+<blockquote>
+<p>CPU 想要和什么设备通信，通信的指令是什么，对应的数据是什么，都发送到这个线路上；设备要向 CPU 发送什么信息呢，也发送到这个线路上。这个线路就好像一个高速公路，各个设备和其他设备之间，不需要单独建公路，只建一条小路通向这条高速公路就好了。</p>
+</blockquote>
+<img src="/img/computer_img/总线降低复杂度.webp" alt="总线降低复杂度" style="zoom:50%;" />
+
+<p>这个设计思路，就是我们今天要说的总线（Bus）。</p>
+<p>总线，其实就是一组线路。我们的 CPU、内存以及输入和输出设备，都是通过这组线路，进行相互间通信的。总线的英文叫作 <strong>Bus</strong>，就是一辆公交车。这个名字很好地描述了总线的含义。我们的“公交车”的各个站点，就是各个接入设备。要想向一个设备传输数据，我们只要把数据放上公交车，在对应的车站下车就可以了。</p>
+<p>其实，对应的设计思路，在软件开发中也是非常常见的。我们在做大型系统开发的过程中，经常会用到一种叫作<a href="https://dzone.com/articles/design-patterns-event-bus"><strong>事件总线</strong></a>（Event Bus）的设计模式。</p>
+<p>进行大规模应用系统开发的时候，系统中的各个组件之间也需要相互通信。模块之间如果是两两之间单独去定义协议，这个软件系统一样会遇到一个复杂度变成了 N2 的问题。所以常见的一个解决方案，就是事件总线这个设计模式。</p>
+<p>在事件总线这个设计模式里，各个模块触发对应的事件，并把事件对象发送到总线上。 也就是说，每个模块就是一个发布者。而每个模块也会把自己注册到总线上，去监听总线上的事件，并根据事件的对象类型或者是对象内容，来决定自己是否要进行特定的处理或者响应。<br><img src="/img/computer_img/事件总线.webp" alt="事件总线" style="zoom:50%;" /></p>
+<p>这样的设计下，注册在总线上的各个模块就是松耦合的。模块互相之间并没有依赖关系。无论代码的维护，还是未来的扩展，都会很方便。</p>
+<p><strong>发布者、订阅者</strong></p>
+<h2 id="理解总线：-三种线路和多总线架构"><a href="#理解总线：-三种线路和多总线架构" class="headerlink" title="理解总线： 三种线路和多总线架构"></a>理解总线： 三种线路和多总线架构</h2><p>现代的 Intel CPU 的体系结构里面，通常有好几条总线。</p>
+<p>首先，CPU 和内存以及高速缓存通信的总线，这里面通常有两种总线。</p>
+<p>这种方式，我们称之为<strong>双独立总线</strong> （Dual Independent Bus，缩写为 DIB）。CPU 里，有一个快速的<strong>本地总线（</strong>Local Bus），以及一个速度相对较慢的<strong>前端总线</strong>（Front-side Bus）。</p>
+<p>在前面几讲刚刚讲过，现代的 CPU 里，通常有专门的高速缓存芯片。这里的高速本地总线，就是用来和高速缓存通信的。而前端总线，则是用来和主内存以及输入输出设备通信的。有时候，我们会把本地总线也叫作后端总线（Back-side Bus），和前面的前端总线对应起来。而前端总线也有很多其他名字，比如处理器总线（Processor Bus）、内存总线（Memory Bus）。</p>
+<p>除了前端总线呢，我们常常还会听到 PCI 总线、I&#x2F;O 总线或者系统总线（System Bus）。看到这么多总线的名字，你是不是已经有点晕了。这些名词确实容易混为一谈。其实各种总线的命名一直都很混乱，我们不如直接来看一看 <strong>CPU 的硬件架构图</strong>。对照图来看，一切问题就都清楚了。</p>
+<p>CPU 里面的北桥芯片，把我们上面说的前端总线，一分为二，变成了三个总线。</p>
+<img src="/img/computer_img/双独立总线.webp" alt="双独立总线" style="zoom:50%;" />
+
+<p>我们的前端总线，其实就是 <strong>系统总线</strong> 。CPU 里面的内存接口，直接和系统总线通信，然后系统总线再接入一个 I&#x2F;O 桥接器（I&#x2F;O Bridge）。这个 I&#x2F;O 桥接器，一边接入了我们的内存总线，使得我们的 CPU 和内存通信；另一边呢，又接入了一个 I&#x2F;O 总线，用来连接 I&#x2F;O 设备。</p>
+<hr>
+<p>事实上，真实的计算机里，这个总线层面拆分得更细。根据不同的设备，还会分成独立的 PCI 总线、ISA 总线等等。</p>
+<img src="/img/computer_img/总线细分.webp" alt="总线细分" style="zoom:50%;" />
+
+
+
+<p>在物理层面，其实我们完全可以把总线看作一组“电线”。不过呢，这些电线之间也是有分工的，我们通常有三类线路。</p>
+<ol>
+<li><p>数据线（Data Bus），用来传输实际的数据信息，也就是实际上了公交车的“人”。</p>
+</li>
+<li><p>地址线（Address Bus），用来确定到底把数据传输到哪里去，是内存的某个位置，还是某一个 I&#x2F;O 设备。这个其实就相当于拿了个纸条，写下了上面的人要下车的站点。</p>
+</li>
+<li><p>控制线（Control Bus），用来控制对于总线的访问。虽然我们把总线比喻成了一辆公交车。那么有人想要做公交车的时候，需要告诉公交车司机，这个就是我们的控制信号。</p>
+</li>
+</ol>
+<ul>
+<li>尽管总线减少客设备之间的耦合，降低了系统设计的复杂度，但同时带来了一个问题，就是总线不能同时给多个设备提供通信功能。</li>
+</ul>
+<p>我们的总线是很多个设备公用的，那多个设备都想要用总线，我们就需要有一个机制，去决定这种情况下，到底把总线给哪一个设备用。这个机制，就叫作总线裁决（Bus Arbitraction）。总线裁决的机制有很多种不同的实现，如果你对这个实现的细节感兴趣，可以去看一看 <a href="https://en.wikipedia.org/wiki/Arbiter_(electronics)">Wiki</a> 里面关于裁决器的对应条目，这里我们就不多说了。</p>
+<h2 id="总线延伸"><a href="#总线延伸" class="headerlink" title="总线延伸"></a>总线延伸</h2><p>讲解了计算机里各个不同的组件之间用来通信的渠道，也就是总线。总线的设计思路，核心是为了减少多个模块之间交互的复杂性和耦合度。实际上，总线这个设计思路在我们的软件开发过程中也经常会被用到。事件总线就是我们常见的一个设计模式，通常事件总线也会和订阅者发布者模式结合起来，成为大型系统的各个松耦合的模块之间交互的一种主要模式。</p>
+<p>在实际的硬件层面，总线其实就是一组连接电路的线路。因为不同设备之间的速度有差异，所以一台计算机里往往会有多个总线。  常见的就有在 CPU 内部和高速缓存通信的本地总线，以及和外部 I&#x2F;O 设备以及内存通信的前端总线。</p>
+<p>前端总线通常也被叫作<strong>系统总线</strong>。它可以通过一个 I&#x2F;O 桥接器，拆分成两个总线，分别来和 I&#x2F;O 设备以及内存通信。自然，这样拆开的两个总线，就叫作 I&#x2F;O 总线和内存总线<u>。总线本身的电路功能，又可以拆分成用来传输数据的数据线、用来传输地址的地址线，以及用来传输控制信号的控制线。</u></p>
+<hr>
+<p>总线是一个各个接入的设备公用的线路，所以自然会在各个设备之间争夺总线所有权的情况。于是，我们需要一个机制来决定让谁来使用总线，这个决策机制就是总线裁决。</p>
+]]></content>
+      <categories>
+        <category>计算机组成原理</category>
+      </categories>
   </entry>
   <entry>
     <title>输入输出设备</title>
