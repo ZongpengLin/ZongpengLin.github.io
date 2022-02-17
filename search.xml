@@ -42,6 +42,57 @@
       </tags>
   </entry>
   <entry>
+    <title>关于性能提升</title>
+    <url>/posts/bc93e288/</url>
+    <content><![CDATA[<h1 id="穿越功耗墙，我们该从哪些方面提升“性能”？"><a href="#穿越功耗墙，我们该从哪些方面提升“性能”？" class="headerlink" title="穿越功耗墙，我们该从哪些方面提升“性能”？"></a>穿越功耗墙，我们该从哪些方面提升“性能”？</h1><center> ` 程序的 CPU 执行时间 = 指令数 × CPI × Clock Cycle Time `</center>
+
+<h2 id="功耗：CPU-的“人体极限”"><a href="#功耗：CPU-的“人体极限”" class="headerlink" title="功耗：CPU 的“人体极限”"></a>功耗：CPU 的“人体极限”</h2><p>案例：奔腾 4 的 CPU 主频从来没有达到过 10GHz，最终它的主频上限定格在 3.8GHz。这还不是最糟的，更糟糕的事情是，大家发现，奔腾 4 的主频虽然高，但是它的实际性能却配不上同样的主频。想要用在笔记本上的奔腾 4 2.4GHz 处理器，其性能只和基于奔腾 3 架构的奔腾 M 1.6GHz 处理器差不多。</p>
+<span id="more"></span>
+<img src="https://static001.geekbang.org/resource/image/18/80/1826102a89e4cdd31f7573db53dd9280.png?wh=756*468" alt="CPU的主频变化" style="zoom: 75%;"/>
+
+<p>2019 年的最高配置 Intel i9 CPU，主频也只不过是 5GHz 而已。相较于 1978 年到 2000 年，这 20 年里 300 倍的主频提升，从 2000 年到现在的这 19 年，CPU 的主频大概提高了 3 倍。 </p>
+<p>奔腾 4 的主频为什么没能超过 3.8GHz 的障碍呢？答案就是功耗问题。什么是功耗问题呢？</p>
+<p>(一个 3.8GHz 的奔腾 4 处理器，满载功率是 130 瓦。这个 130 瓦是什么概念呢？机场允许带上飞机的充电宝的容量上限是 100 瓦时。如果我们把这个 CPU 安在手机里面，不考虑屏幕内存之类的耗电，这个 CPU 满载运行 45 分钟，充电宝里面就没电了。而 iPhone X 使用 ARM 架构的 CPU，功率则只有 4.5 瓦左右。)</p>
+<p>我们的 CPU，一般都被叫作超大规模集成电路（Very-Large-Scale Integration，VLSI）。这些电路，实际上都是一个个晶体管组合而成的。CPU 在计算，其实就是让晶体管里面的“开关”不断地去“打开”和“关闭”，来组合完成各种运算和功能。</p>
+<p>想要计算的快，一方面，我们要在 CPU 里，同样的面积里面，多放一些晶体管，也就是增加密度；另一方面，我们要让晶体管“打开”和“关闭”得更快一点，也就是提升主频。而这两者，都会增加功耗，带来耗电和散热的问题。</p>
+<p>在 CPU 里面，能够放下的晶体管数量和晶体管的“开关”频率也都是有限的。一个CPU 的公路，可以用一个公式表示：</p>
+<center> 功耗 ~= 1/2 ×负载电容×电压的平方×开关频率×晶体管数量</center>
+
+<p>那么，为了要提升性能，我们需要不断地增加晶体管数量。同样的面积下，我们想要多放一点晶体管，就要把晶体管造得小一点。这个就是平时我们所说的提升“制程”。从 28nm 到 7nm，相当于晶体管本身变成了原来的 1&#x2F;4 大小。我们还要提升主频，让开关的频率变快。 但是，功耗增加太多，就会导致 CPU 散热跟不上，这时，我们就需要降低电压。这里有一点非常关键，在整个功耗的公式里面，功耗和电压的平方是成正比的。这意味着电压下降到原来的 1&#x2F;5，整个的功耗会变成原来的 1&#x2F;25 。</p>
+<h2 id="并行优化，理解阿姆达尔定律"><a href="#并行优化，理解阿姆达尔定律" class="headerlink" title="并行优化，理解阿姆达尔定律"></a>并行优化，理解阿姆达尔定律</h2><p>就是所谓的“吞吐率”变大。所以，不管你有没有需要，现在 CPU 的性能就是提升了 2 倍乃至 8 倍、16 倍。这也是一个最常见的提升性能的方式，<strong>通过并行提高性能。</strong></p>
+<p>通过并行提高性能来解决。如果想要使用这种思想，需要满足这样几个条件。</p>
+<ol>
+<li>需要进行的计算，本身可以分解成几个可以并行的任务。好比上面的乘法和加法计算，几个人可以同时进行，不会影响最后的结果。</li>
+<li>需要能够分解好问题，并确保几个人的结果能够汇总到一起。</li>
+<li>在“汇总”这个阶段，是没有办法并行进行的，还是得顺序执行，一步一步来。</li>
+</ol>
+<p>这就引出了阿姆达尔定律（Amdahl’s Law）：</p>
+<p>这个定律说的就是，对于一个程序进行优化之后，处理器并行运算之后效率提升的情况。具体可以用这样一个公式来表示：</p>
+<center> **优化后的执行时间 = 受优化影响的执行时间 / 加速倍数 + 不受影响的执行时间** </center>
+
+<p>比如上面的各个向量的一小段的点积，需要 100ns，加法需要 20ns，总共需要 120ns。这里通过并行 4 个 CPU 有了 4 倍的加速度。那么最终优化后，就有了 100&#x2F;4+20&#x3D;45ns。即使我们增加更多的并行度来提供加速倍数，比如有 100 个 CPU，整个时间也需要 100&#x2F;100+20&#x3D;21ns。</p>
+<p><img src="https://static001.geekbang.org/resource/image/f1/e5/f1d05ec439e6377803df741bc07b09e5.jpeg?wh=3140*2039"></p>
+<p>T1就是不受影响的执行时间 ，T2就是可以优化影响的执行时间</p>
+<h2 id="延伸："><a href="#延伸：" class="headerlink" title="延伸："></a>延伸：</h2><p>在“摩尔定律”和“并行计算”之外，在整个计算机组成层面，还有这样几个原则性的性能提升方法。</p>
+<ol>
+<li><p>加速大概率事件。最典型的就是，过去几年流行的深度学习，整个计算过程中，99% 都是向量和矩阵计算，于是，工程师们通过用 GPU 替代 CPU，大幅度提升了深度学习的模型训练过程。本来一个 CPU 需要跑几小时甚至几天的程序，GPU 只需要几分钟就好了。Google 更是不满足于 GPU 的性能，进一步地推出了 TPU。</p>
+</li>
+<li><p>通过流水线提高性能。现代的工厂里的生产线叫“流水线”。我们可以把装配 iPhone 这样的任务拆分成一个个细分的任务，让每个人都只需要处理一道工序，最大化整个工厂的生产效率。类似的，我们的 CPU 其实就是一个“运算工厂”。我们把 CPU 指令执行的过程进行拆分，细化运行，也是现代 CPU 在主频没有办法提升那么多的情况下，性能仍然可以得到提升的重要原因之一。</p>
+</li>
+<li><p>通过预测提高性能。通过预先猜测下一步该干什么，而不是等上一步运行的结果，提前进行运算，也是让程序跑得更快一点的办法。典型的例子就是在一个循环访问数组的时候，凭经验，你也会猜到下一步我们会访问数组的下一项。所谓的“分支和冒险”、“局部性原理”这些 CPU 和存储系统设计方法，其实都是在利用我们对于未来的“预测”，提前进行相应的操作，来提升我们的程序性能。</p>
+</li>
+</ol>
+<p>比如：</p>
+<p>1.加速大概率事件<br>各种缓存(内存缓存、CDN缓存)<br>2.流水线<br>并发编程、异步编程<br>音视频播放器边播放边缓冲<br>3.预测<br>小说的下一页预加载<br>电商大促的CDN预热</p>
+]]></content>
+      <categories>
+        <category>计算机组成原理</category>
+      </categories>
+      <tags>
+        <tag>性能与主频</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>CPU的主频</title>
     <url>/posts/5dfefcf1/</url>
     <content><![CDATA[<h1 id="透过CPU的主频，谈谈性能究竟是什么"><a href="#透过CPU的主频，谈谈性能究竟是什么" class="headerlink" title="透过CPU的主频，谈谈性能究竟是什么"></a>透过CPU的主频，谈谈性能究竟是什么</h1><h2 id="计算机的性能衡量"><a href="#计算机的性能衡量" class="headerlink" title="计算机的性能衡量"></a>计算机的性能衡量</h2><p>于计算机的性能，我们需要有个标准来衡量。这个标准中主要有两个指标。</p>
@@ -216,54 +267,66 @@ SPEC 提供的 CPU 基准测试程序，就好像 CPU 届的“高考”，通�
       </tags>
   </entry>
   <entry>
-    <title>关于性能提升</title>
-    <url>/posts/bc93e288/</url>
-    <content><![CDATA[<h1 id="穿越功耗墙，我们该从哪些方面提升“性能”？"><a href="#穿越功耗墙，我们该从哪些方面提升“性能”？" class="headerlink" title="穿越功耗墙，我们该从哪些方面提升“性能”？"></a>穿越功耗墙，我们该从哪些方面提升“性能”？</h1><center> ` 程序的 CPU 执行时间 = 指令数 × CPI × Clock Cycle Time `</center>
+    <title>ELF和静态链接</title>
+    <url>/posts/b778160a/</url>
+    <content><![CDATA[<h1 id="ELF和静态链接：为什么程序无法同时在Linux和Windows下运行？"><a href="#ELF和静态链接：为什么程序无法同时在Linux和Windows下运行？" class="headerlink" title="ELF和静态链接：为什么程序无法同时在Linux和Windows下运行？"></a>ELF和静态链接：为什么程序无法同时在Linux和Windows下运行？</h1><h2 id="编译、链接和装载：-拆解程序执行"><a href="#编译、链接和装载：-拆解程序执行" class="headerlink" title="编译、链接和装载： 拆解程序执行"></a>编译、链接和装载： 拆解程序执行</h2><p>之前，我们通过 gcc 生成的文件和 objdump 获取到的汇编指令都有些小小的问题，以add 函数示例，<span id="more"></span>拆分成两个文件 add_lib.c 和 link_example.c 。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">// add_lib.c</span><br><span class="line">int add(int a, int b)</span><br><span class="line">&#123;</span><br><span class="line">    return a+b;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<h2 id="功耗：CPU-的“人体极限”"><a href="#功耗：CPU-的“人体极限”" class="headerlink" title="功耗：CPU 的“人体极限”"></a>功耗：CPU 的“人体极限”</h2><p>案例：奔腾 4 的 CPU 主频从来没有达到过 10GHz，最终它的主频上限定格在 3.8GHz。这还不是最糟的，更糟糕的事情是，大家发现，奔腾 4 的主频虽然高，但是它的实际性能却配不上同样的主频。想要用在笔记本上的奔腾 4 2.4GHz 处理器，其性能只和基于奔腾 3 架构的奔腾 M 1.6GHz 处理器差不多。</p>
-<span id="more"></span>
-<img src="https://static001.geekbang.org/resource/image/18/80/1826102a89e4cdd31f7573db53dd9280.png?wh=756*468" alt="CPU的主频变化" style="zoom: 75%;"/>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">// link_example.c</span><br><span class="line"></span><br><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">int main()</span><br><span class="line">&#123;</span><br><span class="line">    int a = 10;</span><br><span class="line">    int b = 5;</span><br><span class="line">    int c = add(a, b);</span><br><span class="line">    printf(&quot;c = %d\n&quot;, c);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p>2019 年的最高配置 Intel i9 CPU，主频也只不过是 5GHz 而已。相较于 1978 年到 2000 年，这 20 年里 300 倍的主频提升，从 2000 年到现在的这 19 年，CPU 的主频大概提高了 3 倍。 </p>
-<p>奔腾 4 的主频为什么没能超过 3.8GHz 的障碍呢？答案就是功耗问题。什么是功耗问题呢？</p>
-<p>(一个 3.8GHz 的奔腾 4 处理器，满载功率是 130 瓦。这个 130 瓦是什么概念呢？机场允许带上飞机的充电宝的容量上限是 100 瓦时。如果我们把这个 CPU 安在手机里面，不考虑屏幕内存之类的耗电，这个 CPU 满载运行 45 分钟，充电宝里面就没电了。而 iPhone X 使用 ARM 架构的 CPU，功率则只有 4.5 瓦左右。)</p>
-<p>我们的 CPU，一般都被叫作超大规模集成电路（Very-Large-Scale Integration，VLSI）。这些电路，实际上都是一个个晶体管组合而成的。CPU 在计算，其实就是让晶体管里面的“开关”不断地去“打开”和“关闭”，来组合完成各种运算和功能。</p>
-<p>想要计算的快，一方面，我们要在 CPU 里，同样的面积里面，多放一些晶体管，也就是增加密度；另一方面，我们要让晶体管“打开”和“关闭”得更快一点，也就是提升主频。而这两者，都会增加功耗，带来耗电和散热的问题。</p>
-<p>在 CPU 里面，能够放下的晶体管数量和晶体管的“开关”频率也都是有限的。一个CPU 的公路，可以用一个公式表示：</p>
-<center> 功耗 ~= 1/2 ×负载电容×电压的平方×开关频率×晶体管数量</center>
+<p>我们通过 gcc 来编译这两个文件，然后通过 objdump 命令看看它们的汇编代码。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">$ gcc -g -c add_lib.c link_example.c</span><br><span class="line">$ objdump -d -M intel -S add_lib.o</span><br><span class="line">$ objdump -d -M intel -S link_example.o</span><br></pre></td></tr></table></figure>
 
-<p>那么，为了要提升性能，我们需要不断地增加晶体管数量。同样的面积下，我们想要多放一点晶体管，就要把晶体管造得小一点。这个就是平时我们所说的提升“制程”。从 28nm 到 7nm，相当于晶体管本身变成了原来的 1&#x2F;4 大小。我们还要提升主频，让开关的频率变快。 但是，功耗增加太多，就会导致 CPU 散热跟不上，这时，我们就需要降低电压。这里有一点非常关键，在整个功耗的公式里面，功耗和电压的平方是成正比的。这意味着电压下降到原来的 1&#x2F;5，整个的功耗会变成原来的 1&#x2F;25 。</p>
-<h2 id="并行优化，理解阿姆达尔定律"><a href="#并行优化，理解阿姆达尔定律" class="headerlink" title="并行优化，理解阿姆达尔定律"></a>并行优化，理解阿姆达尔定律</h2><p>就是所谓的“吞吐率”变大。所以，不管你有没有需要，现在 CPU 的性能就是提升了 2 倍乃至 8 倍、16 倍。这也是一个最常见的提升性能的方式，<strong>通过并行提高性能。</strong></p>
-<p>通过并行提高性能来解决。如果想要使用这种思想，需要满足这样几个条件。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">add_lib.o:     file format elf64-x86-64</span><br><span class="line">Disassembly of section .text:</span><br><span class="line">0000000000000000 &lt;add&gt;:</span><br><span class="line">   0:   55                      push   rbp</span><br><span class="line">   1:   48 89 e5                mov    rbp,rsp</span><br><span class="line">   4:   89 7d fc                mov    DWORD PTR [rbp-0x4],edi</span><br><span class="line">   7:   89 75 f8                mov    DWORD PTR [rbp-0x8],esi</span><br><span class="line">   a:   8b 55 fc                mov    edx,DWORD PTR [rbp-0x4]</span><br><span class="line">   d:   8b 45 f8                mov    eax,DWORD PTR [rbp-0x8]</span><br><span class="line">  10:   01 d0                   add    eax,edx</span><br><span class="line">  12:   5d                      pop    rbp</span><br><span class="line">  13:   c3                      ret    </span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">link_example.o:     file format elf64-x86-64</span><br><span class="line">Disassembly of section .text:</span><br><span class="line">0000000000000000 &lt;main&gt;:</span><br><span class="line">   0:   55                      push   rbp</span><br><span class="line">   1:   48 89 e5                mov    rbp,rsp</span><br><span class="line">   4:   48 83 ec 10             sub    rsp,0x10</span><br><span class="line">   8:   c7 45 fc 0a 00 00 00    mov    DWORD PTR [rbp-0x4],0xa</span><br><span class="line">   f:   c7 45 f8 05 00 00 00    mov    DWORD PTR [rbp-0x8],0x5</span><br><span class="line">  16:   8b 55 f8                mov    edx,DWORD PTR [rbp-0x8]</span><br><span class="line">  19:   8b 45 fc                mov    eax,DWORD PTR [rbp-0x4]</span><br><span class="line">  1c:   89 d6                   mov    esi,edx</span><br><span class="line">  1e:   89 c7                   mov    edi,eax</span><br><span class="line">  20:   b8 00 00 00 00          mov    eax,0x0</span><br><span class="line">  25:   e8 00 00 00 00          call   2a &lt;main+0x2a&gt;</span><br><span class="line">  2a:   89 45 f4                mov    DWORD PTR [rbp-0xc],eax</span><br><span class="line">  2d:   8b 45 f4                mov    eax,DWORD PTR [rbp-0xc]</span><br><span class="line">  30:   89 c6                   mov    esi,eax</span><br><span class="line">  32:   48 8d 3d 00 00 00 00    lea    rdi,[rip+0x0]        # 39 &lt;main+0x39&gt;</span><br><span class="line">  39:   b8 00 00 00 00          mov    eax,0x0</span><br><span class="line">  3e:   e8 00 00 00 00          call   43 &lt;main+0x43&gt;</span><br><span class="line">  43:   b8 00 00 00 00          mov    eax,0x0</span><br><span class="line">  48:   c9                      leave  </span><br><span class="line">  49:   c3                      ret    </span><br></pre></td></tr></table></figure>
+
+<p>既然代码已经被我们“编译”成了指令，我们不妨尝试运行一下 .&#x2F;link_example.o。不幸的是，文件没有执行权限，我们遇到一个 Permission denied 错误。即使通过 chmod 命令赋予 link_example.o 文件可执行的权限，运行.&#x2F;link_example.o 仍然只会得到一条 cannot execute binary file: Exec format error 的错误。</p>
+<p>我们再仔细看一下 objdump 出来的两个文件的代码，会发现两个程序的地址都是从 0 开始的。如果地址是一样的，程序如果需要通过 call 指令调用函数的话，它怎么知道应该跳转到哪一个文件里呢？</p>
+<p>这么说吧，无论是这里的运行报错，还是 objdump 出来的汇编代码里面的重复地址，都是因为 add_lib.o 以及 link_example.o 并不是一个<strong>可执行文件</strong>（Executable Program），而是<strong>目标文件（</strong>Object File）。只有通过链接器（Linker）把多个目标文件以及调用的各种函数库链接起来，才能得到一个可执行文件。</p>
+<p>我们通过 gcc 的 -o 参数，可以生成对应的可执行文件，对应执行之后，就可以得到这个简单的加法调用函数的结果。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">$ gcc -o link-example add_lib.o link_example.o</span><br><span class="line">$ ./link_example</span><br><span class="line">c = 15</span><br></pre></td></tr></table></figure>
+
+<h2 id="“C-语言代码-汇编代码-机器码”-的过程"><a href="#“C-语言代码-汇编代码-机器码”-的过程" class="headerlink" title="“C 语言代码 - 汇编代码 - 机器码” 的过程"></a>“C 语言代码 - 汇编代码 - 机器码” 的过程</h2><p>实际上，“C 语言代码 - 汇编代码 - 机器码” 这个过程，在我们的计算机上进行的时候是由两部分组成的。</p>
+<ul>
+<li><p>第一部分： 由编译（Compile）、汇编（Assemble）以及链接（Link）三个阶段组成。之后生成一个可执行文件。</p>
+</li>
+<li><p>第二部分，我们通过装载器（Loader）把可执行文件装载（Load）到内存中。CPU 从内存中读取指令和数据，开始真正执行程序。</p>
+<img src="/img/computer_img/装载.webp" alt="装载" style="zoom:33%;" /></li>
+</ul>
+<h2 id="ELF-格式和链接：理解链接过程"><a href="#ELF-格式和链接：理解链接过程" class="headerlink" title="ELF 格式和链接：理解链接过程"></a>ELF 格式和链接：理解链接过程</h2><p>程序最终是通过装载器变成指令和数据的，所以其实我们生成的可执行代码也并不仅仅是一条条的指令。我们还是通过 objdump 指令，把可执行文件的内容拿出来看看。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">link_example:     file format elf64-x86-64</span><br><span class="line">Disassembly of section .init:</span><br><span class="line">...</span><br><span class="line">Disassembly of section .plt:</span><br><span class="line">...</span><br><span class="line">Disassembly of section .plt.got:</span><br><span class="line">...</span><br><span class="line">Disassembly of section .text:</span><br><span class="line">...</span><br><span class="line"></span><br><span class="line"> 6b0:   55                      push   rbp</span><br><span class="line"> 6b1:   48 89 e5                mov    rbp,rsp</span><br><span class="line"> 6b4:   89 7d fc                mov    DWORD PTR [rbp-0x4],edi</span><br><span class="line"> 6b7:   89 75 f8                mov    DWORD PTR [rbp-0x8],esi</span><br><span class="line"> 6ba:   8b 55 fc                mov    edx,DWORD PTR [rbp-0x4]</span><br><span class="line"> 6bd:   8b 45 f8                mov    eax,DWORD PTR [rbp-0x8]</span><br><span class="line"> 6c0:   01 d0                   add    eax,edx</span><br><span class="line"> 6c2:   5d                      pop    rbp</span><br><span class="line"> 6c3:   c3                      ret    </span><br><span class="line">00000000000006c4 &lt;main&gt;:</span><br><span class="line"> 6c4:   55                      push   rbp</span><br><span class="line"> 6c5:   48 89 e5                mov    rbp,rsp</span><br><span class="line"> 6c8:   48 83 ec 10             sub    rsp,0x10</span><br><span class="line"> 6cc:   c7 45 fc 0a 00 00 00    mov    DWORD PTR [rbp-0x4],0xa</span><br><span class="line"> 6d3:   c7 45 f8 05 00 00 00    mov    DWORD PTR [rbp-0x8],0x5</span><br><span class="line"> 6da:   8b 55 f8                mov    edx,DWORD PTR [rbp-0x8]</span><br><span class="line"> 6dd:   8b 45 fc                mov    eax,DWORD PTR [rbp-0x4]</span><br><span class="line"> 6e0:   89 d6                   mov    esi,edx</span><br><span class="line"> 6e2:   89 c7                   mov    edi,eax</span><br><span class="line"> 6e4:   b8 00 00 00 00          mov    eax,0x0</span><br><span class="line"> 6e9:   e8 c2 ff ff ff          call   6b0 &lt;add&gt;</span><br><span class="line"> ------------------------------------------------</span><br><span class="line"> 6ee:   89 45 f4                mov    DWORD PTR [rbp-0xc],eax</span><br><span class="line"> 6f1:   8b 45 f4                mov    eax,DWORD PTR [rbp-0xc]</span><br><span class="line"> 6f4:   89 c6                   mov    esi,eax</span><br><span class="line"> 6f6:   48 8d 3d 97 00 00 00    lea    rdi,[rip+0x97]        # 794 &lt;_IO_stdin_used+0x4&gt;</span><br><span class="line"> 6fd:   b8 00 00 00 00          mov    eax,0x0</span><br><span class="line"> 702:   e8 59 fe ff ff          call   560 &lt;printf@plt&gt;</span><br><span class="line"> 707:   b8 00 00 00 00          mov    eax,0x0</span><br><span class="line"> 70c:   c9                      leave  </span><br><span class="line"> 70d:   c3                      ret    </span><br><span class="line"> 70e:   66 90                   xchg   ax,ax</span><br><span class="line">...</span><br><span class="line">Disassembly of section .fini:</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+
+<p>你会发现，可执行代码 dump 出来内容，和之前的目标代码长得差不多，但是长了很多。因为在 Linux 下，可执行文件和目标文件所使用的都是一种叫<strong>ELF（Execuatable and Linkable File Format）</strong>的文件格式，中文名叫可执行与可链接文件格式，这里面不仅存放了编译成的汇编指令，还保留了很多别的数据。</p>
+<p>比如我们过去所有 objdump 出来的代码里，你都可以看到对应的函数名称，像 add、main 等等，乃至你自己定义的全局可以访问的变量名称，都存放在这个 ELF 格式文件里。这些名字和他们对应的地址，在ELF 文件里，存储在一个叫作符号表（Symbols Table）的位置里。符号表相当于一个地址簿，把它们关联了起来。</p>
+<p>只关注和我们的 add 以及 main 函数相关的部分。你会发现，这里面，main 函数里调用 add 的跳转地址，不再是下一条指令的地址，而是 add 函数的入口地址了，这就是ELF 格式和链接器的功劳。</p>
+<img src="/img/computer_img/ELF 格式.webp" alt="ELF 格式" style="zoom:33%;" />
+
+<p>ELF 文件格式把各种信息，分成一个一个的 Section 保存起来。ELF 有一个基本的文件头（File Header）,用来表示这个文件的基本属性，比如是否是可执行文件，对应的 CPU、操作系统等等。除了这些基本属性之外，大部分程序还有这么一些 Section：</p>
 <ol>
-<li>需要进行的计算，本身可以分解成几个可以并行的任务。好比上面的乘法和加法计算，几个人可以同时进行，不会影响最后的结果。</li>
-<li>需要能够分解好问题，并确保几个人的结果能够汇总到一起。</li>
-<li>在“汇总”这个阶段，是没有办法并行进行的，还是得顺序执行，一步一步来。</li>
+<li><p>text Section: 代码段或者指令段（Code Section）,用来保存程序的代码和指令；</p>
+</li>
+<li><p>data Section ,也叫数据段（Data Section）,用来保存程序里设置好的初始化数据信息。</p>
+</li>
+<li><p>.rel.text.Section ,也叫重定位表。表里保留的是当前的文件里面，哪些跳转地址是我们不知道的。比如上面的 link_example.o 里面，我们在 main 函数里面调用了 add 和 printf 这两个函数，但是在链接发生之前，我们并不知道该跳转到哪里，这些信息就存在重定位表里；</p>
+</li>
+<li><p>最后是 .symtab Section ,也叫符号表。符号表保留了我们所说的当前文件里面定义的函数名称和对应地址的地址簿。</p>
+</li>
 </ol>
-<p>这就引出了阿姆达尔定律（Amdahl’s Law）：</p>
-<p>这个定律说的就是，对于一个程序进行优化之后，处理器并行运算之后效率提升的情况。具体可以用这样一个公式来表示：</p>
-<center> **优化后的执行时间 = 受优化影响的执行时间 / 加速倍数 + 不受影响的执行时间** </center>
+<h2 id="链接器工作原理"><a href="#链接器工作原理" class="headerlink" title="链接器工作原理"></a>链接器工作原理</h2><p>链接器会扫描所有输入的目标文件，然后把所有<strong>符号表</strong>里的信息收集起来，构成一个全局的符号表。然后再根据<strong>重定位表</strong>，把所有不确定要跳转地址的代码，根据符号表里的存储地址，进行一次修正。最后，把所有的目标文件的对应段进行一次合并，变成了最终的可执行代码。<em>这也是为什么，可执行文件里面的函数调用的地址是正确的。</em></p>
+<img src="/img/computer_img/ELF 链接过程.webp" alt="ELF 链接过程" style="zoom: 33%;" />
 
-<p>比如上面的各个向量的一小段的点积，需要 100ns，加法需要 20ns，总共需要 120ns。这里通过并行 4 个 CPU 有了 4 倍的加速度。那么最终优化后，就有了 100&#x2F;4+20&#x3D;45ns。即使我们增加更多的并行度来提供加速倍数，比如有 100 个 CPU，整个时间也需要 100&#x2F;100+20&#x3D;21ns。</p>
-<p><img src="https://static001.geekbang.org/resource/image/f1/e5/f1d05ec439e6377803df741bc07b09e5.jpeg?wh=3140*2039"></p>
-<p>T1就是不受影响的执行时间 ，T2就是可以优化影响的执行时间</p>
-<h2 id="延伸："><a href="#延伸：" class="headerlink" title="延伸："></a>延伸：</h2><p>在“摩尔定律”和“并行计算”之外，在整个计算机组成层面，还有这样几个原则性的性能提升方法。</p>
-<ol>
-<li><p>加速大概率事件。最典型的就是，过去几年流行的深度学习，整个计算过程中，99% 都是向量和矩阵计算，于是，工程师们通过用 GPU 替代 CPU，大幅度提升了深度学习的模型训练过程。本来一个 CPU 需要跑几小时甚至几天的程序，GPU 只需要几分钟就好了。Google 更是不满足于 GPU 的性能，进一步地推出了 TPU。</p>
-</li>
-<li><p>通过流水线提高性能。现代的工厂里的生产线叫“流水线”。我们可以把装配 iPhone 这样的任务拆分成一个个细分的任务，让每个人都只需要处理一道工序，最大化整个工厂的生产效率。类似的，我们的 CPU 其实就是一个“运算工厂”。我们把 CPU 指令执行的过程进行拆分，细化运行，也是现代 CPU 在主频没有办法提升那么多的情况下，性能仍然可以得到提升的重要原因之一。</p>
-</li>
-<li><p>通过预测提高性能。通过预先猜测下一步该干什么，而不是等上一步运行的结果，提前进行运算，也是让程序跑得更快一点的办法。典型的例子就是在一个循环访问数组的时候，凭经验，你也会猜到下一步我们会访问数组的下一项。所谓的“分支和冒险”、“局部性原理”这些 CPU 和存储系统设计方法，其实都是在利用我们对于未来的“预测”，提前进行相应的操作，来提升我们的程序性能。</p>
-</li>
-</ol>
-<p>比如：</p>
-<p>1.加速大概率事件<br>各种缓存(内存缓存、CDN缓存)<br>2.流水线<br>并发编程、异步编程<br>音视频播放器边播放边缓冲<br>3.预测<br>小说的下一页预加载<br>电商大促的CDN预热</p>
+<p><strong>最后</strong>，在链接器把程序变成可执行文件之后，要装载器去执行程序就容易多了。装载器不再需要考虑地址跳转的问题，只需要解析 ELF 文件，把对应的指令和数据，加载到内存里面供 CPU 执行就可以了。</p>
+<h2 id="总结延伸："><a href="#总结延伸：" class="headerlink" title="总结延伸："></a>总结延伸：</h2><p>什么同样一个程序，在 Linux 下可以执行而在 Windows 下不能执行了。其中一个非常重要的原因就是，两个操作系统下可执行文件的格式不一样。Linux 下的 ELF 文件格式，而 Windows 的可执行文件格式是一种叫作 PE（Portable Executable Format）的文件格式。Linux 下的装载器只能解析 ELF 格式而不能解析 PE 格式。</p>
+<p>如果我们有一个可以能够解析PE 格式的装载器，我们就有可能在 Linux 下运行 Windows 程序。</p>
+<p>对于 ELF 格式的文件，为了能够实现这样一个<em><strong>静态链接</strong></em>的机制，里面不只是简单罗列了程序所需要执行的指令，还会包括链接所需要的重定位表和符号表。</p>
 ]]></content>
       <categories>
         <category>计算机组成原理</category>
       </categories>
       <tags>
-        <tag>性能与主频</tag>
+        <tag>程序</tag>
+        <tag>链接</tag>
       </tags>
   </entry>
   <entry>
@@ -327,69 +390,6 @@ SPEC 提供的 CPU 基准测试程序，就好像 CPU 届的“高考”，通�
         <tag>机器码</tag>
         <tag>stack overflow</tag>
         <tag>函数内联</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>ELF和静态链接</title>
-    <url>/posts/b778160a/</url>
-    <content><![CDATA[<h1 id="ELF和静态链接：为什么程序无法同时在Linux和Windows下运行？"><a href="#ELF和静态链接：为什么程序无法同时在Linux和Windows下运行？" class="headerlink" title="ELF和静态链接：为什么程序无法同时在Linux和Windows下运行？"></a>ELF和静态链接：为什么程序无法同时在Linux和Windows下运行？</h1><h2 id="编译、链接和装载：-拆解程序执行"><a href="#编译、链接和装载：-拆解程序执行" class="headerlink" title="编译、链接和装载： 拆解程序执行"></a>编译、链接和装载： 拆解程序执行</h2><p>之前，我们通过 gcc 生成的文件和 objdump 获取到的汇编指令都有些小小的问题，以add 函数示例，<span id="more"></span>拆分成两个文件 add_lib.c 和 link_example.c 。</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">// add_lib.c</span><br><span class="line">int add(int a, int b)</span><br><span class="line">&#123;</span><br><span class="line">    return a+b;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">// link_example.c</span><br><span class="line"></span><br><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">int main()</span><br><span class="line">&#123;</span><br><span class="line">    int a = 10;</span><br><span class="line">    int b = 5;</span><br><span class="line">    int c = add(a, b);</span><br><span class="line">    printf(&quot;c = %d\n&quot;, c);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>我们通过 gcc 来编译这两个文件，然后通过 objdump 命令看看它们的汇编代码。</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">$ gcc -g -c add_lib.c link_example.c</span><br><span class="line">$ objdump -d -M intel -S add_lib.o</span><br><span class="line">$ objdump -d -M intel -S link_example.o</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">add_lib.o:     file format elf64-x86-64</span><br><span class="line">Disassembly of section .text:</span><br><span class="line">0000000000000000 &lt;add&gt;:</span><br><span class="line">   0:   55                      push   rbp</span><br><span class="line">   1:   48 89 e5                mov    rbp,rsp</span><br><span class="line">   4:   89 7d fc                mov    DWORD PTR [rbp-0x4],edi</span><br><span class="line">   7:   89 75 f8                mov    DWORD PTR [rbp-0x8],esi</span><br><span class="line">   a:   8b 55 fc                mov    edx,DWORD PTR [rbp-0x4]</span><br><span class="line">   d:   8b 45 f8                mov    eax,DWORD PTR [rbp-0x8]</span><br><span class="line">  10:   01 d0                   add    eax,edx</span><br><span class="line">  12:   5d                      pop    rbp</span><br><span class="line">  13:   c3                      ret    </span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">link_example.o:     file format elf64-x86-64</span><br><span class="line">Disassembly of section .text:</span><br><span class="line">0000000000000000 &lt;main&gt;:</span><br><span class="line">   0:   55                      push   rbp</span><br><span class="line">   1:   48 89 e5                mov    rbp,rsp</span><br><span class="line">   4:   48 83 ec 10             sub    rsp,0x10</span><br><span class="line">   8:   c7 45 fc 0a 00 00 00    mov    DWORD PTR [rbp-0x4],0xa</span><br><span class="line">   f:   c7 45 f8 05 00 00 00    mov    DWORD PTR [rbp-0x8],0x5</span><br><span class="line">  16:   8b 55 f8                mov    edx,DWORD PTR [rbp-0x8]</span><br><span class="line">  19:   8b 45 fc                mov    eax,DWORD PTR [rbp-0x4]</span><br><span class="line">  1c:   89 d6                   mov    esi,edx</span><br><span class="line">  1e:   89 c7                   mov    edi,eax</span><br><span class="line">  20:   b8 00 00 00 00          mov    eax,0x0</span><br><span class="line">  25:   e8 00 00 00 00          call   2a &lt;main+0x2a&gt;</span><br><span class="line">  2a:   89 45 f4                mov    DWORD PTR [rbp-0xc],eax</span><br><span class="line">  2d:   8b 45 f4                mov    eax,DWORD PTR [rbp-0xc]</span><br><span class="line">  30:   89 c6                   mov    esi,eax</span><br><span class="line">  32:   48 8d 3d 00 00 00 00    lea    rdi,[rip+0x0]        # 39 &lt;main+0x39&gt;</span><br><span class="line">  39:   b8 00 00 00 00          mov    eax,0x0</span><br><span class="line">  3e:   e8 00 00 00 00          call   43 &lt;main+0x43&gt;</span><br><span class="line">  43:   b8 00 00 00 00          mov    eax,0x0</span><br><span class="line">  48:   c9                      leave  </span><br><span class="line">  49:   c3                      ret    </span><br></pre></td></tr></table></figure>
-
-<p>既然代码已经被我们“编译”成了指令，我们不妨尝试运行一下 .&#x2F;link_example.o。不幸的是，文件没有执行权限，我们遇到一个 Permission denied 错误。即使通过 chmod 命令赋予 link_example.o 文件可执行的权限，运行.&#x2F;link_example.o 仍然只会得到一条 cannot execute binary file: Exec format error 的错误。</p>
-<p>我们再仔细看一下 objdump 出来的两个文件的代码，会发现两个程序的地址都是从 0 开始的。如果地址是一样的，程序如果需要通过 call 指令调用函数的话，它怎么知道应该跳转到哪一个文件里呢？</p>
-<p>这么说吧，无论是这里的运行报错，还是 objdump 出来的汇编代码里面的重复地址，都是因为 add_lib.o 以及 link_example.o 并不是一个<strong>可执行文件</strong>（Executable Program），而是<strong>目标文件（</strong>Object File）。只有通过链接器（Linker）把多个目标文件以及调用的各种函数库链接起来，才能得到一个可执行文件。</p>
-<p>我们通过 gcc 的 -o 参数，可以生成对应的可执行文件，对应执行之后，就可以得到这个简单的加法调用函数的结果。</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">$ gcc -o link-example add_lib.o link_example.o</span><br><span class="line">$ ./link_example</span><br><span class="line">c = 15</span><br></pre></td></tr></table></figure>
-
-<h2 id="“C-语言代码-汇编代码-机器码”-的过程"><a href="#“C-语言代码-汇编代码-机器码”-的过程" class="headerlink" title="“C 语言代码 - 汇编代码 - 机器码” 的过程"></a>“C 语言代码 - 汇编代码 - 机器码” 的过程</h2><p>实际上，“C 语言代码 - 汇编代码 - 机器码” 这个过程，在我们的计算机上进行的时候是由两部分组成的。</p>
-<ul>
-<li><p>第一部分： 由编译（Compile）、汇编（Assemble）以及链接（Link）三个阶段组成。之后生成一个可执行文件。</p>
-</li>
-<li><p>第二部分，我们通过装载器（Loader）把可执行文件装载（Load）到内存中。CPU 从内存中读取指令和数据，开始真正执行程序。</p>
-<img src="/img/computer_img/装载.webp" alt="装载" style="zoom:33%;" /></li>
-</ul>
-<h2 id="ELF-格式和链接：理解链接过程"><a href="#ELF-格式和链接：理解链接过程" class="headerlink" title="ELF 格式和链接：理解链接过程"></a>ELF 格式和链接：理解链接过程</h2><p>程序最终是通过装载器变成指令和数据的，所以其实我们生成的可执行代码也并不仅仅是一条条的指令。我们还是通过 objdump 指令，把可执行文件的内容拿出来看看。</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">link_example:     file format elf64-x86-64</span><br><span class="line">Disassembly of section .init:</span><br><span class="line">...</span><br><span class="line">Disassembly of section .plt:</span><br><span class="line">...</span><br><span class="line">Disassembly of section .plt.got:</span><br><span class="line">...</span><br><span class="line">Disassembly of section .text:</span><br><span class="line">...</span><br><span class="line"></span><br><span class="line"> 6b0:   55                      push   rbp</span><br><span class="line"> 6b1:   48 89 e5                mov    rbp,rsp</span><br><span class="line"> 6b4:   89 7d fc                mov    DWORD PTR [rbp-0x4],edi</span><br><span class="line"> 6b7:   89 75 f8                mov    DWORD PTR [rbp-0x8],esi</span><br><span class="line"> 6ba:   8b 55 fc                mov    edx,DWORD PTR [rbp-0x4]</span><br><span class="line"> 6bd:   8b 45 f8                mov    eax,DWORD PTR [rbp-0x8]</span><br><span class="line"> 6c0:   01 d0                   add    eax,edx</span><br><span class="line"> 6c2:   5d                      pop    rbp</span><br><span class="line"> 6c3:   c3                      ret    </span><br><span class="line">00000000000006c4 &lt;main&gt;:</span><br><span class="line"> 6c4:   55                      push   rbp</span><br><span class="line"> 6c5:   48 89 e5                mov    rbp,rsp</span><br><span class="line"> 6c8:   48 83 ec 10             sub    rsp,0x10</span><br><span class="line"> 6cc:   c7 45 fc 0a 00 00 00    mov    DWORD PTR [rbp-0x4],0xa</span><br><span class="line"> 6d3:   c7 45 f8 05 00 00 00    mov    DWORD PTR [rbp-0x8],0x5</span><br><span class="line"> 6da:   8b 55 f8                mov    edx,DWORD PTR [rbp-0x8]</span><br><span class="line"> 6dd:   8b 45 fc                mov    eax,DWORD PTR [rbp-0x4]</span><br><span class="line"> 6e0:   89 d6                   mov    esi,edx</span><br><span class="line"> 6e2:   89 c7                   mov    edi,eax</span><br><span class="line"> 6e4:   b8 00 00 00 00          mov    eax,0x0</span><br><span class="line"> 6e9:   e8 c2 ff ff ff          call   6b0 &lt;add&gt;</span><br><span class="line"> ------------------------------------------------</span><br><span class="line"> 6ee:   89 45 f4                mov    DWORD PTR [rbp-0xc],eax</span><br><span class="line"> 6f1:   8b 45 f4                mov    eax,DWORD PTR [rbp-0xc]</span><br><span class="line"> 6f4:   89 c6                   mov    esi,eax</span><br><span class="line"> 6f6:   48 8d 3d 97 00 00 00    lea    rdi,[rip+0x97]        # 794 &lt;_IO_stdin_used+0x4&gt;</span><br><span class="line"> 6fd:   b8 00 00 00 00          mov    eax,0x0</span><br><span class="line"> 702:   e8 59 fe ff ff          call   560 &lt;printf@plt&gt;</span><br><span class="line"> 707:   b8 00 00 00 00          mov    eax,0x0</span><br><span class="line"> 70c:   c9                      leave  </span><br><span class="line"> 70d:   c3                      ret    </span><br><span class="line"> 70e:   66 90                   xchg   ax,ax</span><br><span class="line">...</span><br><span class="line">Disassembly of section .fini:</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
-
-<p>你会发现，可执行代码 dump 出来内容，和之前的目标代码长得差不多，但是长了很多。因为在 Linux 下，可执行文件和目标文件所使用的都是一种叫<strong>ELF（Execuatable and Linkable File Format）</strong>的文件格式，中文名叫可执行与可链接文件格式，这里面不仅存放了编译成的汇编指令，还保留了很多别的数据。</p>
-<p>比如我们过去所有 objdump 出来的代码里，你都可以看到对应的函数名称，像 add、main 等等，乃至你自己定义的全局可以访问的变量名称，都存放在这个 ELF 格式文件里。这些名字和他们对应的地址，在ELF 文件里，存储在一个叫作符号表（Symbols Table）的位置里。符号表相当于一个地址簿，把它们关联了起来。</p>
-<p>只关注和我们的 add 以及 main 函数相关的部分。你会发现，这里面，main 函数里调用 add 的跳转地址，不再是下一条指令的地址，而是 add 函数的入口地址了，这就是ELF 格式和链接器的功劳。</p>
-<img src="/img/computer_img/ELF 格式.webp" alt="ELF 格式" style="zoom:33%;" />
-
-<p>ELF 文件格式把各种信息，分成一个一个的 Section 保存起来。ELF 有一个基本的文件头（File Header）,用来表示这个文件的基本属性，比如是否是可执行文件，对应的 CPU、操作系统等等。除了这些基本属性之外，大部分程序还有这么一些 Section：</p>
-<ol>
-<li><p>text Section: 代码段或者指令段（Code Section）,用来保存程序的代码和指令；</p>
-</li>
-<li><p>data Section ,也叫数据段（Data Section）,用来保存程序里设置好的初始化数据信息。</p>
-</li>
-<li><p>.rel.text.Section ,也叫重定位表。表里保留的是当前的文件里面，哪些跳转地址是我们不知道的。比如上面的 link_example.o 里面，我们在 main 函数里面调用了 add 和 printf 这两个函数，但是在链接发生之前，我们并不知道该跳转到哪里，这些信息就存在重定位表里；</p>
-</li>
-<li><p>最后是 .symtab Section ,也叫符号表。符号表保留了我们所说的当前文件里面定义的函数名称和对应地址的地址簿。</p>
-</li>
-</ol>
-<h2 id="链接器工作原理"><a href="#链接器工作原理" class="headerlink" title="链接器工作原理"></a>链接器工作原理</h2><p>链接器会扫描所有输入的目标文件，然后把所有<strong>符号表</strong>里的信息收集起来，构成一个全局的符号表。然后再根据<strong>重定位表</strong>，把所有不确定要跳转地址的代码，根据符号表里的存储地址，进行一次修正。最后，把所有的目标文件的对应段进行一次合并，变成了最终的可执行代码。<em>这也是为什么，可执行文件里面的函数调用的地址是正确的。</em></p>
-<img src="/img/computer_img/ELF 链接过程.webp" alt="ELF 链接过程" style="zoom: 33%;" />
-
-<p><strong>最后</strong>，在链接器把程序变成可执行文件之后，要装载器去执行程序就容易多了。装载器不再需要考虑地址跳转的问题，只需要解析 ELF 文件，把对应的指令和数据，加载到内存里面供 CPU 执行就可以了。</p>
-<h2 id="总结延伸："><a href="#总结延伸：" class="headerlink" title="总结延伸："></a>总结延伸：</h2><p>什么同样一个程序，在 Linux 下可以执行而在 Windows 下不能执行了。其中一个非常重要的原因就是，两个操作系统下可执行文件的格式不一样。Linux 下的 ELF 文件格式，而 Windows 的可执行文件格式是一种叫作 PE（Portable Executable Format）的文件格式。Linux 下的装载器只能解析 ELF 格式而不能解析 PE 格式。</p>
-<p>如果我们有一个可以能够解析PE 格式的装载器，我们就有可能在 Linux 下运行 Windows 程序。</p>
-<p>对于 ELF 格式的文件，为了能够实现这样一个<em><strong>静态链接</strong></em>的机制，里面不只是简单罗列了程序所需要执行的指令，还会包括链接所需要的重定位表和符号表。</p>
-]]></content>
-      <categories>
-        <category>计算机组成原理</category>
-      </categories>
-      <tags>
-        <tag>程序</tag>
-        <tag>链接</tag>
       </tags>
   </entry>
   <entry>
@@ -1064,6 +1064,63 @@ SPEC 提供的 CPU 基准测试程序，就好像 CPU 届的“高考”，通�
       </tags>
   </entry>
   <entry>
+    <title>局部性原理</title>
+    <url>/posts/90cdc880/</url>
+    <content><![CDATA[<h1 id="局部性原理：数据库性能跟不上，加个缓存就好了？"><a href="#局部性原理：数据库性能跟不上，加个缓存就好了？" class="headerlink" title="局部性原理：数据库性能跟不上，加个缓存就好了？"></a>局部性原理：数据库性能跟不上，加个缓存就好了？</h1><p>平时进行服务端软件开发的时候，我们通常会把数据存储在数据库里。而服务端系统遇到的第一个性能瓶颈<span id="more"></span>，往往就发生在访问数据库的时候。 这个时候，大部分工程师和架构师会拿出一种叫作“缓存”的武器，通过使用 Redis 或者 Memcache 这样的开源软件，在数据库前面提供一层缓存的数据，来缓解数据库面临的压力，提升服务端的程序性能。</p>
+<img src="/img/computer_img/加一个缓存.webp" alt="加一个缓存" style="zoom:50%;" />
+
+<center>在数据库前添加数据缓存是常见的性能优化方式</center>
+
+<p>那么，不知道你有没有想过，这种添加缓存的策略一定是有效的吗？或者说，这种策略在什么情况下是有效的呢？如果从理论角度去分析，添加缓存一定是我们的最佳策略么？进一步地，如果我们对于访问性能的要求非常高，希望数据在 1 毫秒，乃至 100 微秒内完成处理，我们还能用这个添加缓存的策略么？</p>
+<h2 id="理解局部性原理"><a href="#理解局部性原理" class="headerlink" title="理解局部性原理"></a>理解局部性原理</h2><p>可以看到，不同的存储器设备之间，访问速度、价格和容量都有几十乃至上千倍的差异。</p>
+<img src="/img/computer_img/计算机组成/存储价目表.webp" alt="存储价目表" style="zoom:50%;" />
+
+<p>以上一讲的 Intel 8265U 的 CPU 为例，它的 L1 Cache 只有 256K，L2 Cache 有个 1MB，L3 Cache 有 12MB。一共 13MB 的存储空间，如果按照 7 美元 &#x2F;1MB 的价格计算，就要 91 美元。</p>
+<p>以上一讲的 Intel 8265U 的 CPU 为例，它的 L1 Cache 只有 256K，L2 Cache 有个 1MB，L3 Cache 有 12MB。一共 13MB 的存储空间，如果按照 7 美元 &#x2F;1MB 的价格计算，就要 91 美元。</p>
+<p>我们的内存有 8GB，容量是 CPU Cache 的 600 多倍，按照表上的价格差不多就是 120 美元。如果按照今天京东上的价格，恐怕不到 40 美元。128G 的 SSD 和 1T 的 HDD，现在的价格加起来也不会超过 100 美元。虽然容量是内存的 16 倍乃至 128 倍，但是它们的访问速度却不到内存的 1&#x2F;1000。</p>
+<p>性能和价格的巨大差异，给我们工程师带来了一个挑战：<strong>我们能不能既享受 CPU Cache 的速度，又享受内存、硬盘巨大的容量和低廉的价格呢？</strong></p>
+<p>想要同时享受到这三点，前辈们已经探索出了答案，那就是，存储器中数据的<strong>局部性原理（Principle of Locality）</strong>。我们可以利用这个局部性原理，来制定管理和访问数据的策略。这个局部性原理包括  <strong>时间局部性（temporal locality）</strong>和 <strong>空间局部性（spatial locality）</strong>这两种策略。</p>
+<ul>
+<li>时间局部性。这个策略是说，如果一个数据被访问了，那么它在短时间内还会被再次访问。用一个简单的例子给你解释下，你一下就能明白了。</li>
+</ul>
+<p>比如说，《哈利波特与魔法石》这本小说，我今天读了一会儿，没读完，明天还会继续读。同理，在一个电子商务型系统中，如果一个用户打开了 App，看到了首屏。我们推断他应该很快还会再次访问网站的其他内容或者页面，我们就将这个用户的个人信息，从存储在硬盘的数据库读取到内存的缓存中来。这利用的就是时间局部性。</p>
+<hr>
+<ul>
+<li>空间局部性。这个策略是说，如果一个数据被访问了，那么和它相邻的数据也很快会被访问。</li>
+</ul>
+<p>我们还拿刚才读《哈利波特与魔法石》的例子来说。我读完了这本书之后，感觉这书不错，所以就会借阅整套“哈利波特”。这就好比我们的程序，在访问了数组的首项之后，多半会循环访问它的下一项。因为，在存储数据的时候，数组内的多项数据会存储在相邻的位置。这就好比图书馆会把“哈利波特”系列放在一个书架上，摆放在一起，加载的时候，也会一并加载。我们去图书馆借书，往往会一次性把 7 本都借回来。</p>
+<hr>
+<blockquote>
+<p>有了这个局部性原理，我们不用再把所有数据都放在内存里，也不用都放在 HDD 硬盘上，<strong>而是把访问次数多的数据，放在贵但是快一点的存储器里，把访问次数少的数据，放在慢但是大一点的存储器里。</strong> 这样组合使用内存、SSD 硬盘以及 HDD 硬盘，使得我们可以用最低的成本提供实际所需要的数据存储、管理和访问的需求。</p>
+</blockquote>
+<h2 id="如何花最少的钱，装下亚马逊的所有商品？"><a href="#如何花最少的钱，装下亚马逊的所有商品？" class="headerlink" title="如何花最少的钱，装下亚马逊的所有商品？"></a>如何花最少的钱，装下亚马逊的所有商品？</h2><hr>
+<p>了解了局部性原理，下面我用一些真实世界中的数据举个例子，带你做个小小的思维体操，来看一看通过局部性原理，利用不同层次存储器的组合，究竟会有什么样的好处。</p>
+<p>我们现在要提供一个亚马逊这样的电商网站。我们假设里面有 6 亿件商品，如果每件商品需要 4MB 的存储空间（考虑到商品图片的话，4MB 已经是一个相对较小的估计了），那么一共需要 2400TB（  &#x3D;  6 亿  × 4MB）的数据存储。</p>
+<p>如果我们把数据都放在内存里面，那就需要 3600 万美元（  &#x3D;  2400TB&#x2F;1MB  × 0.015 美元  &#x3D;  3600 万美元）。但是，这 6 亿件商品中，不是每一件商品都会被经常访问。比如说，有 Kindle 电子书这样的热销商品，也一定有基本无人问津的商品，比如偏门的缅甸语词典。</p>
+<p>如果我们只在内存里放前 1% 的热门商品，也就是 600 万件热门商品，而把剩下的商品，放在机械式的 HDD 硬盘上，那么，我们需要的存储成本就下降到 45.6 万美元（ &#x3D; 3600 万美元 × 1% + 2400TB &#x2F; 1MB × 0.00004 美元），是原来成本的 1.3% 左右。</p>
+<p>这里我们用的就是时间局部性。<em>我们把有用户访问过的数据，加载到内存中，一旦内存里面放不下了，我们就把最长时间没有在内存中被访问过的数据，从内存中移走，</em>这个其实就是我们常用的 <strong>LRU（Least Recently Used）缓存算法</strong>。</p>
+<hr>
+<p>热门商品被访问得多，就会始终被保留在内存里，而冷门商品被访问得少，就只存放在 HDD 硬盘上，数据的读取也都是直接访问硬盘。即使加载到内存中，也会很快被移除。<strong>越是热门的商品，越容易在内存中找到，也就更好地利用了内存的随机访问性能。</strong> （缓存命中率）</p>
+<p>那么，只放 600 万件商品真的可以满足我们实际的线上服务请求吗？这个就要看 LRU 缓存策略的 <strong>缓存命中率</strong>（Hit Rate&#x2F;Hit Ratio）了，也就是访问的数据中，可以在我们设置的内存缓存中找到的，占有多大比例。</p>
+<p>内存的随机访问请求需要 100ns。这也就意味着，在极限情况下，内存可以支持 1000 万次随机访问。我们用了 24TB 内存，如果 8G 一条的话，意味着有 3000 条内存，可以支持每秒 300 亿次（ &#x3D; 24TB&#x2F;8GB × 1s&#x2F;100ns）访问。以亚马逊 2017 年 3 亿的用户数来看，我们估算每天的活跃用户为 1 亿，这 1 亿用户每人平均会访问 100 个商品，那么平均每秒访问的商品数量，就是 12 万次。</p>
+<p>但是如果数据没有命中内存，那么对应的数据请求就要访问到 HDD 磁盘了。刚才的图表中，我写了，一块 HDD 硬盘只能支撑每秒 100 次的随机访问，2400TB 的数据，以 4TB 一块磁盘来计算，有 600 块磁盘，也就是能支撑每秒 6 万次（ &#x3D; 2400TB&#x2F;4TB × 1s&#x2F;10ms ）的随机访问。</p>
+<p>这就意味着，所有的商品访问请求，都直接到了 HDD 磁盘，HDD 磁盘支撑不了这样的压力。我们至少要 50% 的缓存命中率，HDD 磁盘才能支撑对应的访问次数。不然的话，我们要么选择添加更多数量的 HDD 硬盘，做到每秒 12 万次的随机访问，或者将 HDD 替换成 SSD 硬盘，让单个硬盘可以支持更多的随机访问请求。</p>
+<hr>
+<p>当然，这里我们只是一个简单的估算。在实际的应用程序中，查看一个商品的数据可能意味着不止一次的随机内存或者随机磁盘的访问。对应的数据存储空间也不止要考虑数据，还需要考虑维护数据结构的空间，而缓存命中率和访问请求也要考虑均值和峰值问题。</p>
+<p>通过这个估算过程，你需要理解，如何进行存储器的硬件规划。你需要考虑硬件的成本、访问的数据量以及访问的数据分布，然后根据这些数据的估算，来组合不同的存储器，能用尽可能低的成本支撑所需要的服务器压力。而当你用上了数据访问的局部性原理，组合起了多种存储器，你也就理解了怎么基于存储器层次结构，来进行硬件规划了。</p>
+<h2 id="总结延伸"><a href="#总结延伸" class="headerlink" title="总结延伸"></a>总结延伸</h2><p>在实际的计算机日常的开发和应用中，我们对于数据的访问总是会存在一定的局部性。 有时候，这个局部性是时间局部性，就是我们最近访问过的数据还会被反复访问。有时候，这个局部性是空间局部性，就是我们最近访问过数据附近的数据很快会被访问到。</p>
+<p>而局部性的存在，使得我们可以在应用开发中使用缓存这个有利的武器。比如，<strong>通过将热点数据加载并保留在速度更快的存储设备里面，我们可以用更低的成本来支撑服务器。</strong></p>
+<hr>
+<p>通过亚马逊这个例子，我们可以看到，我们可以通过快速估算的方式，来判断这个添加缓存的策略是否能够满足我们的需求，以及在估算的服务器负载的情况下，需要规划多少硬件设备。这个“估算 + 规划”的能力，是每一个期望成长为架构师的工程师，必须掌握的能力。</p>
+]]></content>
+      <categories>
+        <category>计算机组成原理</category>
+      </categories>
+      <tags>
+        <tag>数据存储</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>高速缓存（上）</title>
     <url>/posts/dccb8a89/</url>
     <content><![CDATA[<h1 id="高速缓存（上）：“4毫秒”究竟值多少钱？"><a href="#高速缓存（上）：“4毫秒”究竟值多少钱？" class="headerlink" title="高速缓存（上）：“4毫秒”究竟值多少钱？"></a>高速缓存（上）：“4毫秒”究竟值多少钱？</h1><p>这一节内容开始之前，我们先来看一个 3 行的小程序。你可以猜一猜，这个程序里的循环 1 和循环 2，运行所花费的时间会差多少？<span id="more"></span>你可以先思考几分钟，然后再看我下面的解释。</p>
@@ -1139,60 +1196,75 @@ SPEC 提供的 CPU 基准测试程序，就好像 CPU 届的“高考”，通�
       </tags>
   </entry>
   <entry>
-    <title>局部性原理</title>
-    <url>/posts/90cdc880/</url>
-    <content><![CDATA[<h1 id="局部性原理：数据库性能跟不上，加个缓存就好了？"><a href="#局部性原理：数据库性能跟不上，加个缓存就好了？" class="headerlink" title="局部性原理：数据库性能跟不上，加个缓存就好了？"></a>局部性原理：数据库性能跟不上，加个缓存就好了？</h1><p>平时进行服务端软件开发的时候，我们通常会把数据存储在数据库里。而服务端系统遇到的第一个性能瓶颈<span id="more"></span>，往往就发生在访问数据库的时候。 这个时候，大部分工程师和架构师会拿出一种叫作“缓存”的武器，通过使用 Redis 或者 Memcache 这样的开源软件，在数据库前面提供一层缓存的数据，来缓解数据库面临的压力，提升服务端的程序性能。</p>
-<img src="/img/computer_img/加一个缓存.webp" alt="加一个缓存" style="zoom:50%;" />
-
-<center>在数据库前添加数据缓存是常见的性能优化方式</center>
-
-<p>那么，不知道你有没有想过，这种添加缓存的策略一定是有效的吗？或者说，这种策略在什么情况下是有效的呢？如果从理论角度去分析，添加缓存一定是我们的最佳策略么？进一步地，如果我们对于访问性能的要求非常高，希望数据在 1 毫秒，乃至 100 微秒内完成处理，我们还能用这个添加缓存的策略么？</p>
-<h2 id="理解局部性原理"><a href="#理解局部性原理" class="headerlink" title="理解局部性原理"></a>理解局部性原理</h2><p>可以看到，不同的存储器设备之间，访问速度、价格和容量都有几十乃至上千倍的差异。</p>
-<img src="/img/computer_img/计算机组成/存储价目表.webp" alt="存储价目表" style="zoom:50%;" />
-
-<p>以上一讲的 Intel 8265U 的 CPU 为例，它的 L1 Cache 只有 256K，L2 Cache 有个 1MB，L3 Cache 有 12MB。一共 13MB 的存储空间，如果按照 7 美元 &#x2F;1MB 的价格计算，就要 91 美元。</p>
-<p>以上一讲的 Intel 8265U 的 CPU 为例，它的 L1 Cache 只有 256K，L2 Cache 有个 1MB，L3 Cache 有 12MB。一共 13MB 的存储空间，如果按照 7 美元 &#x2F;1MB 的价格计算，就要 91 美元。</p>
-<p>我们的内存有 8GB，容量是 CPU Cache 的 600 多倍，按照表上的价格差不多就是 120 美元。如果按照今天京东上的价格，恐怕不到 40 美元。128G 的 SSD 和 1T 的 HDD，现在的价格加起来也不会超过 100 美元。虽然容量是内存的 16 倍乃至 128 倍，但是它们的访问速度却不到内存的 1&#x2F;1000。</p>
-<p>性能和价格的巨大差异，给我们工程师带来了一个挑战：<strong>我们能不能既享受 CPU Cache 的速度，又享受内存、硬盘巨大的容量和低廉的价格呢？</strong></p>
-<p>想要同时享受到这三点，前辈们已经探索出了答案，那就是，存储器中数据的<strong>局部性原理（Principle of Locality）</strong>。我们可以利用这个局部性原理，来制定管理和访问数据的策略。这个局部性原理包括  <strong>时间局部性（temporal locality）</strong>和 <strong>空间局部性（spatial locality）</strong>这两种策略。</p>
+    <title>MESI协议</title>
+    <url>/posts/a2fa04e/</url>
+    <content><![CDATA[<h1 id="MESI协议：如何让多核CPU的高速缓存保持一致？"><a href="#MESI协议：如何让多核CPU的高速缓存保持一致？" class="headerlink" title="MESI协议：如何让多核CPU的高速缓存保持一致？"></a>MESI协议：如何让多核CPU的高速缓存保持一致？</h1><p>多核 CPU 有很多好处，其中最重要的一个就是，它使得我们在不能提升 CPU 的主频之后，找到了另一种提升 CPU 吞吐率<span id="more"></span>的办法。</p>
 <ul>
-<li>时间局部性。这个策略是说，如果一个数据被访问了，那么它在短时间内还会被再次访问。用一个简单的例子给你解释下，你一下就能明白了。</li>
-</ul>
-<p>比如说，《哈利波特与魔法石》这本小说，我今天读了一会儿，没读完，明天还会继续读。同理，在一个电子商务型系统中，如果一个用户打开了 App，看到了首屏。我们推断他应该很快还会再次访问网站的其他内容或者页面，我们就将这个用户的个人信息，从存储在硬盘的数据库读取到内存的缓存中来。这利用的就是时间局部性。</p>
-<hr>
-<ul>
-<li>空间局部性。这个策略是说，如果一个数据被访问了，那么和它相邻的数据也很快会被访问。</li>
-</ul>
-<p>我们还拿刚才读《哈利波特与魔法石》的例子来说。我读完了这本书之后，感觉这书不错，所以就会借阅整套“哈利波特”。这就好比我们的程序，在访问了数组的首项之后，多半会循环访问它的下一项。因为，在存储数据的时候，数组内的多项数据会存储在相邻的位置。这就好比图书馆会把“哈利波特”系列放在一个书架上，摆放在一起，加载的时候，也会一并加载。我们去图书馆借书，往往会一次性把 7 本都借回来。</p>
-<hr>
+<li><p>多核 CPU 里的每一个 CPU 核，都有独立的属于自己的 L1 Cache 和 L2 Cache。 多个CPU 之间 ， 只是共用 L3 Cache 和主内存。</p>
 <blockquote>
-<p>有了这个局部性原理，我们不用再把所有数据都放在内存里，也不用都放在 HDD 硬盘上，<strong>而是把访问次数多的数据，放在贵但是快一点的存储器里，把访问次数少的数据，放在慢但是大一点的存储器里。</strong> 这样组合使用内存、SSD 硬盘以及 HDD 硬盘，使得我们可以用最低的成本提供实际所需要的数据存储、管理和访问的需求。</p>
+<p>CPU Cache 解决的是内存访问速度和 CPU 的速度差距太大的问题。而多核 CPU 提供的是，在主频难以提升的时候，通过增加 CPU 核心来提升 CPU 的吞吐率的办法。我们把多核和 CPU Cache 两者一结合，就给我们带来了一个新的挑战。因为 CPU 的每个核各有各的缓存，互相之间的操作又是各自独立的，就会带来<strong>缓存一致性（Cache Coherence）</strong>的问题。</p>
 </blockquote>
-<h2 id="如何花最少的钱，装下亚马逊的所有商品？"><a href="#如何花最少的钱，装下亚马逊的所有商品？" class="headerlink" title="如何花最少的钱，装下亚马逊的所有商品？"></a>如何花最少的钱，装下亚马逊的所有商品？</h2><hr>
-<p>了解了局部性原理，下面我用一些真实世界中的数据举个例子，带你做个小小的思维体操，来看一看通过局部性原理，利用不同层次存储器的组合，究竟会有什么样的好处。</p>
-<p>我们现在要提供一个亚马逊这样的电商网站。我们假设里面有 6 亿件商品，如果每件商品需要 4MB 的存储空间（考虑到商品图片的话，4MB 已经是一个相对较小的估计了），那么一共需要 2400TB（  &#x3D;  6 亿  × 4MB）的数据存储。</p>
-<p>如果我们把数据都放在内存里面，那就需要 3600 万美元（  &#x3D;  2400TB&#x2F;1MB  × 0.015 美元  &#x3D;  3600 万美元）。但是，这 6 亿件商品中，不是每一件商品都会被经常访问。比如说，有 Kindle 电子书这样的热销商品，也一定有基本无人问津的商品，比如偏门的缅甸语词典。</p>
-<p>如果我们只在内存里放前 1% 的热门商品，也就是 600 万件热门商品，而把剩下的商品，放在机械式的 HDD 硬盘上，那么，我们需要的存储成本就下降到 45.6 万美元（ &#x3D; 3600 万美元 × 1% + 2400TB &#x2F; 1MB × 0.00004 美元），是原来成本的 1.3% 左右。</p>
-<p>这里我们用的就是时间局部性。<em>我们把有用户访问过的数据，加载到内存中，一旦内存里面放不下了，我们就把最长时间没有在内存中被访问过的数据，从内存中移走，</em>这个其实就是我们常用的 <strong>LRU（Least Recently Used）缓存算法</strong>。</p>
+</li>
+</ul>
+<h2 id="缓存一致性问题"><a href="#缓存一致性问题" class="headerlink" title="缓存一致性问题"></a>缓存一致性问题</h2><p>比方说，iPhone 降价了，我们要把 iPhone 最新的价格更新到内存里。为了性能问题，它采用了上一讲我们说的写回策略，先把数据写入到 L2 Cache 里面，然后把 Cache Block 标记成脏的。这个时候，数据其实并没有被同步到 L3 Cache 或者主内存里。1 号核心希望在这个 Cache Block 要被交换出去的时候，数据才写入到主内存里。</p>
+<p>如果我们的 CPU 只有 1 号核心这一个 CPU 核，那这其实是没有问题的。不过，我们旁边还有一个 2 号核心呢！这个时候，2 号核心尝试从内存里面去读取 iPhone 的价格，结果读到的是一个错误的价格。这是因为，iPhone 的价格刚刚被 1 号核心更新过。但是这个更新的信息，只出现在 1 号核心的 L2 Cache 里，而没有出现在 2 号核心的 L2 Cache 或者主内存里面。 <strong>这个问题，就是所谓的缓存一致性问题，1 号核心和 2 号核心的缓存，在这个时候是不一致的。</strong></p>
+<p>为了解决这个缓存不一致的问题，我们就需要有一种机制，来同步两个不同核心里面的缓存数据。那这样的机制需要满足什么条件呢？我觉得能够做到下面两点就是合理的。</p>
+<p>一、 第一点叫写传播（Write Propagation）。写传播是说，在一个 CPU 核心里，我们的 Cache 数据更新，必须能够传播到其他的对应节点的 Cache Line 里。</p>
+<p>二、 第二点叫事务的串行化（Transaction Serialization），事务串行化是说，我们在一个 CPU 核心里面的读取和写入，在其他的节点看起来，顺序是一样的。</p>
+<p>从1 号到4 号核心，都能看到相同顺序的数据变化。  事务的串行化，不仅仅是缓存一致性中所必须的。比如，我们平时所用到的系统当中，最需要保障事务串行化的就是数据库。多个不同的连接去访问数据库的时候，我们必须保障事务的串行化，做不到事务的串行化的数据库，根本没法作为可靠的商业数据库来使用。</p>
+<ul>
+<li>而在 CPU Cache 里做到事务串行化，需要做到两点<ol>
+<li>一个 CPU 核心对于数据的操作，需要同步通信给其他 CPU 核心</li>
+<li>两个 CPU 核心里有同一个数据的 Cache，那么对于这个ca che 数据的更新，需要有一个“锁”的概念 ，只有 拿到了对应 Cache Block 的锁之后，才能进行对应的数据更新。</li>
+</ol>
+</li>
+</ul>
 <hr>
-<p>热门商品被访问得多，就会始终被保留在内存里，而冷门商品被访问得少，就只存放在 HDD 硬盘上，数据的读取也都是直接访问硬盘。即使加载到内存中，也会很快被移除。<strong>越是热门的商品，越容易在内存中找到，也就更好地利用了内存的随机访问性能。</strong> （缓存命中率）</p>
-<p>那么，只放 600 万件商品真的可以满足我们实际的线上服务请求吗？这个就要看 LRU 缓存策略的 <strong>缓存命中率</strong>（Hit Rate&#x2F;Hit Ratio）了，也就是访问的数据中，可以在我们设置的内存缓存中找到的，占有多大比例。</p>
-<p>内存的随机访问请求需要 100ns。这也就意味着，在极限情况下，内存可以支持 1000 万次随机访问。我们用了 24TB 内存，如果 8G 一条的话，意味着有 3000 条内存，可以支持每秒 300 亿次（ &#x3D; 24TB&#x2F;8GB × 1s&#x2F;100ns）访问。以亚马逊 2017 年 3 亿的用户数来看，我们估算每天的活跃用户为 1 亿，这 1 亿用户每人平均会访问 100 个商品，那么平均每秒访问的商品数量，就是 12 万次。</p>
-<p>但是如果数据没有命中内存，那么对应的数据请求就要访问到 HDD 磁盘了。刚才的图表中，我写了，一块 HDD 硬盘只能支撑每秒 100 次的随机访问，2400TB 的数据，以 4TB 一块磁盘来计算，有 600 块磁盘，也就是能支撑每秒 6 万次（ &#x3D; 2400TB&#x2F;4TB × 1s&#x2F;10ms ）的随机访问。</p>
-<p>这就意味着，所有的商品访问请求，都直接到了 HDD 磁盘，HDD 磁盘支撑不了这样的压力。我们至少要 50% 的缓存命中率，HDD 磁盘才能支撑对应的访问次数。不然的话，我们要么选择添加更多数量的 HDD 硬盘，做到每秒 12 万次的随机访问，或者将 HDD 替换成 SSD 硬盘，让单个硬盘可以支持更多的随机访问请求。</p>
+<h2 id="总线嗅探机制和-MESI-协议"><a href="#总线嗅探机制和-MESI-协议" class="headerlink" title="总线嗅探机制和 MESI 协议"></a>总线嗅探机制和 MESI 协议</h2><p>要解决缓存一致性问题，首先要解决的是多个 CPU 核心之间的数据传播问题。最常见的一种解决方案呢，叫作总线嗅探（Bus Snooping）。</p>
+<p>本质上就是把所有的读写请求都通过总线（Bus）广播给所有的 CPU 核心，然后让各个核心去“嗅探”这些请求，再根据本地的情况进行响应。</p>
+<ul>
+<li>基于总线嗅探机制，其实还可以分成很多种不同的缓存一致性协议。不过其中最常用的，就是今天我们要讲的 MESI 协议。</li>
+</ul>
+<h3 id="MESI-协议-（写失效协议）"><a href="#MESI-协议-（写失效协议）" class="headerlink" title="MESI 协议 （写失效协议）"></a>MESI 协议 （写失效协议）</h3><p>在写失效协议里，只有一个 CPU 核心负责写入数据，其他的核心，只是同步读取到这个写入。在这个CPU 核心写入cache 之后，他会去广播一个“失效”请求告诉所有其他的 CPU 核心。其他的CPU 核心只是去判断自己是否也有一个“失效”版本的 Cache Block ，然后把这个也标记成失效的就好了。</p>
+<h3 id="写广播协议"><a href="#写广播协议" class="headerlink" title="写广播协议"></a>写广播协议</h3><p>在那个协议里，一个写入请求广播到所有的 CPU 核心，同时更新各个核心里的 Cache。</p>
+<p>写广播在实现上自然很简单，但是写广播需要<strong>占用更多的总线带宽</strong>。写失效只需要告诉其他的 CPU 核心，哪一个内存地址的缓存失效了（只需要去传输一个操作信号和一个地址信号），但是写广播还需要把对应的数据传输给其他 CPU 核心。</p>
 <hr>
-<p>当然，这里我们只是一个简单的估算。在实际的应用程序中，查看一个商品的数据可能意味着不止一次的随机内存或者随机磁盘的访问。对应的数据存储空间也不止要考虑数据，还需要考虑维护数据结构的空间，而缓存命中率和访问请求也要考虑均值和峰值问题。</p>
-<p>通过这个估算过程，你需要理解，如何进行存储器的硬件规划。你需要考虑硬件的成本、访问的数据量以及访问的数据分布，然后根据这些数据的估算，来组合不同的存储器，能用尽可能低的成本支撑所需要的服务器压力。而当你用上了数据访问的局部性原理，组合起了多种存储器，你也就理解了怎么基于存储器层次结构，来进行硬件规划了。</p>
-<h2 id="总结延伸"><a href="#总结延伸" class="headerlink" title="总结延伸"></a>总结延伸</h2><p>在实际的计算机日常的开发和应用中，我们对于数据的访问总是会存在一定的局部性。 有时候，这个局部性是时间局部性，就是我们最近访问过的数据还会被反复访问。有时候，这个局部性是空间局部性，就是我们最近访问过数据附近的数据很快会被访问到。</p>
-<p>而局部性的存在，使得我们可以在应用开发中使用缓存这个有利的武器。比如，<strong>通过将热点数据加载并保留在速度更快的存储设备里面，我们可以用更低的成本来支撑服务器。</strong></p>
+<p>MESI 协议的由来呢，来自于我们对 Cache Line 的四个不同的标记，分别是：</p>
+<ul>
+<li>M：代表已修改（Modified）</li>
+<li>E：代表独占（Exclusive）</li>
+<li>S：代表共享（Shared）</li>
+<li>I：代表已失效（Invalidated）</li>
+</ul>
+<p>我们先来看看“已修改”和“已失效”，这两个状态比较容易理解。所谓的“已修改”，就是我们上一讲所说的“脏”的 Cache Block。<u>Cache Block 里面的内容我们已经更新过了，但是还没有写回到主内存里面。</u>  而所谓的“已失效“，自然是这个 Cache Block 里面的数据已经失效了，我们不可以相信这个 Cache Block 里面的数据。</p>
+<p>然后，我们再来看<strong>“独占”</strong>和<strong>“共享”</strong>这两个状态。这就是 MESI 协议的精华所在了。无论是独占状态还是共享状态，缓存里面的数据都是“干净”的。 这个“干净”，自然对应的是前面所说的“脏”的，也就是说，<u><strong>这个时候，Cache Block 里面的数据和主内存里面的数据是一致的。</strong></u></p>
 <hr>
-<p>通过亚马逊这个例子，我们可以看到，我们可以通过快速估算的方式，来判断这个添加缓存的策略是否能够满足我们的需求，以及在估算的服务器负载的情况下，需要规划多少硬件设备。这个“估算 + 规划”的能力，是每一个期望成长为架构师的工程师，必须掌握的能力。</p>
+<p>“独占”和“共享”这两个状态的差别:</p>
+<p>在独占状态下，对应的 Cache Line 只加载到了当前 CPU 核所拥有的 Cache 里。其他的 CPU 核，并没有加载对应的数据到自己的 Cache 里。这个时候，如果要向独占的 Cache Block 写入数据，我们可以自由地写入数据，而不需要告知其他 CPU 核。</p>
+<p>在独占状态下的数据，如果收到了一个来自于总线的读取对应缓存的请求，它就会变成共享状态。这个共享状态是因为，这个时候，另外一个 CPU 核心，也把对应的 Cache Block，从内存里面加载到了自己的 Cache 里来。</p>
+<ul>
+<li>而在共享状态下，因为同样的数据在多个 CPU 核心的 Cache 里都有。所以，当我们想要更新 Cache 里面的数据的时候，不能直接修改，而是要先向所有的其他 CPU 核心广播一个请求，要求先把其他 CPU 核心里面的 Cache，都变成无效的状态. 这个广播操作，一般叫作 RFO（Request For Ownership），也就是获取当前对应 Cache Block 数据的所有权。</li>
+</ul>
+<p>这个操作有点儿像我们在多线程里面用到的读写锁。在共享状态下，大家都可以并行去读对应的数据。但是如果要写，我们就需要通过一个锁，获取当前写入位置的所有权。</p>
+<p>整个 MESI 的状态，可以用一个有限状态机来表示它的状态流转。需要注意的是，对于不同状态触发的事件操作，可能来自于当前 CPU 核心，也可能来自总线里其他 CPU 核心广播出来的信号。</p>
+<hr>
+<h2 id="总结延伸"><a href="#总结延伸" class="headerlink" title="总结延伸"></a>总结延伸</h2><p>这一节，我们其实就讲了两块儿内容，一个是缓存一致性，另一个是 MESI 协议。</p>
+<ol>
+<li><p>想要实现缓存一致性，关键是要满足两点。第一个是写传播，也就是在一个 CPU 核心写入的内容，需要传播到其他 CPU 核心里。更重要的是第二点，保障事务的串行化，才能保障我们的数据是真正一致的，我们的程序在各个不同的核心上运行的结果也是一致的。这个特性不仅在 CPU 的缓存层面很重要，在数据库层面更加重要。</p>
+</li>
+<li><p>我介绍了基于总线嗅探机制的 MESI 协议。MESI 协议是一种基于写失效的缓存一致性协议。写失效的协议的好处是，我们不需要在总线上传输数据内容，而只需要传输操作信号和地址信号就好了，不会那么占总线带宽。</p>
+</li>
+<li><p>MESI 协议，是已修改、独占、共享以及已失效这四个缩写的合称。独占和共享状态，就好像我们在多线程应用开发里面的读写锁机制，确保了我们的缓存一致性。而整个 MESI 的状态变更，则是根据来自自己 CPU 核心的请求，以及来自其他 CPU 核心通过总线传输过来的操作信号和地址信息，进行状态流转的一个有限状态机。</p>
+</li>
+</ol>
+<p>sql里面不用sql拼接 而使用占位符可以防止sql注入攻击吧<br>那么为什么使用占位符可以防止攻击呢 ？</p>
+<p>简单来说就是将占位符当成数据解析，而不是指令解析。不管占位符是什么，我都把它当成 数据，而不是指令。</p>
 ]]></content>
       <categories>
         <category>计算机组成原理</category>
       </categories>
       <tags>
-        <tag>数据存储</tag>
+        <tag>缓存一致性</tag>
       </tags>
   </entry>
   <entry>
@@ -1280,78 +1352,6 @@ SPEC 提供的 CPU 基准测试程序，就好像 CPU 届的“高考”，通�
       <tags>
         <tag>高速缓存</tag>
         <tag>写回</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>MESI协议</title>
-    <url>/posts/a2fa04e/</url>
-    <content><![CDATA[<h1 id="MESI协议：如何让多核CPU的高速缓存保持一致？"><a href="#MESI协议：如何让多核CPU的高速缓存保持一致？" class="headerlink" title="MESI协议：如何让多核CPU的高速缓存保持一致？"></a>MESI协议：如何让多核CPU的高速缓存保持一致？</h1><p>多核 CPU 有很多好处，其中最重要的一个就是，它使得我们在不能提升 CPU 的主频之后，找到了另一种提升 CPU 吞吐率<span id="more"></span>的办法。</p>
-<ul>
-<li><p>多核 CPU 里的每一个 CPU 核，都有独立的属于自己的 L1 Cache 和 L2 Cache。 多个CPU 之间 ， 只是共用 L3 Cache 和主内存。</p>
-<blockquote>
-<p>CPU Cache 解决的是内存访问速度和 CPU 的速度差距太大的问题。而多核 CPU 提供的是，在主频难以提升的时候，通过增加 CPU 核心来提升 CPU 的吞吐率的办法。我们把多核和 CPU Cache 两者一结合，就给我们带来了一个新的挑战。因为 CPU 的每个核各有各的缓存，互相之间的操作又是各自独立的，就会带来<strong>缓存一致性（Cache Coherence）</strong>的问题。</p>
-</blockquote>
-</li>
-</ul>
-<h2 id="缓存一致性问题"><a href="#缓存一致性问题" class="headerlink" title="缓存一致性问题"></a>缓存一致性问题</h2><p>比方说，iPhone 降价了，我们要把 iPhone 最新的价格更新到内存里。为了性能问题，它采用了上一讲我们说的写回策略，先把数据写入到 L2 Cache 里面，然后把 Cache Block 标记成脏的。这个时候，数据其实并没有被同步到 L3 Cache 或者主内存里。1 号核心希望在这个 Cache Block 要被交换出去的时候，数据才写入到主内存里。</p>
-<p>如果我们的 CPU 只有 1 号核心这一个 CPU 核，那这其实是没有问题的。不过，我们旁边还有一个 2 号核心呢！这个时候，2 号核心尝试从内存里面去读取 iPhone 的价格，结果读到的是一个错误的价格。这是因为，iPhone 的价格刚刚被 1 号核心更新过。但是这个更新的信息，只出现在 1 号核心的 L2 Cache 里，而没有出现在 2 号核心的 L2 Cache 或者主内存里面。 <strong>这个问题，就是所谓的缓存一致性问题，1 号核心和 2 号核心的缓存，在这个时候是不一致的。</strong></p>
-<p>为了解决这个缓存不一致的问题，我们就需要有一种机制，来同步两个不同核心里面的缓存数据。那这样的机制需要满足什么条件呢？我觉得能够做到下面两点就是合理的。</p>
-<p>一、 第一点叫写传播（Write Propagation）。写传播是说，在一个 CPU 核心里，我们的 Cache 数据更新，必须能够传播到其他的对应节点的 Cache Line 里。</p>
-<p>二、 第二点叫事务的串行化（Transaction Serialization），事务串行化是说，我们在一个 CPU 核心里面的读取和写入，在其他的节点看起来，顺序是一样的。</p>
-<p>从1 号到4 号核心，都能看到相同顺序的数据变化。  事务的串行化，不仅仅是缓存一致性中所必须的。比如，我们平时所用到的系统当中，最需要保障事务串行化的就是数据库。多个不同的连接去访问数据库的时候，我们必须保障事务的串行化，做不到事务的串行化的数据库，根本没法作为可靠的商业数据库来使用。</p>
-<ul>
-<li>而在 CPU Cache 里做到事务串行化，需要做到两点<ol>
-<li>一个 CPU 核心对于数据的操作，需要同步通信给其他 CPU 核心</li>
-<li>两个 CPU 核心里有同一个数据的 Cache，那么对于这个ca che 数据的更新，需要有一个“锁”的概念 ，只有 拿到了对应 Cache Block 的锁之后，才能进行对应的数据更新。</li>
-</ol>
-</li>
-</ul>
-<hr>
-<h2 id="总线嗅探机制和-MESI-协议"><a href="#总线嗅探机制和-MESI-协议" class="headerlink" title="总线嗅探机制和 MESI 协议"></a>总线嗅探机制和 MESI 协议</h2><p>要解决缓存一致性问题，首先要解决的是多个 CPU 核心之间的数据传播问题。最常见的一种解决方案呢，叫作总线嗅探（Bus Snooping）。</p>
-<p>本质上就是把所有的读写请求都通过总线（Bus）广播给所有的 CPU 核心，然后让各个核心去“嗅探”这些请求，再根据本地的情况进行响应。</p>
-<ul>
-<li>基于总线嗅探机制，其实还可以分成很多种不同的缓存一致性协议。不过其中最常用的，就是今天我们要讲的 MESI 协议。</li>
-</ul>
-<h3 id="MESI-协议-（写失效协议）"><a href="#MESI-协议-（写失效协议）" class="headerlink" title="MESI 协议 （写失效协议）"></a>MESI 协议 （写失效协议）</h3><p>在写失效协议里，只有一个 CPU 核心负责写入数据，其他的核心，只是同步读取到这个写入。在这个CPU 核心写入cache 之后，他会去广播一个“失效”请求告诉所有其他的 CPU 核心。其他的CPU 核心只是去判断自己是否也有一个“失效”版本的 Cache Block ，然后把这个也标记成失效的就好了。</p>
-<h3 id="写广播协议"><a href="#写广播协议" class="headerlink" title="写广播协议"></a>写广播协议</h3><p>在那个协议里，一个写入请求广播到所有的 CPU 核心，同时更新各个核心里的 Cache。</p>
-<p>写广播在实现上自然很简单，但是写广播需要<strong>占用更多的总线带宽</strong>。写失效只需要告诉其他的 CPU 核心，哪一个内存地址的缓存失效了（只需要去传输一个操作信号和一个地址信号），但是写广播还需要把对应的数据传输给其他 CPU 核心。</p>
-<hr>
-<p>MESI 协议的由来呢，来自于我们对 Cache Line 的四个不同的标记，分别是：</p>
-<ul>
-<li>M：代表已修改（Modified）</li>
-<li>E：代表独占（Exclusive）</li>
-<li>S：代表共享（Shared）</li>
-<li>I：代表已失效（Invalidated）</li>
-</ul>
-<p>我们先来看看“已修改”和“已失效”，这两个状态比较容易理解。所谓的“已修改”，就是我们上一讲所说的“脏”的 Cache Block。<u>Cache Block 里面的内容我们已经更新过了，但是还没有写回到主内存里面。</u>  而所谓的“已失效“，自然是这个 Cache Block 里面的数据已经失效了，我们不可以相信这个 Cache Block 里面的数据。</p>
-<p>然后，我们再来看<strong>“独占”</strong>和<strong>“共享”</strong>这两个状态。这就是 MESI 协议的精华所在了。无论是独占状态还是共享状态，缓存里面的数据都是“干净”的。 这个“干净”，自然对应的是前面所说的“脏”的，也就是说，<u><strong>这个时候，Cache Block 里面的数据和主内存里面的数据是一致的。</strong></u></p>
-<hr>
-<p>“独占”和“共享”这两个状态的差别:</p>
-<p>在独占状态下，对应的 Cache Line 只加载到了当前 CPU 核所拥有的 Cache 里。其他的 CPU 核，并没有加载对应的数据到自己的 Cache 里。这个时候，如果要向独占的 Cache Block 写入数据，我们可以自由地写入数据，而不需要告知其他 CPU 核。</p>
-<p>在独占状态下的数据，如果收到了一个来自于总线的读取对应缓存的请求，它就会变成共享状态。这个共享状态是因为，这个时候，另外一个 CPU 核心，也把对应的 Cache Block，从内存里面加载到了自己的 Cache 里来。</p>
-<ul>
-<li>而在共享状态下，因为同样的数据在多个 CPU 核心的 Cache 里都有。所以，当我们想要更新 Cache 里面的数据的时候，不能直接修改，而是要先向所有的其他 CPU 核心广播一个请求，要求先把其他 CPU 核心里面的 Cache，都变成无效的状态. 这个广播操作，一般叫作 RFO（Request For Ownership），也就是获取当前对应 Cache Block 数据的所有权。</li>
-</ul>
-<p>这个操作有点儿像我们在多线程里面用到的读写锁。在共享状态下，大家都可以并行去读对应的数据。但是如果要写，我们就需要通过一个锁，获取当前写入位置的所有权。</p>
-<p>整个 MESI 的状态，可以用一个有限状态机来表示它的状态流转。需要注意的是，对于不同状态触发的事件操作，可能来自于当前 CPU 核心，也可能来自总线里其他 CPU 核心广播出来的信号。</p>
-<hr>
-<h2 id="总结延伸"><a href="#总结延伸" class="headerlink" title="总结延伸"></a>总结延伸</h2><p>这一节，我们其实就讲了两块儿内容，一个是缓存一致性，另一个是 MESI 协议。</p>
-<ol>
-<li><p>想要实现缓存一致性，关键是要满足两点。第一个是写传播，也就是在一个 CPU 核心写入的内容，需要传播到其他 CPU 核心里。更重要的是第二点，保障事务的串行化，才能保障我们的数据是真正一致的，我们的程序在各个不同的核心上运行的结果也是一致的。这个特性不仅在 CPU 的缓存层面很重要，在数据库层面更加重要。</p>
-</li>
-<li><p>我介绍了基于总线嗅探机制的 MESI 协议。MESI 协议是一种基于写失效的缓存一致性协议。写失效的协议的好处是，我们不需要在总线上传输数据内容，而只需要传输操作信号和地址信号就好了，不会那么占总线带宽。</p>
-</li>
-<li><p>MESI 协议，是已修改、独占、共享以及已失效这四个缩写的合称。独占和共享状态，就好像我们在多线程应用开发里面的读写锁机制，确保了我们的缓存一致性。而整个 MESI 的状态变更，则是根据来自自己 CPU 核心的请求，以及来自其他 CPU 核心通过总线传输过来的操作信号和地址信息，进行状态流转的一个有限状态机。</p>
-</li>
-</ol>
-<p>sql里面不用sql拼接 而使用占位符可以防止sql注入攻击吧<br>那么为什么使用占位符可以防止攻击呢 ？</p>
-<p>简单来说就是将占位符当成数据解析，而不是指令解析。不管占位符是什么，我都把它当成 数据，而不是指令。</p>
-]]></content>
-      <categories>
-        <category>计算机组成原理</category>
-      </categories>
-      <tags>
-        <tag>缓存一致性</tag>
       </tags>
   </entry>
   <entry>
@@ -1658,6 +1658,127 @@ SPEC 提供的 CPU 基准测试程序，就好像 CPU 届的“高考”，通�
       <tags>
         <tag>SSD</tag>
       </tags>
+  </entry>
+  <entry>
+    <title>Hexo 主题下Next主题目录解析</title>
+    <url>/posts/dc9e0770/</url>
+    <content><![CDATA[<h1 id="Next-主题的-Hexo-博客配置目录结构"><a href="#Next-主题的-Hexo-博客配置目录结构" class="headerlink" title="Next 主题的 Hexo 博客配置目录结构"></a>Next 主题的 Hexo 博客配置目录结构</h1><blockquote>
+<p> Next 主题的简约明亮的风格深受广大网友喜爱，其集成功能繁多，主要涉及对主站点的配置以及主题的配置文件进行定制（_config.yml）,为了对Hexo博客下各个子目录有一个大致认知，现将目录结构展示如下：</p>
+</blockquote>
+<span id="more"></span>
+
+<h2 id="Hexo-博客下默认目录结构"><a href="#Hexo-博客下默认目录结构" class="headerlink" title="Hexo 博客下默认目录结构"></a>Hexo 博客下默认目录结构</h2><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">.</span><br><span class="line">├── .deploy</span><br><span class="line">├── public</span><br><span class="line">├── scaffolds</span><br><span class="line">├── scripts</span><br><span class="line">├── source</span><br><span class="line">|   ├── _drafts</span><br><span class="line">|   └── _posts</span><br><span class="line">├── themes</span><br><span class="line">├── _config.yml</span><br><span class="line">└── package.json</span><br></pre></td></tr></table></figure>
+
+<p>详细对应于：</p>
+<ul>
+<li>deploy：执行hexo deploy命令部署到GitHub上的内容目录</li>
+<li>public：执行hexo generate命令，输出的静态网页内容目录</li>
+<li>scaffolds：layout模板文件目录，其中的md文件可以添加编辑</li>
+<li>scripts：扩展脚本目录，这里可以自定义一些javascript脚本</li>
+<li>source：文章源码目录，该目录下的markdown和html文件均会被hexo处理。该页面对应repo的根目录，404文件、favicon.ico文件，CNAME文件等都应该放这里，该目录下可新建页面目录。<ol>
+<li>drafts：草稿文章</li>
+<li>posts：发布文章</li>
+</ol>
+</li>
+<li>themes：主题文件目录</li>
+<li>_config.yml：全局配置文件，大多数的设置都在这里</li>
+<li>package.json：应用程序数据，指明hexo的版本等信息，类似于一般软件中的关于按钮</li>
+</ul>
+<h2 id="Next主题下的子目录结构"><a href="#Next主题下的子目录结构" class="headerlink" title="Next主题下的子目录结构"></a>Next主题下的子目录结构</h2><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">├── .github            #git信息</span><br><span class="line">├── languages          #多语言</span><br><span class="line">|   ├── default.yml    #默认语言</span><br><span class="line">|   └── zh-Hans.yml      #简体中文</span><br><span class="line">|   └── zh-tw.yml      #繁体中文</span><br><span class="line">├── layout             #布局，根目录下的*.ejs文件是对主页，分页，存档等的控制</span><br><span class="line">|   ├── _custom        #可以自己修改的模板，覆盖原有模板</span><br><span class="line">|   |   ├── _header.swig    #头部样式</span><br><span class="line">|   |   ├── _sidebar.swig   #侧边栏样式</span><br><span class="line">|   ├── _macro        #可以自己修改的模板，覆盖原有模板</span><br><span class="line">|   |   ├── post.swig    #文章模板</span><br><span class="line">|   |   ├── reward.swig    #打赏模板</span><br><span class="line">|   |   ├── sidebar.swig   #侧边栏模板</span><br><span class="line">|   ├── _partial       #局部的布局</span><br><span class="line">|   |   ├── head       #头部模板</span><br><span class="line">|   |   ├── search     #搜索模板</span><br><span class="line">|   |   ├── share      #分享模板</span><br><span class="line">|   ├── _script        #局部的布局</span><br><span class="line">|   ├── _third-party   #第三方模板</span><br><span class="line">|   ├── _layout.swig   #主页面模板</span><br><span class="line">|   ├── index.swig     #主页面模板</span><br><span class="line">|   ├── page           #页面模板</span><br><span class="line">|   └── tag.swig       #tag模板</span><br><span class="line">├── scripts            #script源码</span><br><span class="line">|   ├── tags           #tags的script源码</span><br><span class="line">|   ├── marge.js       #页面模板</span><br><span class="line">├── source             #源码</span><br><span class="line">|   ├── css            #css源码</span><br><span class="line">|   |   ├── _common    #*.styl基础css</span><br><span class="line">|   |   ├── _custom    #*.styl局部css</span><br><span class="line">|   |   └── _mixins    #mixins的css</span><br><span class="line">|   ├── fonts          #字体</span><br><span class="line">|   ├── images         #图片</span><br><span class="line">|   ├── uploads        #添加的文件</span><br><span class="line">|   └── js             #javascript源代码</span><br><span class="line">├── _config.yml        #主题配置文件</span><br><span class="line">└── README.md          #用GitHub的都知道</span><br></pre></td></tr></table></figure>
+
+
+]]></content>
+      <categories>
+        <category>目录集</category>
+      </categories>
+      <tags>
+        <tag>Next</tag>
+        <tag>Hexo博客</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Hexo博客下集成Gitalk评论</title>
+    <url>/posts/d37d3bf7/</url>
+    <content><![CDATA[<h1 id="Hexo-Next博客下集成-Gitalk-评论功能"><a href="#Hexo-Next博客下集成-Gitalk-评论功能" class="headerlink" title="Hexo+Next博客下集成 Gitalk 评论功能"></a>Hexo+Next博客下集成 Gitalk 评论功能</h1><blockquote>
+<p>Gitalk 是基于 GitHub Issues 的评论系统 ，面向程序员，不能匿名评论，需博主初始化话题，用户需登录 github 账号评论。并且支持markdown 格式。</p>
+</blockquote>
+<span id="more"></span>
+
+<h2 id="Gitalk-功能集成过程："><a href="#Gitalk-功能集成过程：" class="headerlink" title="Gitalk 功能集成过程："></a>Gitalk 功能集成过程：</h2><h3 id="新建评论仓库"><a href="#新建评论仓库" class="headerlink" title="新建评论仓库"></a><strong>新建评论仓库</strong></h3><p>如果 Hexo博客是通过Github的仓库（repositories）部署到远端的话，该仓库即可以作为评论仓库，在setting中启动该仓库的Issues即可。</p>
+<p> 否则的话，需要新建一个空的仓库来使用，并且启动该仓库的 Issues。</p>
+<h3 id="注册OAuth-Application"><a href="#注册OAuth-Application" class="headerlink" title="注册OAuth Application"></a>注册OAuth Application</h3><ul>
+<li><p>进入GitHub官网<a href="https://github.com/">https://github.com/</a> ，点击右上角头像，选择setting.</p>
+</li>
+<li><p>接着在setting后选择developer setting 。<img src="/img/Next/talk1.png" alt="talk1" style="zoom:67%;" /></p>
+</li>
+<li><p>然后 new OAuth app</p>
+</li>
+</ul>
+<img src="/img/Next/talk2.png" alt="talk2" style="zoom:67%;" />
+
+<ul>
+<li>接着完成注册信息。<br>​                    <img src="/img/Next/talk3.png" alt="talk3" style="zoom: 50%;" /></li>
+</ul>
+<p>值得注意的是第四个参数信息很重要！是回调URL，这个一定不能填写错，一般填写你博客主页地址。</p>
+<p><img src="/img/Next/talk4.png" alt="talk4" style="zoom:67%;" />注册成功之后会有 Client ID和 Client Secret ，需要记录下来之后会用到。</p>
+<h3 id="配置文件修改"><a href="#配置文件修改" class="headerlink" title="配置文件修改"></a>配置文件修改</h3><p>第一步：新建或修改<code>/layout/_third-party/comments/gitalk.swig</code>文件，并添加内容（若该文件下载后已存在则无需进行更改，Next8.0 版本后为.njk 后缀结尾文件）。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&#123;%- if page.comments %&#125;</span><br><span class="line">&#123;%- set gitalk_css_uri = theme.vendors.gitalk_css | default(&#x27;//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css&#x27;) %&#125;</span><br><span class="line">&lt;link rel=&quot;stylesheet&quot; href=&quot;&#123;&#123; gitalk_css_uri &#125;&#125;&quot;&gt;</span><br><span class="line"></span><br><span class="line">&#123;%- set gitalk_js_uri = theme.vendors.gitalk_js | default(&#x27;//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js&#x27;) %&#125;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line">  NexT.utils.getScript(&#x27;&#123;&#123; gitalk_js_uri &#125;&#125;&#x27;, () =&gt; &#123;</span><br><span class="line">    var gitalk = new Gitalk(&#123;</span><br><span class="line">      clientID: &#x27;&#123;&#123; theme.gitalk.client_id &#125;&#125;&#x27;,</span><br><span class="line">      clientSecret: &#x27;&#123;&#123; theme.gitalk.client_secret &#125;&#125;&#x27;,</span><br><span class="line">      repo: &#x27;&#123;&#123; theme.gitalk.repo &#125;&#125;&#x27;,</span><br><span class="line">      owner: &#x27;&#123;&#123; theme.gitalk.github_id &#125;&#125;&#x27;,</span><br><span class="line">      admin: [&#x27;&#123;&#123; theme.gitalk.admin_user &#125;&#125;&#x27;],</span><br><span class="line">      id: &#x27;&#123;&#123; gitalk_md5(page.path) &#125;&#125;&#x27;,</span><br><span class="line">      &#123;%- if theme.gitalk.language == &#x27;&#x27; %&#125;</span><br><span class="line">        language: window.navigator.language || window.navigator.userLanguage,</span><br><span class="line">      &#123;% else %&#125;</span><br><span class="line">        language: &#x27;&#123;&#123; theme.gitalk.language &#125;&#125;&#x27;,</span><br><span class="line">      &#123;%- endif %&#125;</span><br><span class="line">      distractionFreeMode: &#x27;&#123;&#123; theme.gitalk.distraction_free_mode &#125;&#125;&#x27;</span><br><span class="line">    &#125;);</span><br><span class="line">    gitalk.render(&#x27;gitalk-container&#x27;);</span><br><span class="line">  &#125;, window.Gitalk);</span><br><span class="line">&lt;/script&gt;</span><br><span class="line">&#123;%- endif %&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>comments.swig</strong></p>
+<p>第二步：修改<code>/layout/_partials/comments.swig</code>文件，在最后一个<code>&#123;%- endif %&#125;</code>前面加上如下内容 (十分重要)：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&#123;% elseif theme.gitalk.enable %&#125;</span><br><span class="line"> &lt;div id=&quot;gitalk-container&quot;&gt;&lt;/div&gt;</span><br></pre></td></tr></table></figure>
+
+<p><strong>index.swig</strong></p>
+<p>第三步：新建或者修改<code>layout/_third-party/comments/index.swig</code>文件，在最后添加内容</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&#123;% include &#x27;gitalk.swig&#x27; %&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>gitalk.styl</strong></p>
+<p>第四步：新建或者修改<code>/source/css/_common/components/third-party/gitalk.styl</code>文件，添加内容：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">if (hexo-config(&#x27;gitalk.enable&#x27;)) &#123;</span><br><span class="line">  .gt-header a, .gt-comments a, .gt-popup a &#123;</span><br><span class="line">    border-bottom: 0;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  .gt-container .gt-popup .gt-action.is--active::before &#123;</span><br><span class="line">    top: .7em;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>_config.xml</strong></p>
+<p>第五步：在主题配置文件<code>next/_config.xml</code>中找到<code>gitalk处</code>修改或者添加如下内容：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">gitalk:</span><br><span class="line">  enable: true</span><br><span class="line">  githubID: github帐号  # 例：TateTang</span><br><span class="line">  repo: 仓库名称   # 例：blog-comments</span><br><span class="line">  ClientID: Client ID</span><br><span class="line">  ClientSecret: Client Secret</span><br><span class="line">  adminUser: github帐号 #指定可初始化评论账户 如：TateTang</span><br><span class="line">  distractionFreeMode: true</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>这时我们就需要用到之前记录的 Client ID和 Client Secret ，需要注意的是<strong>repo必须是你存放评论并启动Issues的仓库（repository）名称</strong>。</p>
+<h3 id="初始化-Issues"><a href="#初始化-Issues" class="headerlink" title="初始化 Issues"></a>初始化 Issues</h3><p>完成上述工作后，即可在博客主目录下输入命令<code>hexo clean &amp;&amp; hexo g &amp;&amp; hexo d</code> 运行</p>
+<p>进入博客后在评论会出现下图情况，这时使用注册 OAuth Application 的GitHub登录进行初始化创建即可。   <img src="/img/Next/talk5.png" alt="talk5" style="zoom:67%;" /></p>
+<p>首次初始化会有如下结果，点击授权即可完成！（Gitalk Lin 是我OAuth APP注册的项目名称）<br><img src="/img/Next/talk6.png" alt="talk6" style="zoom:67%;" /></p>
+<h2 id="注意事项："><a href="#注意事项：" class="headerlink" title="注意事项："></a>注意事项：</h2><ol>
+<li><p>有时授权完成后可能显示 <code>Error Not Found</code> 问题，很可能的情况是没有创建或者已经存在 (在Setting中) 启动了 Issues的 GitHub 仓库，或者在 Next主题的配置文件中 <em><strong>repo</strong></em>名称输入有误（请与创建的评论仓库的名称相一致）。</p>
+<p>例如： repo: blog-Comments</p>
+<p>(blog-Comments 即为创建时的仓库名)</p>
+</li>
+<li><p>虽然已完成 Gitalk功能的集成，但是需要每篇博客都允许其他人可以评论的话，那么你要在该博客下登陆评论仓库（repo）使用的 GitHub 账号来完成 Issues的初始化！</p>
+</li>
+</ol>
+<h2 id="参考链接："><a href="#参考链接：" class="headerlink" title="参考链接："></a>参考链接：</h2><p>gitalk 参考文档说明 （<a href="https://github.com/gitalk/gitalk/blob/master/readme-cn.md%EF%BC%89">https://github.com/gitalk/gitalk/blob/master/readme-cn.md）</a></p>
+]]></content>
+      <categories>
+        <category>Hexo博客</category>
+      </categories>
+      <tags>
+        <tag>Next</tag>
+        <tag>gitalk</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Java中的关键字和标识符号</title>
+    <url>/posts/89799f4a/</url>
+    <content><![CDATA[<h1 id="Java-的关键字和标识符"><a href="#Java-的关键字和标识符" class="headerlink" title="Java 的关键字和标识符"></a>Java 的关键字和标识符</h1><h2 id="常用关键字展示："><a href="#常用关键字展示：" class="headerlink" title="常用关键字展示："></a>常用关键字展示：</h2><span id="more"></span>
+<p>汇总：<br><img src="/img/java_img/java关键字.jpg" alt="java关键字" style="zoom:100%;" /><br>*值得注意的是Java 关键字是区分大小写的哦！”</p>
+<h2 id="Java-中的标识符"><a href="#Java-中的标识符" class="headerlink" title="Java 中的标识符"></a>Java 中的标识符</h2><p>标识符是用于给 Java 程序中变量、类、方法等命名的符号。<br>例如：<br><img src="/img/java_img/标识符.png" alt="标识符" style="zoom:68%;" /></p>
+<p>注意的是：</p>
+<ul>
+<li>标识符可以由字母、数字、下划线（_）、美元符（$）组成，但不能包含 @、%、空格等其它特殊字符，不能以数字开头。譬如：123name 就是不合法滴</li>
+<li>标识符不能是 Java 关键字和保留字（ Java 预留的关键字，以后的升级版本中有可能作为关键字），但可以包含关键字和保留字。如：不可以使用 void 作为标识符，但是 Myvoid 可以</li>
+<li>标识符是严格区分大小写的。标识符的命名最好能反映出其作用，做到见名知意。 所以涅，一定要分清楚 imooc 和 IMooc 是两个不同的标识符哦！</li>
+<li>标识符的命名最好能反映出其作用，做到见名知意。</li>
+</ul>
+]]></content>
+      <categories>
+        <category>Java</category>
+      </categories>
   </entry>
   <entry>
     <title>next主题下为博客添加页面宠物</title>
