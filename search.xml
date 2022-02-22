@@ -42,6 +42,57 @@
       </tags>
   </entry>
   <entry>
+    <title>关于性能提升</title>
+    <url>/posts/bc93e288/</url>
+    <content><![CDATA[<h1 id="穿越功耗墙，我们该从哪些方面提升“性能”？"><a href="#穿越功耗墙，我们该从哪些方面提升“性能”？" class="headerlink" title="穿越功耗墙，我们该从哪些方面提升“性能”？"></a>穿越功耗墙，我们该从哪些方面提升“性能”？</h1><center> ` 程序的 CPU 执行时间 = 指令数 × CPI × Clock Cycle Time `</center>
+
+<h2 id="功耗：CPU-的“人体极限”"><a href="#功耗：CPU-的“人体极限”" class="headerlink" title="功耗：CPU 的“人体极限”"></a>功耗：CPU 的“人体极限”</h2><p>案例：奔腾 4 的 CPU 主频从来没有达到过 10GHz，最终它的主频上限定格在 3.8GHz。这还不是最糟的，更糟糕的事情是，大家发现，奔腾 4 的主频虽然高，但是它的实际性能却配不上同样的主频。想要用在笔记本上的奔腾 4 2.4GHz 处理器，其性能只和基于奔腾 3 架构的奔腾 M 1.6GHz 处理器差不多。</p>
+<span id="more"></span>
+<img src="https://static001.geekbang.org/resource/image/18/80/1826102a89e4cdd31f7573db53dd9280.png?wh=756*468" alt="CPU的主频变化" style="zoom: 75%;"/>
+
+<p>2019 年的最高配置 Intel i9 CPU，主频也只不过是 5GHz 而已。相较于 1978 年到 2000 年，这 20 年里 300 倍的主频提升，从 2000 年到现在的这 19 年，CPU 的主频大概提高了 3 倍。 </p>
+<p>奔腾 4 的主频为什么没能超过 3.8GHz 的障碍呢？答案就是功耗问题。什么是功耗问题呢？</p>
+<p>(一个 3.8GHz 的奔腾 4 处理器，满载功率是 130 瓦。这个 130 瓦是什么概念呢？机场允许带上飞机的充电宝的容量上限是 100 瓦时。如果我们把这个 CPU 安在手机里面，不考虑屏幕内存之类的耗电，这个 CPU 满载运行 45 分钟，充电宝里面就没电了。而 iPhone X 使用 ARM 架构的 CPU，功率则只有 4.5 瓦左右。)</p>
+<p>我们的 CPU，一般都被叫作超大规模集成电路（Very-Large-Scale Integration，VLSI）。这些电路，实际上都是一个个晶体管组合而成的。CPU 在计算，其实就是让晶体管里面的“开关”不断地去“打开”和“关闭”，来组合完成各种运算和功能。</p>
+<p>想要计算的快，一方面，我们要在 CPU 里，同样的面积里面，多放一些晶体管，也就是增加密度；另一方面，我们要让晶体管“打开”和“关闭”得更快一点，也就是提升主频。而这两者，都会增加功耗，带来耗电和散热的问题。</p>
+<p>在 CPU 里面，能够放下的晶体管数量和晶体管的“开关”频率也都是有限的。一个CPU 的公路，可以用一个公式表示：</p>
+<center> 功耗 ~= 1/2 ×负载电容×电压的平方×开关频率×晶体管数量</center>
+
+<p>那么，为了要提升性能，我们需要不断地增加晶体管数量。同样的面积下，我们想要多放一点晶体管，就要把晶体管造得小一点。这个就是平时我们所说的提升“制程”。从 28nm 到 7nm，相当于晶体管本身变成了原来的 1&#x2F;4 大小。我们还要提升主频，让开关的频率变快。 但是，功耗增加太多，就会导致 CPU 散热跟不上，这时，我们就需要降低电压。这里有一点非常关键，在整个功耗的公式里面，功耗和电压的平方是成正比的。这意味着电压下降到原来的 1&#x2F;5，整个的功耗会变成原来的 1&#x2F;25 。</p>
+<h2 id="并行优化，理解阿姆达尔定律"><a href="#并行优化，理解阿姆达尔定律" class="headerlink" title="并行优化，理解阿姆达尔定律"></a>并行优化，理解阿姆达尔定律</h2><p>就是所谓的“吞吐率”变大。所以，不管你有没有需要，现在 CPU 的性能就是提升了 2 倍乃至 8 倍、16 倍。这也是一个最常见的提升性能的方式，<strong>通过并行提高性能。</strong></p>
+<p>通过并行提高性能来解决。如果想要使用这种思想，需要满足这样几个条件。</p>
+<ol>
+<li>需要进行的计算，本身可以分解成几个可以并行的任务。好比上面的乘法和加法计算，几个人可以同时进行，不会影响最后的结果。</li>
+<li>需要能够分解好问题，并确保几个人的结果能够汇总到一起。</li>
+<li>在“汇总”这个阶段，是没有办法并行进行的，还是得顺序执行，一步一步来。</li>
+</ol>
+<p>这就引出了阿姆达尔定律（Amdahl’s Law）：</p>
+<p>这个定律说的就是，对于一个程序进行优化之后，处理器并行运算之后效率提升的情况。具体可以用这样一个公式来表示：</p>
+<center> **优化后的执行时间 = 受优化影响的执行时间 / 加速倍数 + 不受影响的执行时间** </center>
+
+<p>比如上面的各个向量的一小段的点积，需要 100ns，加法需要 20ns，总共需要 120ns。这里通过并行 4 个 CPU 有了 4 倍的加速度。那么最终优化后，就有了 100&#x2F;4+20&#x3D;45ns。即使我们增加更多的并行度来提供加速倍数，比如有 100 个 CPU，整个时间也需要 100&#x2F;100+20&#x3D;21ns。</p>
+<p><img src="https://static001.geekbang.org/resource/image/f1/e5/f1d05ec439e6377803df741bc07b09e5.jpeg?wh=3140*2039"></p>
+<p>T1就是不受影响的执行时间 ，T2就是可以优化影响的执行时间</p>
+<h2 id="延伸："><a href="#延伸：" class="headerlink" title="延伸："></a>延伸：</h2><p>在“摩尔定律”和“并行计算”之外，在整个计算机组成层面，还有这样几个原则性的性能提升方法。</p>
+<ol>
+<li><p>加速大概率事件。最典型的就是，过去几年流行的深度学习，整个计算过程中，99% 都是向量和矩阵计算，于是，工程师们通过用 GPU 替代 CPU，大幅度提升了深度学习的模型训练过程。本来一个 CPU 需要跑几小时甚至几天的程序，GPU 只需要几分钟就好了。Google 更是不满足于 GPU 的性能，进一步地推出了 TPU。</p>
+</li>
+<li><p>通过流水线提高性能。现代的工厂里的生产线叫“流水线”。我们可以把装配 iPhone 这样的任务拆分成一个个细分的任务，让每个人都只需要处理一道工序，最大化整个工厂的生产效率。类似的，我们的 CPU 其实就是一个“运算工厂”。我们把 CPU 指令执行的过程进行拆分，细化运行，也是现代 CPU 在主频没有办法提升那么多的情况下，性能仍然可以得到提升的重要原因之一。</p>
+</li>
+<li><p>通过预测提高性能。通过预先猜测下一步该干什么，而不是等上一步运行的结果，提前进行运算，也是让程序跑得更快一点的办法。典型的例子就是在一个循环访问数组的时候，凭经验，你也会猜到下一步我们会访问数组的下一项。所谓的“分支和冒险”、“局部性原理”这些 CPU 和存储系统设计方法，其实都是在利用我们对于未来的“预测”，提前进行相应的操作，来提升我们的程序性能。</p>
+</li>
+</ol>
+<p>比如：</p>
+<p>1.加速大概率事件<br>各种缓存(内存缓存、CDN缓存)<br>2.流水线<br>并发编程、异步编程<br>音视频播放器边播放边缓冲<br>3.预测<br>小说的下一页预加载<br>电商大促的CDN预热</p>
+]]></content>
+      <categories>
+        <category>计算机组成原理</category>
+      </categories>
+      <tags>
+        <tag>性能与主频</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>CPU的主频</title>
     <url>/posts/5dfefcf1/</url>
     <content><![CDATA[<h1 id="透过CPU的主频，谈谈性能究竟是什么"><a href="#透过CPU的主频，谈谈性能究竟是什么" class="headerlink" title="透过CPU的主频，谈谈性能究竟是什么"></a>透过CPU的主频，谈谈性能究竟是什么</h1><h2 id="计算机的性能衡量"><a href="#计算机的性能衡量" class="headerlink" title="计算机的性能衡量"></a>计算机的性能衡量</h2><p>于计算机的性能，我们需要有个标准来衡量。这个标准中主要有两个指标。</p>
@@ -105,57 +156,6 @@ SPEC 提供的 CPU 基准测试程序，就好像 CPU 届的“高考”，通�
       </tags>
   </entry>
   <entry>
-    <title>关于性能提升</title>
-    <url>/posts/bc93e288/</url>
-    <content><![CDATA[<h1 id="穿越功耗墙，我们该从哪些方面提升“性能”？"><a href="#穿越功耗墙，我们该从哪些方面提升“性能”？" class="headerlink" title="穿越功耗墙，我们该从哪些方面提升“性能”？"></a>穿越功耗墙，我们该从哪些方面提升“性能”？</h1><center> ` 程序的 CPU 执行时间 = 指令数 × CPI × Clock Cycle Time `</center>
-
-<h2 id="功耗：CPU-的“人体极限”"><a href="#功耗：CPU-的“人体极限”" class="headerlink" title="功耗：CPU 的“人体极限”"></a>功耗：CPU 的“人体极限”</h2><p>案例：奔腾 4 的 CPU 主频从来没有达到过 10GHz，最终它的主频上限定格在 3.8GHz。这还不是最糟的，更糟糕的事情是，大家发现，奔腾 4 的主频虽然高，但是它的实际性能却配不上同样的主频。想要用在笔记本上的奔腾 4 2.4GHz 处理器，其性能只和基于奔腾 3 架构的奔腾 M 1.6GHz 处理器差不多。</p>
-<span id="more"></span>
-<img src="https://static001.geekbang.org/resource/image/18/80/1826102a89e4cdd31f7573db53dd9280.png?wh=756*468" alt="CPU的主频变化" style="zoom: 75%;"/>
-
-<p>2019 年的最高配置 Intel i9 CPU，主频也只不过是 5GHz 而已。相较于 1978 年到 2000 年，这 20 年里 300 倍的主频提升，从 2000 年到现在的这 19 年，CPU 的主频大概提高了 3 倍。 </p>
-<p>奔腾 4 的主频为什么没能超过 3.8GHz 的障碍呢？答案就是功耗问题。什么是功耗问题呢？</p>
-<p>(一个 3.8GHz 的奔腾 4 处理器，满载功率是 130 瓦。这个 130 瓦是什么概念呢？机场允许带上飞机的充电宝的容量上限是 100 瓦时。如果我们把这个 CPU 安在手机里面，不考虑屏幕内存之类的耗电，这个 CPU 满载运行 45 分钟，充电宝里面就没电了。而 iPhone X 使用 ARM 架构的 CPU，功率则只有 4.5 瓦左右。)</p>
-<p>我们的 CPU，一般都被叫作超大规模集成电路（Very-Large-Scale Integration，VLSI）。这些电路，实际上都是一个个晶体管组合而成的。CPU 在计算，其实就是让晶体管里面的“开关”不断地去“打开”和“关闭”，来组合完成各种运算和功能。</p>
-<p>想要计算的快，一方面，我们要在 CPU 里，同样的面积里面，多放一些晶体管，也就是增加密度；另一方面，我们要让晶体管“打开”和“关闭”得更快一点，也就是提升主频。而这两者，都会增加功耗，带来耗电和散热的问题。</p>
-<p>在 CPU 里面，能够放下的晶体管数量和晶体管的“开关”频率也都是有限的。一个CPU 的公路，可以用一个公式表示：</p>
-<center> 功耗 ~= 1/2 ×负载电容×电压的平方×开关频率×晶体管数量</center>
-
-<p>那么，为了要提升性能，我们需要不断地增加晶体管数量。同样的面积下，我们想要多放一点晶体管，就要把晶体管造得小一点。这个就是平时我们所说的提升“制程”。从 28nm 到 7nm，相当于晶体管本身变成了原来的 1&#x2F;4 大小。我们还要提升主频，让开关的频率变快。 但是，功耗增加太多，就会导致 CPU 散热跟不上，这时，我们就需要降低电压。这里有一点非常关键，在整个功耗的公式里面，功耗和电压的平方是成正比的。这意味着电压下降到原来的 1&#x2F;5，整个的功耗会变成原来的 1&#x2F;25 。</p>
-<h2 id="并行优化，理解阿姆达尔定律"><a href="#并行优化，理解阿姆达尔定律" class="headerlink" title="并行优化，理解阿姆达尔定律"></a>并行优化，理解阿姆达尔定律</h2><p>就是所谓的“吞吐率”变大。所以，不管你有没有需要，现在 CPU 的性能就是提升了 2 倍乃至 8 倍、16 倍。这也是一个最常见的提升性能的方式，<strong>通过并行提高性能。</strong></p>
-<p>通过并行提高性能来解决。如果想要使用这种思想，需要满足这样几个条件。</p>
-<ol>
-<li>需要进行的计算，本身可以分解成几个可以并行的任务。好比上面的乘法和加法计算，几个人可以同时进行，不会影响最后的结果。</li>
-<li>需要能够分解好问题，并确保几个人的结果能够汇总到一起。</li>
-<li>在“汇总”这个阶段，是没有办法并行进行的，还是得顺序执行，一步一步来。</li>
-</ol>
-<p>这就引出了阿姆达尔定律（Amdahl’s Law）：</p>
-<p>这个定律说的就是，对于一个程序进行优化之后，处理器并行运算之后效率提升的情况。具体可以用这样一个公式来表示：</p>
-<center> **优化后的执行时间 = 受优化影响的执行时间 / 加速倍数 + 不受影响的执行时间** </center>
-
-<p>比如上面的各个向量的一小段的点积，需要 100ns，加法需要 20ns，总共需要 120ns。这里通过并行 4 个 CPU 有了 4 倍的加速度。那么最终优化后，就有了 100&#x2F;4+20&#x3D;45ns。即使我们增加更多的并行度来提供加速倍数，比如有 100 个 CPU，整个时间也需要 100&#x2F;100+20&#x3D;21ns。</p>
-<p><img src="https://static001.geekbang.org/resource/image/f1/e5/f1d05ec439e6377803df741bc07b09e5.jpeg?wh=3140*2039"></p>
-<p>T1就是不受影响的执行时间 ，T2就是可以优化影响的执行时间</p>
-<h2 id="延伸："><a href="#延伸：" class="headerlink" title="延伸："></a>延伸：</h2><p>在“摩尔定律”和“并行计算”之外，在整个计算机组成层面，还有这样几个原则性的性能提升方法。</p>
-<ol>
-<li><p>加速大概率事件。最典型的就是，过去几年流行的深度学习，整个计算过程中，99% 都是向量和矩阵计算，于是，工程师们通过用 GPU 替代 CPU，大幅度提升了深度学习的模型训练过程。本来一个 CPU 需要跑几小时甚至几天的程序，GPU 只需要几分钟就好了。Google 更是不满足于 GPU 的性能，进一步地推出了 TPU。</p>
-</li>
-<li><p>通过流水线提高性能。现代的工厂里的生产线叫“流水线”。我们可以把装配 iPhone 这样的任务拆分成一个个细分的任务，让每个人都只需要处理一道工序，最大化整个工厂的生产效率。类似的，我们的 CPU 其实就是一个“运算工厂”。我们把 CPU 指令执行的过程进行拆分，细化运行，也是现代 CPU 在主频没有办法提升那么多的情况下，性能仍然可以得到提升的重要原因之一。</p>
-</li>
-<li><p>通过预测提高性能。通过预先猜测下一步该干什么，而不是等上一步运行的结果，提前进行运算，也是让程序跑得更快一点的办法。典型的例子就是在一个循环访问数组的时候，凭经验，你也会猜到下一步我们会访问数组的下一项。所谓的“分支和冒险”、“局部性原理”这些 CPU 和存储系统设计方法，其实都是在利用我们对于未来的“预测”，提前进行相应的操作，来提升我们的程序性能。</p>
-</li>
-</ol>
-<p>比如：</p>
-<p>1.加速大概率事件<br>各种缓存(内存缓存、CDN缓存)<br>2.流水线<br>并发编程、异步编程<br>音视频播放器边播放边缓冲<br>3.预测<br>小说的下一页预加载<br>电商大促的CDN预热</p>
-]]></content>
-      <categories>
-        <category>计算机组成原理</category>
-      </categories>
-      <tags>
-        <tag>性能与主频</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>初窥计算机指令</title>
     <url>/posts/d754f544/</url>
     <content><![CDATA[<h1 id="初窥计算机指令"><a href="#初窥计算机指令" class="headerlink" title="初窥计算机指令"></a>初窥计算机指令</h1><h2 id="在软硬件接口中，CPU-帮我们做了什么事？"><a href="#在软硬件接口中，CPU-帮我们做了什么事？" class="headerlink" title="在软硬件接口中，CPU 帮我们做了什么事？"></a>在软硬件接口中，CPU 帮我们做了什么事？</h2><ul>
@@ -208,62 +208,6 @@ SPEC 提供的 CPU 基准测试程序，就好像 CPU 届的“高考”，通�
         <tag>CPU</tag>
         <tag>指令集</tag>
         <tag>机器码</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>指令跳转</title>
-    <url>/posts/84302a9d/</url>
-    <content><![CDATA[<h1 id="指令跳转：原来if…else就是goto"><a href="#指令跳转：原来if…else就是goto" class="headerlink" title="指令跳转：原来if…else就是goto"></a>指令跳转：原来if…else就是goto</h1><p>用到 if…else 这样的条件判断语句、while 和 for 这样的循环语句，还有函数<span id="more"></span>或者过程调用。对应的，CPU 执行也不只是一条指令，一般一个程序包含很多条指令，因为有 if…else、for 这样的条件和循环存在，这些指令也不会一路平铺直叙地执行下去。</p>
-<h2 id="CPU-是如何执行指令的？"><a href="#CPU-是如何执行指令的？" class="headerlink" title="CPU 是如何执行指令的？"></a>CPU 是如何执行指令的？</h2><p>对于做软件开发来说，写好的代码变成指令之后，是一条一条顺序执行的。<br>先不管几百亿的晶体管的背后是怎么通过电路运转起来的，逻辑上，我们可以认为，CPU 其实就是由一堆寄存器组成的。而寄存器就是CPU 内部，由多个触发器（Flip-Flop）或者锁存器（Latches）组成的简单电路。</p>
-<p>N 个触发器或者锁存器，就可以组成一个 N 位（Bit）的寄存器，能够保存 N 位的数据。比方说，用的64位 Intel服务器，寄存器就是64位的。</p>
-<img src="/img/computer_img/CPU寄存器.webp" alt="CPU寄存器" style="zoom:25%;" />
-
-<p>一个CPU 里会有多种不同功能的寄存器，主要介绍以下三种较为特殊的：</p>
-<ol>
-<li><p>PC寄存器，也称为指令地址寄存器（Instruction Address Register）。是用来存放下一条需要执行的计算机指令的内存地址。</p>
-</li>
-<li><p>指令寄存器，用来存放当前正在执行的指令。</p>
-</li>
-<li><p>条件寄存器，用里面的一个一个标记位（Flag）,存放CPU进行算数或者逻辑计算的结果。</p>
-</li>
-</ol>
-<ul>
-<li>除了这些特殊的寄存器，CPU 里还有更多用来存储数据和内存地址的寄存器。这样的寄存器通常一类里面不止一个。通常根据存放的数据内存来给他们取名，比如整数寄存器、浮点寄存器、向量寄存器和地址寄存器等。有些既可以存数据，也能存地址的就称之为通用寄存器。</li>
-</ul>
-<img src="/img/computer_img/常见寄存器.webp" alt="常见寄存器" style="zoom:33%;" />
-
-<p>实际上，一个程序执行的时候，CPU 会根据PC寄存器里的地址，从内存里把需要执行的指令读取到指令寄存器里执行，然后根据指令长度递增，开始顺序读取下一条指令。可以看到，一个程序的一条条指令，在内存里是连续保存的，也是一条条顺序加载的。</p>
-<p>而一些特殊指令，比如 J指令，会修改PC寄存器里的地址值。这样，下一条要执行的指令就不是从内存里顺序加载的了。事实上，这些跳转指令的存在，也是我们在写程序的时候，使用 if…else 条件语句和 while&#x2F;for 循环语句的原因。</p>
-<h2 id="从-if…else-来看程序的执行和跳转"><a href="#从-if…else-来看程序的执行和跳转" class="headerlink" title="从 if…else 来看程序的执行和跳转"></a>从 if…else 来看程序的执行和跳转</h2><p>现在就来看一个包含 if…else 的简单程序。</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">// test.c</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">#include &lt;time.h&gt;</span><br><span class="line">#include &lt;stdlib.h&gt;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">int main()</span><br><span class="line">&#123;</span><br><span class="line">  srand(time(NULL));</span><br><span class="line">  int r = rand() % 2;</span><br><span class="line">  int a = 10;</span><br><span class="line">  if (r == 0)</span><br><span class="line">  &#123;</span><br><span class="line">    a = 1;</span><br><span class="line">  &#125; else &#123;</span><br><span class="line">    a = 2;</span><br><span class="line">  &#125; </span><br></pre></td></tr></table></figure>
-
-<p>我们用 rand 生成了一个随机数 r，r 要么是 0，要么是 1。当 r 是 0 的时候，我们把之前定义的变量 a 设成 1，不然就设成 2。使用 gcc 和 objdump 把这个程序编译成汇编代码。只关注于这里的 if…else 条件判断语句。对应的汇编代码是这样的：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">  if (r == 0)</span><br><span class="line">3b:   83 7d fc 00             cmp    DWORD PTR [rbp-0x4],0x0</span><br><span class="line">3f:   75 09                   jne    4a &lt;main+0x4a&gt;</span><br><span class="line">  &#123;</span><br><span class="line">      a = 1;</span><br><span class="line">41:   c7 45 f8 01 00 00 00    mov    DWORD PTR [rbp-0x8],0x1</span><br><span class="line">48:   eb 07                   jmp    51 &lt;main+0x51&gt;</span><br><span class="line">  &#125;</span><br><span class="line">  else</span><br><span class="line">  &#123;</span><br><span class="line">      a = 2;</span><br><span class="line">4a:   c7 45 f8 02 00 00 00    mov    DWORD PTR [rbp-0x8],0x2</span><br><span class="line">51:   b8 00 00 00 00          mov    eax,0x0</span><br><span class="line">  &#125; </span><br></pre></td></tr></table></figure>
-
-<p>可以看到，这里对于 r &#x3D;&#x3D; 0 的条件判断，被编译成了 cmp 和 jne 这两条指令。cmp 指令比较了前后两个操作数的值，这里的 DWORD PTR 代表操作的数据类型是 32 位的整数，而[rbp-0x4]则是变量 r 的内存地址。第一个操作数就是从内存里拿到的变量 r 的值。第二个操作数 0x0 就是我们设定的常量 0 的 16 进制表示。cmp 指令的比较结果，会存入到条件码寄存器当中去。</p>
-<p>在这里，如果比较的结果是 True，也就是 r &#x3D;&#x3D; 0，就把<strong>零标志条件码</strong>（对应的条件码是 ZF，Zero Flag）设置为 <strong>1</strong>。除了零标志之外，Intel 的 CPU 下还有进位标志（CF，Carry Flag）、符号标志（SF，Sign Flag）以及溢出标志（OF，Overflow Flag），用在不同的判断条件下。</p>
-<p>cop 指令执行完成之后，PC寄存器会自动增加，开始执行下一条 jne指令。</p>
-<p>跟着的 jne 指令，是 <strong>jump if not equal</strong> 的意思，它会查看对应的零标志位。如果 ZF 为 1，说明上面的比较结果是 TRUE，如果是 ZF 是 0，也就是上面的比较结果是 False，会跳转到后面跟着的操作数 4a 的位置。<strong>这个 4a，对应这里汇编代码的行号，</strong>也就是上面设置的 else 条件里的第一条指令。<strong>当跳转发生的时候，PC 寄存器就不再是自增变成下一条指令的地址，而是被直接设置成这里的 4a 这个地址。</strong> CPU 再把 4a 地址里的指令加载到指令寄存器中来执行。</p>
-<p>到执行地址为 4a 的指令，实际是一条 mov 指令，第一个操作数和前面的 cmp 指令一样，是另一个 32 位整型的内存地址，以及 2 的对应的 16 进制值 0x2。mov 指令把 2 设置到对应的内存里去，相当于一个<strong>赋值操作</strong>。然后，PC 寄存器里的值继续自增，执行下一条 mov 指令。</p>
-<p>这条 mov 指令的第一个操作数 eax，代表累加寄存器，第二个操作数 0x0 则是 16 进制的 0 的表示。这条指令其实没有实际的作用，它的作用是一个<strong>占位符</strong>。前面的 if 条件，如果满足的话，在赋值的 mov 指令执行完成之后，有一个 jmp 的无条件跳转指令。跳转的地址就是这一行的地址 51。我们的main 函数没有设定返回值，而move  eax,0x0 其实就是给函数生成了一个默认的为0 的返回值的累加器里面。if 条件里面的内容执行完成之后也会跳转到这里，和 else 里的内容结束之后的位置是一样的。<br><img src="/img/computer_img/ifelse.webp" alt="ifelse" style="zoom:33%;" /></p>
-<h2 id="如何通过-if…else-和-goto-来实现循环？"><a href="#如何通过-if…else-和-goto-来实现循环？" class="headerlink" title="如何通过 if…else 和 goto 来实现循环？"></a>如何通过 if…else 和 goto 来实现循环？</h2><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">int main()</span><br><span class="line">&#123;</span><br><span class="line">    int a = 0;</span><br><span class="line">    for (int i = 0; i &lt; 3; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        a += i;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>从上面这一段简单的利用 for 循环的程序。我们循环自增变量 i 三次，三次之后，i&gt;&#x3D;3，就会跳出循环。整个程序，对应的 Intel 汇编代码就是这样的：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">for (int i = 0; i &lt;= 2; i++)</span><br><span class="line"> b:   c7 45 f8 00 00 00 00    mov    DWORD PTR [rbp-0x4],0x0</span><br><span class="line">12:   eb 0a                   jmp    1e </span><br><span class="line">  &#123;</span><br><span class="line">      a += i;</span><br><span class="line">14:   8b 45 f8                mov    eax,DWORD PTR [rbp-0x4]</span><br><span class="line">17:   01 45 fc                add    DWORD PTR [rbp-0x8],eax</span><br><span class="line"></span><br><span class="line">1a:   83 45 f8 01             add    DWORD PTR [rbp-0x4],0x1</span><br><span class="line">1e:   83 7d f8 02             cmp    DWORD PTR [rbp-0x4],0x2</span><br><span class="line">22:   7e f0                   jle    14 </span><br><span class="line">24:   b8 00 00 00 00          mov    eax,0x0</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
-
-<p>可以看到，对应的循环也是用 1e 这个地址上的 cmp 比较指令，和紧接着的 jle条件跳转指令来实现的。主要的差别在于，这里的 jle 跳转的地址，在这条指令之前的地址 14。往前跳转使得条件满足的时候，PC寄存器会把指令地址设置到之前执行过的指令位置，重新执行之前执行过的指令，直到条件不满足，顺序往下执行jle之后的指令，整个循环才结束。</p>
-<img src="/img/computer_img/循环.webp" alt="循环" style="zoom:33%;" />
-
-<p>其实，jle 和 jmp 指令，有点像程序语言里面的 goto 命令，直接指定了一个特定条件下的跳转位置。虽然我们在用高级语言开发程序的时候反对使用 goto，但是实际在机器指令层面，无论是 if…else…也好，还是 for&#x2F;while 也好，都是用和 goto 相同的跳转到特定指令位置的方式来实现的。</p>
-<h2 id="总结延伸："><a href="#总结延伸：" class="headerlink" title="总结延伸："></a>总结延伸：</h2><p>程序里的多条指令，除了通过PC寄存器自增的方式顺序执行外，条件寄存器会记录下当前执行指令的条件判断状态，然后通过跳转指令读取对应的条件码，修改PC寄存器内的下一条指令的地址，最终实现if…else 以及 for&#x2F;while 这样的程序控制流程。</p>
-<p><em>想要在硬件层面实现这个 goto 语句，除了本身需要用来保存下一条指令地址，以及当前正要执行指令的 PC 寄存器、指令寄存器外，我们只需要再增加一个条件码寄存器，来保留条件判断的状态。这样简简单单的三个寄存器，就可以实现条件判断和循环重复执行代码的功能。</em></p>
-]]></content>
-      <categories>
-        <category>计算机组成原理</category>
-      </categories>
-      <tags>
-        <tag>指令跳转</tag>
-        <tag>寄存器</tag>
       </tags>
   </entry>
   <entry>
@@ -330,6 +274,62 @@ SPEC 提供的 CPU 基准测试程序，就好像 CPU 届的“高考”，通�
       </tags>
   </entry>
   <entry>
+    <title>指令跳转</title>
+    <url>/posts/84302a9d/</url>
+    <content><![CDATA[<h1 id="指令跳转：原来if…else就是goto"><a href="#指令跳转：原来if…else就是goto" class="headerlink" title="指令跳转：原来if…else就是goto"></a>指令跳转：原来if…else就是goto</h1><p>用到 if…else 这样的条件判断语句、while 和 for 这样的循环语句，还有函数<span id="more"></span>或者过程调用。对应的，CPU 执行也不只是一条指令，一般一个程序包含很多条指令，因为有 if…else、for 这样的条件和循环存在，这些指令也不会一路平铺直叙地执行下去。</p>
+<h2 id="CPU-是如何执行指令的？"><a href="#CPU-是如何执行指令的？" class="headerlink" title="CPU 是如何执行指令的？"></a>CPU 是如何执行指令的？</h2><p>对于做软件开发来说，写好的代码变成指令之后，是一条一条顺序执行的。<br>先不管几百亿的晶体管的背后是怎么通过电路运转起来的，逻辑上，我们可以认为，CPU 其实就是由一堆寄存器组成的。而寄存器就是CPU 内部，由多个触发器（Flip-Flop）或者锁存器（Latches）组成的简单电路。</p>
+<p>N 个触发器或者锁存器，就可以组成一个 N 位（Bit）的寄存器，能够保存 N 位的数据。比方说，用的64位 Intel服务器，寄存器就是64位的。</p>
+<img src="/img/computer_img/CPU寄存器.webp" alt="CPU寄存器" style="zoom:25%;" />
+
+<p>一个CPU 里会有多种不同功能的寄存器，主要介绍以下三种较为特殊的：</p>
+<ol>
+<li><p>PC寄存器，也称为指令地址寄存器（Instruction Address Register）。是用来存放下一条需要执行的计算机指令的内存地址。</p>
+</li>
+<li><p>指令寄存器，用来存放当前正在执行的指令。</p>
+</li>
+<li><p>条件寄存器，用里面的一个一个标记位（Flag）,存放CPU进行算数或者逻辑计算的结果。</p>
+</li>
+</ol>
+<ul>
+<li>除了这些特殊的寄存器，CPU 里还有更多用来存储数据和内存地址的寄存器。这样的寄存器通常一类里面不止一个。通常根据存放的数据内存来给他们取名，比如整数寄存器、浮点寄存器、向量寄存器和地址寄存器等。有些既可以存数据，也能存地址的就称之为通用寄存器。</li>
+</ul>
+<img src="/img/computer_img/常见寄存器.webp" alt="常见寄存器" style="zoom:33%;" />
+
+<p>实际上，一个程序执行的时候，CPU 会根据PC寄存器里的地址，从内存里把需要执行的指令读取到指令寄存器里执行，然后根据指令长度递增，开始顺序读取下一条指令。可以看到，一个程序的一条条指令，在内存里是连续保存的，也是一条条顺序加载的。</p>
+<p>而一些特殊指令，比如 J指令，会修改PC寄存器里的地址值。这样，下一条要执行的指令就不是从内存里顺序加载的了。事实上，这些跳转指令的存在，也是我们在写程序的时候，使用 if…else 条件语句和 while&#x2F;for 循环语句的原因。</p>
+<h2 id="从-if…else-来看程序的执行和跳转"><a href="#从-if…else-来看程序的执行和跳转" class="headerlink" title="从 if…else 来看程序的执行和跳转"></a>从 if…else 来看程序的执行和跳转</h2><p>现在就来看一个包含 if…else 的简单程序。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">// test.c</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">#include &lt;time.h&gt;</span><br><span class="line">#include &lt;stdlib.h&gt;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">int main()</span><br><span class="line">&#123;</span><br><span class="line">  srand(time(NULL));</span><br><span class="line">  int r = rand() % 2;</span><br><span class="line">  int a = 10;</span><br><span class="line">  if (r == 0)</span><br><span class="line">  &#123;</span><br><span class="line">    a = 1;</span><br><span class="line">  &#125; else &#123;</span><br><span class="line">    a = 2;</span><br><span class="line">  &#125; </span><br></pre></td></tr></table></figure>
+
+<p>我们用 rand 生成了一个随机数 r，r 要么是 0，要么是 1。当 r 是 0 的时候，我们把之前定义的变量 a 设成 1，不然就设成 2。使用 gcc 和 objdump 把这个程序编译成汇编代码。只关注于这里的 if…else 条件判断语句。对应的汇编代码是这样的：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">  if (r == 0)</span><br><span class="line">3b:   83 7d fc 00             cmp    DWORD PTR [rbp-0x4],0x0</span><br><span class="line">3f:   75 09                   jne    4a &lt;main+0x4a&gt;</span><br><span class="line">  &#123;</span><br><span class="line">      a = 1;</span><br><span class="line">41:   c7 45 f8 01 00 00 00    mov    DWORD PTR [rbp-0x8],0x1</span><br><span class="line">48:   eb 07                   jmp    51 &lt;main+0x51&gt;</span><br><span class="line">  &#125;</span><br><span class="line">  else</span><br><span class="line">  &#123;</span><br><span class="line">      a = 2;</span><br><span class="line">4a:   c7 45 f8 02 00 00 00    mov    DWORD PTR [rbp-0x8],0x2</span><br><span class="line">51:   b8 00 00 00 00          mov    eax,0x0</span><br><span class="line">  &#125; </span><br></pre></td></tr></table></figure>
+
+<p>可以看到，这里对于 r &#x3D;&#x3D; 0 的条件判断，被编译成了 cmp 和 jne 这两条指令。cmp 指令比较了前后两个操作数的值，这里的 DWORD PTR 代表操作的数据类型是 32 位的整数，而[rbp-0x4]则是变量 r 的内存地址。第一个操作数就是从内存里拿到的变量 r 的值。第二个操作数 0x0 就是我们设定的常量 0 的 16 进制表示。cmp 指令的比较结果，会存入到条件码寄存器当中去。</p>
+<p>在这里，如果比较的结果是 True，也就是 r &#x3D;&#x3D; 0，就把<strong>零标志条件码</strong>（对应的条件码是 ZF，Zero Flag）设置为 <strong>1</strong>。除了零标志之外，Intel 的 CPU 下还有进位标志（CF，Carry Flag）、符号标志（SF，Sign Flag）以及溢出标志（OF，Overflow Flag），用在不同的判断条件下。</p>
+<p>cop 指令执行完成之后，PC寄存器会自动增加，开始执行下一条 jne指令。</p>
+<p>跟着的 jne 指令，是 <strong>jump if not equal</strong> 的意思，它会查看对应的零标志位。如果 ZF 为 1，说明上面的比较结果是 TRUE，如果是 ZF 是 0，也就是上面的比较结果是 False，会跳转到后面跟着的操作数 4a 的位置。<strong>这个 4a，对应这里汇编代码的行号，</strong>也就是上面设置的 else 条件里的第一条指令。<strong>当跳转发生的时候，PC 寄存器就不再是自增变成下一条指令的地址，而是被直接设置成这里的 4a 这个地址。</strong> CPU 再把 4a 地址里的指令加载到指令寄存器中来执行。</p>
+<p>到执行地址为 4a 的指令，实际是一条 mov 指令，第一个操作数和前面的 cmp 指令一样，是另一个 32 位整型的内存地址，以及 2 的对应的 16 进制值 0x2。mov 指令把 2 设置到对应的内存里去，相当于一个<strong>赋值操作</strong>。然后，PC 寄存器里的值继续自增，执行下一条 mov 指令。</p>
+<p>这条 mov 指令的第一个操作数 eax，代表累加寄存器，第二个操作数 0x0 则是 16 进制的 0 的表示。这条指令其实没有实际的作用，它的作用是一个<strong>占位符</strong>。前面的 if 条件，如果满足的话，在赋值的 mov 指令执行完成之后，有一个 jmp 的无条件跳转指令。跳转的地址就是这一行的地址 51。我们的main 函数没有设定返回值，而move  eax,0x0 其实就是给函数生成了一个默认的为0 的返回值的累加器里面。if 条件里面的内容执行完成之后也会跳转到这里，和 else 里的内容结束之后的位置是一样的。<br><img src="/img/computer_img/ifelse.webp" alt="ifelse" style="zoom:33%;" /></p>
+<h2 id="如何通过-if…else-和-goto-来实现循环？"><a href="#如何通过-if…else-和-goto-来实现循环？" class="headerlink" title="如何通过 if…else 和 goto 来实现循环？"></a>如何通过 if…else 和 goto 来实现循环？</h2><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">int main()</span><br><span class="line">&#123;</span><br><span class="line">    int a = 0;</span><br><span class="line">    for (int i = 0; i &lt; 3; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        a += i;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>从上面这一段简单的利用 for 循环的程序。我们循环自增变量 i 三次，三次之后，i&gt;&#x3D;3，就会跳出循环。整个程序，对应的 Intel 汇编代码就是这样的：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">for (int i = 0; i &lt;= 2; i++)</span><br><span class="line"> b:   c7 45 f8 00 00 00 00    mov    DWORD PTR [rbp-0x4],0x0</span><br><span class="line">12:   eb 0a                   jmp    1e </span><br><span class="line">  &#123;</span><br><span class="line">      a += i;</span><br><span class="line">14:   8b 45 f8                mov    eax,DWORD PTR [rbp-0x4]</span><br><span class="line">17:   01 45 fc                add    DWORD PTR [rbp-0x8],eax</span><br><span class="line"></span><br><span class="line">1a:   83 45 f8 01             add    DWORD PTR [rbp-0x4],0x1</span><br><span class="line">1e:   83 7d f8 02             cmp    DWORD PTR [rbp-0x4],0x2</span><br><span class="line">22:   7e f0                   jle    14 </span><br><span class="line">24:   b8 00 00 00 00          mov    eax,0x0</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+
+<p>可以看到，对应的循环也是用 1e 这个地址上的 cmp 比较指令，和紧接着的 jle条件跳转指令来实现的。主要的差别在于，这里的 jle 跳转的地址，在这条指令之前的地址 14。往前跳转使得条件满足的时候，PC寄存器会把指令地址设置到之前执行过的指令位置，重新执行之前执行过的指令，直到条件不满足，顺序往下执行jle之后的指令，整个循环才结束。</p>
+<img src="/img/computer_img/循环.webp" alt="循环" style="zoom:33%;" />
+
+<p>其实，jle 和 jmp 指令，有点像程序语言里面的 goto 命令，直接指定了一个特定条件下的跳转位置。虽然我们在用高级语言开发程序的时候反对使用 goto，但是实际在机器指令层面，无论是 if…else…也好，还是 for&#x2F;while 也好，都是用和 goto 相同的跳转到特定指令位置的方式来实现的。</p>
+<h2 id="总结延伸："><a href="#总结延伸：" class="headerlink" title="总结延伸："></a>总结延伸：</h2><p>程序里的多条指令，除了通过PC寄存器自增的方式顺序执行外，条件寄存器会记录下当前执行指令的条件判断状态，然后通过跳转指令读取对应的条件码，修改PC寄存器内的下一条指令的地址，最终实现if…else 以及 for&#x2F;while 这样的程序控制流程。</p>
+<p><em>想要在硬件层面实现这个 goto 语句，除了本身需要用来保存下一条指令地址，以及当前正要执行指令的 PC 寄存器、指令寄存器外，我们只需要再增加一个条件码寄存器，来保留条件判断的状态。这样简简单单的三个寄存器，就可以实现条件判断和循环重复执行代码的功能。</em></p>
+]]></content>
+      <categories>
+        <category>计算机组成原理</category>
+      </categories>
+      <tags>
+        <tag>指令跳转</tag>
+        <tag>寄存器</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>ELF和静态链接</title>
     <url>/posts/b778160a/</url>
     <content><![CDATA[<h1 id="ELF和静态链接：为什么程序无法同时在Linux和Windows下运行？"><a href="#ELF和静态链接：为什么程序无法同时在Linux和Windows下运行？" class="headerlink" title="ELF和静态链接：为什么程序无法同时在Linux和Windows下运行？"></a>ELF和静态链接：为什么程序无法同时在Linux和Windows下运行？</h1><h2 id="编译、链接和装载：-拆解程序执行"><a href="#编译、链接和装载：-拆解程序执行" class="headerlink" title="编译、链接和装载： 拆解程序执行"></a>编译、链接和装载： 拆解程序执行</h2><p>之前，我们通过 gcc 生成的文件和 objdump 获取到的汇编指令都有些小小的问题，以add 函数示例，<span id="more"></span>拆分成两个文件 add_lib.c 和 link_example.c 。</p>
@@ -390,6 +390,60 @@ SPEC 提供的 CPU 基准测试程序，就好像 CPU 届的“高考”，通�
       <tags>
         <tag>程序</tag>
         <tag>链接</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>程序装载</title>
+    <url>/posts/f17b55f/</url>
+    <content><![CDATA[<h1 id="程序装载：“640K内存”真的不够用么？"><a href="#程序装载：“640K内存”真的不够用么？" class="headerlink" title="程序装载：“640K内存”真的不够用么？"></a>程序装载：“640K内存”真的不够用么？</h1><h2 id="程序装载面临的挑战"><a href="#程序装载面临的挑战" class="headerlink" title="程序装载面临的挑战"></a>程序装载面临的挑战</h2><p>通过链接器，把多个文件合并为一个最终可执行文件。在执行这些可执行文件的时候，就是通过一个装载器，解析ELF 或 PE 格式的可执行文件<span id="more"></span>。装载器把对应的指令和数据加到内存中，让CPU  去执行。</p>
+<ul>
+<li>所以装载器实际上要满足两个要求</li>
+</ul>
+<blockquote>
+<p>一、可执行程序加载后占用的内存空间应该是连续的，在执行指令的时候，程序计数器是顺序的一条一条指令执行下去，这也意味着，这些指令需要连续的存储在一起。</p>
+<p>二、我们需要同时加载多个程序，并且不能让程序自己规定在内存中加载的位置。虽然编译出来的指令有了对应的各种各样的内存地址，但是实际加载的时候，是没有办法确保，这个程序一定加载在那一段内存地址上。因为我们现在的计算机通常会同时运行很多个程序，可能你想要的内存地址已经被其他加载了的程序占用了。</p>
+</blockquote>
+<p>要满足这两个基本的要求，一个办法就是我们可以在内存里面，找到一段连续的内存空间，然后分配给装载的程序，然后把这段连续的内存空间地址，和整个程序指令里指定的内存地址做一个映射。</p>
+<p>把指令里用到的内存地址叫作<strong>虚拟内存地址（Virtual Memory Address）</strong>，实际在内存硬件里面的空间地址，我们叫<strong>物理内存地址（Physical Memory Address）。</strong></p>
+<p>程序里有指令和各种内存地址，我们只需要关心虚拟内存地址就行了。对于任何一个程序来说，看到的都是同样的内存地址。<strong>我们维护一个虚拟内存到物理内存的映射表，</strong>这样实际程序指令执行的时候，会通过虚拟内存地址，找到对应的物理内存地址，然后执行。</p>
+<p>因为是连续的内存地址空间，所以我们只需要维护映射关系的起始地址和对应的空间大小。</p>
+<h2 id="内存分段"><a href="#内存分段" class="headerlink" title="内存分段"></a>内存分段</h2><p>这种找出一段连续的物理内存和虚拟内存地址进行映射的方法，我们叫<strong>分段（Segmentation） 。</strong>这里的段，指的是系统分配出来的那个连续的内存空间。</p>
+<img src="/img/computer_img/内存分段.webp" alt="内存分段" style="zoom: 50%;" />
+
+<p>分段存在一个问题 就是内存碎片。</p>
+<p>我们来看这样一个例子。我现在手头的这台电脑，有 1GB 的内存。我们先启动一个图形渲染程序，占用了 512MB 的内存，接着启动一个 Chrome 浏览器，占用了 128MB 内存，再启动一个 Python 程序，占用了 256MB 内存。这个时候，我们关掉 Chrome，于是空闲内存还有 1024 - 512 - 256 &#x3D; 256MB。按理来说，我们有足够的空间再去装载一个 200MB 的程序。但是，这 256MB 的内存空间不是连续的，而是被分成了两段 128MB 的内存。因此，实际情况是，我们的程序没办法加载进来。</p>
+<img src="/img/computer_img/内部碎片.webp" alt="内部碎片" style="zoom:50%;" />
+
+<p>这个也有办法解决。解决的办法叫<strong>内存交换（Memory Swapping）。</strong></p>
+<p>(Memory swapping )可以将Python 程序占用的那256MB 的内存写到硬盘上，然后再从硬盘读回到内存里。读回来的时候，它被加载到那个占用了的512MB内存的后面。这样，我们就有了连续的 256MB 内存空间，就可以去加载一个新的 200MB 的程序。</p>
+<ul>
+<li>虚拟内存、分段再加上内存交换，看似解决了计算机同时装载多个程序的问题，但是会遇到性能瓶颈。硬盘访问速度比内存要慢的多，每一次内存交换都需要把一大段的连续内存数据写到磁盘上，所以交换非常占内存空间，会引起卡顿。</li>
+</ul>
+<h2 id="内存分页"><a href="#内存分页" class="headerlink" title="内存分页"></a>内存分页</h2><p>为了少出现一些内存碎片，另外，当需要进行内存交换的时候，让需要交换写入或者从磁盘装载的数据更少一点，在现在计算机的内存管理里面，就叫作内存分页（Paging）。</p>
+<p>和分段这样分配一整段连续的空间给到程序相比，分页是把整个物理内存空间切成一段段固定尺寸的大小(4kB)。而对应程序所需要占用的虚拟内存空间，也同样切成一段段固定尺寸的大小。这样一个连续并且尺寸固定的内存空间，我们叫<strong>页（Page）。</strong>从虚拟内存到物理内存的映射，不再是拿整段连续的内存的物理地址，而是按照一个一个页来的。<em>页的尺寸一般远远小于整个程序的大小</em></p>
+<p><strong>由于内存空间都是预先划分好的</strong>，也就没有了不能使用的碎片，而只有被释放出来的很多 4KB 的页。即使内存空间不够，需要让现有的、正在运行的其他程序，通过内存交换释放出一些内存的页出来，一次写入磁盘的也只有少数的一个页或者几个页，不会花太多时间，让整个机器被内存交换过程给卡住。</p>
+<img src="/img/computer_img/内存分页.webp" alt="内存分页" style="zoom: 33%;" />
+
+<p>更进一步地，分页的方式使得我们在加载程序的时候，不再需要一次性都把程序加载到物理内存中。而是只在程序运行中，需要用到对应虚拟内存页里的指令和数据是，再加载到物理内存里面去。</p>
+<p>当要读取特定的页，却发现数据并没有加载到物理内存里的时候，就会触发一个来自于 CPU 的<strong>缺页错误（Page Fault）</strong>。当 OS 捕捉到这个错误时，将对应的页从存放在硬盘上的虚拟内存读取出来，加载到物理内存里。这种方式，使得我们可以运行那些远大于我们实际物理内存的程序（只需要加载到当前需要用到的就行）</p>
+<ul>
+<li>通过虚拟内存、内存交换和内存分页这三个技术的组合，我们得到了一个让程序不需要考虑实际的物理内存地址、大小和当前分配空间的解决方案。（这些技术和方法，对于我们程序的编写、编译和链接过程都是透明的。这也是我们在计算机的软硬件开发中常用的一种方法，就是加入一个间接层。）</li>
+<li>任何一个程序，都只需要把内存当成是一块完整而连续的空间来直接使用。</li>
+</ul>
+<h2 id="总结延伸"><a href="#总结延伸" class="headerlink" title="总结延伸"></a>总结延伸</h2><p>实要运行一个程序，“必需”的内存是很少的。CPU 只需要执行当前的指令，极限情况下，内存也只需要加载一页就好了。再大的程序，也可以分成一页。每次，只在需要用到对应的数据和指令的时候，从硬盘上交换到内存里面来就好了。以我们现在 4K 内存一页的大小，640K 内存也能放下足足 160 页呢，也无怪乎在比尔·盖茨会说出“640K ought to be enough for anyone”这样的话。</p>
+<p>不过呢，硬盘的访问速度比内存慢很多，所以我们现在的计算机，没有个几 G 的内存都不好意思和人打招呼。</p>
+<p>除了程序分页装载这种方式之外，我们还有其他优化内存使用的方式么？其实“动态装载”也是可以优化内存使用。</p>
+<h2 id="思考："><a href="#思考：" class="headerlink" title="思考："></a>思考：</h2><p>在 Java 这样使用虚拟机的编程语言里面，我们写的程序是怎么装载到内存里面来的呢？它也和我们讲的一样，是通过内存分页和内存交换的方式加载到内存里面来的么？</p>
+<p>一、首先，我们编写的Java程序，即源代码<code>.java</code>文件经过编译生成字节码文件<code>.class</code>；</p>
+<p>然后，创建JVM环境，即查找和装载<code>libjvm.so</code>文件；</p>
+<p>最后，通过创建JVM实例，加载主类的字节码文件到系统给该JVM实例分配的内存中；</p>
+<p>二、ava代码的执行需要JVM环境，JVM环境的创建就是查找和装载<code>libjvm.so</code>文件：装载<code>libjvm.so</code>是通过内存分页和内存交换的方式加载到内存的。<br>字节码文件是通过类加载器加载到主类文件对应的JVM实例的内存空间中的，这一部分不是使用内存分页和内存交换的方式来管理的，使用的是JVM的内存分配策略来管理的；</p>
+]]></content>
+      <categories>
+        <category>计算机组成原理</category>
+      </categories>
+      <tags>
+        <tag>虚拟内存</tag>
       </tags>
   </entry>
   <entry>
@@ -464,57 +518,70 @@ SPEC 提供的 CPU 基准测试程序，就好像 CPU 届的“高考”，通�
       </tags>
   </entry>
   <entry>
-    <title>程序装载</title>
-    <url>/posts/f17b55f/</url>
-    <content><![CDATA[<h1 id="程序装载：“640K内存”真的不够用么？"><a href="#程序装载：“640K内存”真的不够用么？" class="headerlink" title="程序装载：“640K内存”真的不够用么？"></a>程序装载：“640K内存”真的不够用么？</h1><h2 id="程序装载面临的挑战"><a href="#程序装载面临的挑战" class="headerlink" title="程序装载面临的挑战"></a>程序装载面临的挑战</h2><p>通过链接器，把多个文件合并为一个最终可执行文件。在执行这些可执行文件的时候，就是通过一个装载器，解析ELF 或 PE 格式的可执行文件<span id="more"></span>。装载器把对应的指令和数据加到内存中，让CPU  去执行。</p>
-<ul>
-<li>所以装载器实际上要满足两个要求</li>
-</ul>
-<blockquote>
-<p>一、可执行程序加载后占用的内存空间应该是连续的，在执行指令的时候，程序计数器是顺序的一条一条指令执行下去，这也意味着，这些指令需要连续的存储在一起。</p>
-<p>二、我们需要同时加载多个程序，并且不能让程序自己规定在内存中加载的位置。虽然编译出来的指令有了对应的各种各样的内存地址，但是实际加载的时候，是没有办法确保，这个程序一定加载在那一段内存地址上。因为我们现在的计算机通常会同时运行很多个程序，可能你想要的内存地址已经被其他加载了的程序占用了。</p>
-</blockquote>
-<p>要满足这两个基本的要求，一个办法就是我们可以在内存里面，找到一段连续的内存空间，然后分配给装载的程序，然后把这段连续的内存空间地址，和整个程序指令里指定的内存地址做一个映射。</p>
-<p>把指令里用到的内存地址叫作<strong>虚拟内存地址（Virtual Memory Address）</strong>，实际在内存硬件里面的空间地址，我们叫<strong>物理内存地址（Physical Memory Address）。</strong></p>
-<p>程序里有指令和各种内存地址，我们只需要关心虚拟内存地址就行了。对于任何一个程序来说，看到的都是同样的内存地址。<strong>我们维护一个虚拟内存到物理内存的映射表，</strong>这样实际程序指令执行的时候，会通过虚拟内存地址，找到对应的物理内存地址，然后执行。</p>
-<p>因为是连续的内存地址空间，所以我们只需要维护映射关系的起始地址和对应的空间大小。</p>
-<h2 id="内存分段"><a href="#内存分段" class="headerlink" title="内存分段"></a>内存分段</h2><p>这种找出一段连续的物理内存和虚拟内存地址进行映射的方法，我们叫<strong>分段（Segmentation） 。</strong>这里的段，指的是系统分配出来的那个连续的内存空间。</p>
-<img src="/img/computer_img/内存分段.webp" alt="内存分段" style="zoom: 50%;" />
+    <title>存储器层次结构</title>
+    <url>/posts/8e9c1609/</url>
+    <content><![CDATA[<h1 id="存储器层次结构全景：数据存储的大金字塔长什么样？"><a href="#存储器层次结构全景：数据存储的大金字塔长什么样？" class="headerlink" title="存储器层次结构全景：数据存储的大金字塔长什么样？"></a>存储器层次结构全景：数据存储的大金字塔长什么样？</h1><h2 id="存储器的层次结构"><a href="#存储器的层次结构" class="headerlink" title="存储器的层次结构"></a>存储器的层次结构</h2><p>在有计算机之前，我们通常把信息和数据存储在书、文件这样的物理介质里面<span id="more"></span>。有了计算机之后，我们通常把数据存储在计算机的存储器里面。而存储器系统是一个通过各种不同的方法和设备，一层一层组合起来的系统。</p>
+<p>我们常常把 CPU 比喻成计算机的“大脑”。我们思考的东西，就好比 CPU 中的寄存器（Register）。 寄存器更像是 CPU 本身的一部分，只能存放极其有限的信息，但是速度非常快，和 CPU 同步。</p>
+<p>而我们大脑中的记忆，就好比 CPU Cache（CPU 高速缓存，我们常常简称为“缓存”）。CPU Cache 用的是一种叫作  <strong>SRAM</strong>（Static Random-Access Memory，<strong>静态随机存取存储器</strong>）的芯片。</p>
+<h2 id="SRAM"><a href="#SRAM" class="headerlink" title="SRAM"></a>SRAM</h2><p>SRAM 之所以被称为“静态”存储器，是因为只要处在通电状态，里面的数据就可以保持存在。而一旦断电，里面的数据就会丢失了。在 SRAM 里面，一个比特的数据，需要 6～8 个晶体管。所以 SRAM 的存储密度不高。同样的物理空间下，能够存储的数据有限。不过，因为 SRAM 的电路简单，所以访问速度非常快。</p>
+<img src="/img/computer_img/6个晶体管组成的SRAM 一个比特.webp" alt="6个晶体管组成的SRAM 一个比特" style="zoom:50%;" />
 
-<p>分段存在一个问题 就是内存碎片。</p>
-<p>我们来看这样一个例子。我现在手头的这台电脑，有 1GB 的内存。我们先启动一个图形渲染程序，占用了 512MB 的内存，接着启动一个 Chrome 浏览器，占用了 128MB 内存，再启动一个 Python 程序，占用了 256MB 内存。这个时候，我们关掉 Chrome，于是空闲内存还有 1024 - 512 - 256 &#x3D; 256MB。按理来说，我们有足够的空间再去装载一个 200MB 的程序。但是，这 256MB 的内存空间不是连续的，而是被分成了两段 128MB 的内存。因此，实际情况是，我们的程序没办法加载进来。</p>
-<img src="/img/computer_img/内部碎片.webp" alt="内部碎片" style="zoom:50%;" />
+<center>6 个晶体管组成 SRAM 的一个比特</center>
 
-<p>这个也有办法解决。解决的办法叫<strong>内存交换（Memory Swapping）。</strong></p>
-<p>(Memory swapping )可以将Python 程序占用的那256MB 的内存写到硬盘上，然后再从硬盘读回到内存里。读回来的时候，它被加载到那个占用了的512MB内存的后面。这样，我们就有了连续的 256MB 内存空间，就可以去加载一个新的 200MB 的程序。</p>
-<ul>
-<li>虚拟内存、分段再加上内存交换，看似解决了计算机同时装载多个程序的问题，但是会遇到性能瓶颈。硬盘访问速度比内存要慢的多，每一次内存交换都需要把一大段的连续内存数据写到磁盘上，所以交换非常占内存空间，会引起卡顿。</li>
-</ul>
-<h2 id="内存分页"><a href="#内存分页" class="headerlink" title="内存分页"></a>内存分页</h2><p>为了少出现一些内存碎片，另外，当需要进行内存交换的时候，让需要交换写入或者从磁盘装载的数据更少一点，在现在计算机的内存管理里面，就叫作内存分页（Paging）。</p>
-<p>和分段这样分配一整段连续的空间给到程序相比，分页是把整个物理内存空间切成一段段固定尺寸的大小(4kB)。而对应程序所需要占用的虚拟内存空间，也同样切成一段段固定尺寸的大小。这样一个连续并且尺寸固定的内存空间，我们叫<strong>页（Page）。</strong>从虚拟内存到物理内存的映射，不再是拿整段连续的内存的物理地址，而是按照一个一个页来的。<em>页的尺寸一般远远小于整个程序的大小</em></p>
-<p><strong>由于内存空间都是预先划分好的</strong>，也就没有了不能使用的碎片，而只有被释放出来的很多 4KB 的页。即使内存空间不够，需要让现有的、正在运行的其他程序，通过内存交换释放出一些内存的页出来，一次写入磁盘的也只有少数的一个页或者几个页，不会花太多时间，让整个机器被内存交换过程给卡住。</p>
-<img src="/img/computer_img/内存分页.webp" alt="内存分页" style="zoom: 33%;" />
 
-<p>更进一步地，分页的方式使得我们在加载程序的时候，不再需要一次性都把程序加载到物理内存中。而是只在程序运行中，需要用到对应虚拟内存页里的指令和数据是，再加载到物理内存里面去。</p>
-<p>当要读取特定的页，却发现数据并没有加载到物理内存里的时候，就会触发一个来自于 CPU 的<strong>缺页错误（Page Fault）</strong>。当 OS 捕捉到这个错误时，将对应的页从存放在硬盘上的虚拟内存读取出来，加载到物理内存里。这种方式，使得我们可以运行那些远大于我们实际物理内存的程序（只需要加载到当前需要用到的就行）</p>
+
+<p>在 CPU 里，通常会有 L1、L2、L3 这样三层高速缓存。每个 CPU 核心都有一块属于自己的 L1 高速缓存，通常分成指令缓存和数据缓存，分开存放 CPU 使用的指令和数据。L1 的 Cache 往往就嵌在 CPU 核心的内部。</p>
+<p><strong>L2</strong> 的 Cache 同样是每个 CPU 核心都有的，不过它往往不在 CPU 核心的内部。所以，L2 Cache 的访问速度会比 L1 稍微慢一些。而 <strong>L3 Cache，</strong>则通常是多个 CPU 核心共用的，尺寸会更大一些，访问速度自然也就更慢一些。</p>
+<p>你可以把 CPU 中的 L1 Cache 理解为我们的短期记忆，把 L2&#x2F;L3 Cache 理解成长期记忆，把内存当成我们拥有的书架或者书桌。 当我们自己记忆中没有资料的时候，可以从书桌或者书架上拿书来翻阅。<em><strong>这个过程中就相当于，数据从内存中加载到 CPU 的寄存器和 Cache 中，然后通过“大脑”，也就是 CPU，进行处理和运算。</strong></em></p>
+<h2 id="DRAM"><a href="#DRAM" class="headerlink" title="DRAM"></a>DRAM</h2><p>内存用的芯片和 Cache 有所不同，它用的是一种叫作 DRAM（Dynamic Random Access Memory，动态随机存取存储器）的芯片，比起 SRAM 来说，它的密度更高，有更大的容量，而且它也比 SRAM 芯片便宜不少。</p>
+<p>DRAM 被称为“动态”存储器，是因为 DRAM 需要靠不断地“刷新”，才能保持数据被存储起来。DRAM 的一个比特，只需要<em><strong>一个晶体管和一个电容</strong></em>就能存储。所以，DRAM 在同样的物理空间下，能够存储的数据也就更多，也就是存储的“密度”更大。但是，因为数据是存储在电容里的，电容会不断漏电，所以需要定时刷新充电，才能保持数据不丢失。DRAM 的数据访问电路和刷新电路都比 SRAM 更复杂，所以访问延时也就更长。</p>
+<img src="/img/computer_img/L1L2L3.webp" alt="L1L2L3" style="zoom:50%;" />
+
+
+
+<h2 id="存储器的层级结构"><a href="#存储器的层级结构" class="headerlink" title="存储器的层级结构"></a>存储器的层级结构</h2><p>整个存储器的层次结构，其实都类似于 SRAM 和 DRAM 在性能和价格上的差异。SRAM 更贵，速度更快。DRAM 更便宜，容量更大。SRAM 好像我们的大脑中的记忆，而 DRAM 就好像属于我们自己的书桌。</p>
+<p>大脑（CPU）中的记忆（L1 Cache），不仅受成本层面的限制，更受物理层面的限制。这就好比 L1 Cache 不仅昂贵，其访问速度和它到 CPU 的物理距离有关。芯片造得越大，总有部分离 CPU 的距离会变远。电信号的传输速度又受物理原理的限制，没法超过光速。所以想要快，并不是靠多花钱就能解决的。</p>
+<p>我们自己的书房和书桌（也就是内存）空间一般是有限的，没有办法放下所有书（也就是数据）。如果想要扩大空间的话，就相当于要多买几平方米的房子，成本就会很高。于是，想要放下更多的书，我们就要寻找更加廉价的解决方案。</p>
+<hr>
+<p>没错，我们想到了公共图书馆。对于内存来说，SSD（Solid-state drive 或 Solid-state disk，固态硬盘）、HDD（Hard Disk Drive，硬盘）这些被称为硬盘的外部存储设备，就是公共图书馆。于是，我们就可以去家附近的图书馆借书了。图书馆有更多的空间（存储空间）和更多的书（数据）。</p>
+<p>SSD 这种基于 NAND 芯片的高速硬盘，价格已经大幅度下降。而 HDD 硬盘则是一种完全符合“磁盘”这个名字的传统硬件。“磁盘”的硬件结构，决定了它的访问速度受限于它的物理结构，是最慢的。</p>
+<img src="/img/computer_img/存储器层次结构.webp" alt="存储器层次结构" style="zoom:50%;" />
+
+<center> 存储器层次结构 </center>
+
+<p>从 Cache、内存，到 SSD 和 HDD 硬盘，一台现代计算机中，就用上了所有这些存储器设备。其中，容量越小的设备速度越快，而且，CPU 并不是直接和每一种存储器设备打交道，而是每一种存储器设备，只和他相邻的存储器设备打交道。</p>
+<p>比如，CPU Cache 是从内存里加载而来的，或者需要写回内存，并不会直接写回数据到硬盘，也不会直接从硬盘加载数据到 CPU Cache 中，而是先加载到内存，再从内存加载到 Cache 中。</p>
+<p><strong>这样，各个存储器只和相邻的一层存储器打交道，并且随着一层层向下，存储器的容量逐层增大，访问速度逐层变慢，而单位存储成本也逐层下降，也就构成了我们日常所说的存储器层次结构。</strong></p>
+<h3 id="使用存储器的时候，该如何权衡价格和性能？"><a href="#使用存储器的时候，该如何权衡价格和性能？" class="headerlink" title="使用存储器的时候，该如何权衡价格和性能？"></a>使用存储器的时候，该如何权衡价格和性能？</h3><p>存储器在不同层级之间的性能差异和价格差异，都至少在一个数量级以上。L1 Cache 的访问延时是 1 纳秒（ns），而内存就已经是 100 纳秒了。在价格上，这两者也差出了 400 倍。</p>
+<p>因为这个价格和性能的差异，你会看到，我们实际在进行电脑硬件配置的时候，会去组合配置各种存储设备。</p>
+<p>我们可以找一台现在主流的笔记本电脑来看看，比如，一款入门级的惠普战 66 的笔记本电脑。今天在京东上的价格是 4999 人民币。它的配置是下面这样的。</p>
+<ol>
+<li>Intle i5-8265U 的 CPU（这是一块 4 核的 CPU）</li>
+</ol>
 <ul>
-<li>通过虚拟内存、内存交换和内存分页这三个技术的组合，我们得到了一个让程序不需要考虑实际的物理内存地址、大小和当前分配空间的解决方案。（这些技术和方法，对于我们程序的编写、编译和链接过程都是透明的。这也是我们在计算机的软硬件开发中常用的一种方法，就是加入一个间接层。）</li>
-<li>任何一个程序，都只需要把内存当成是一块完整而连续的空间来直接使用。</li>
+<li>这块 CPU 每个核有 32KB，一共 128KB 的 L1 指令 Cache。</li>
+<li>同样，每个核还有 32KB，一共 128KB 的 L1 数据 Cache，指令 Cache 和数据 Cache 都是采用 8 路组相连的放置策略。</li>
+<li>每个核有 256KB，一共 1MB 的 L2 Cache。L2 Cache 是用 4 路组相连的放置策略。</li>
+<li>最后还有一块多个核心共用的 12MB 的 L3 Cache，采用的是 12 路组相连的放置策略。</li>
 </ul>
-<h2 id="总结延伸"><a href="#总结延伸" class="headerlink" title="总结延伸"></a>总结延伸</h2><p>实要运行一个程序，“必需”的内存是很少的。CPU 只需要执行当前的指令，极限情况下，内存也只需要加载一页就好了。再大的程序，也可以分成一页。每次，只在需要用到对应的数据和指令的时候，从硬盘上交换到内存里面来就好了。以我们现在 4K 内存一页的大小，640K 内存也能放下足足 160 页呢，也无怪乎在比尔·盖茨会说出“640K ought to be enough for anyone”这样的话。</p>
-<p>不过呢，硬盘的访问速度比内存慢很多，所以我们现在的计算机，没有个几 G 的内存都不好意思和人打招呼。</p>
-<p>除了程序分页装载这种方式之外，我们还有其他优化内存使用的方式么？其实“动态装载”也是可以优化内存使用。</p>
-<h2 id="思考："><a href="#思考：" class="headerlink" title="思考："></a>思考：</h2><p>在 Java 这样使用虚拟机的编程语言里面，我们写的程序是怎么装载到内存里面来的呢？它也和我们讲的一样，是通过内存分页和内存交换的方式加载到内存里面来的么？</p>
-<p>一、首先，我们编写的Java程序，即源代码<code>.java</code>文件经过编译生成字节码文件<code>.class</code>；</p>
-<p>然后，创建JVM环境，即查找和装载<code>libjvm.so</code>文件；</p>
-<p>最后，通过创建JVM实例，加载主类的字节码文件到系统给该JVM实例分配的内存中；</p>
-<p>二、ava代码的执行需要JVM环境，JVM环境的创建就是查找和装载<code>libjvm.so</code>文件：装载<code>libjvm.so</code>是通过内存分页和内存交换的方式加载到内存的。<br>字节码文件是通过类加载器加载到主类文件对应的JVM实例的内存空间中的，这一部分不是使用内存分页和内存交换的方式来管理的，使用的是JVM的内存分配策略来管理的；</p>
+<ol start="2">
+<li><p>8GB 的内存</p>
+</li>
+<li><p>一块 128G 的 SSD 硬盘</p>
+</li>
+<li><p>一块 1T 的 HDD 硬盘</p>
+</li>
+</ol>
+<p>你可以看到，在一台实际的计算机里面，越是速度快的设备，容量就越小。这里一共十多兆的 Cache，成本只是几十美元。而 8GB 的内存、128G 的 SSD 以及 1T 的 HDD，大概零售价格加在一起，也就和我们的高速缓存的价格差不多。</p>
+<h3 id="总结延伸"><a href="#总结延伸" class="headerlink" title="总结延伸"></a>总结延伸</h3><p>我们常常把 CPU 比喻成高速运转的大脑，那么和大脑同步的寄存器（Register），就存放着我们当下正在思考和处理的数据。<strong>而 L1-L3 的 CPU Cache，好比存放在我们大脑中的短期到长期的记忆。</strong>我们需要小小花费一点时间，就能调取并进行处理。</p>
+<p>我们自己的书桌书架就好比计算机的内存，能放下更多的书也就是数据，但是找起来和看起来就要慢上不少。而图书馆更像硬盘这个外存，能够放下更多的数据，找起来也更费时间。<strong>从寄存器、CPU Cache，到内存、硬盘，这样一层层下来的存储器，速度越来越慢，空间越来越大，价格也越来越便宜。</strong></p>
 ]]></content>
       <categories>
         <category>计算机组成原理</category>
       </categories>
       <tags>
-        <tag>虚拟内存</tag>
+        <tag>寄存器</tag>
+        <tag>cache</tag>
       </tags>
   </entry>
   <entry>
@@ -637,73 +704,6 @@ SPEC 提供的 CPU 基准测试程序，就好像 CPU 届的“高考”，通�
       <tags>
         <tag>存储器</tag>
         <tag>SSD</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>存储器层次结构</title>
-    <url>/posts/8e9c1609/</url>
-    <content><![CDATA[<h1 id="存储器层次结构全景：数据存储的大金字塔长什么样？"><a href="#存储器层次结构全景：数据存储的大金字塔长什么样？" class="headerlink" title="存储器层次结构全景：数据存储的大金字塔长什么样？"></a>存储器层次结构全景：数据存储的大金字塔长什么样？</h1><h2 id="存储器的层次结构"><a href="#存储器的层次结构" class="headerlink" title="存储器的层次结构"></a>存储器的层次结构</h2><p>在有计算机之前，我们通常把信息和数据存储在书、文件这样的物理介质里面<span id="more"></span>。有了计算机之后，我们通常把数据存储在计算机的存储器里面。而存储器系统是一个通过各种不同的方法和设备，一层一层组合起来的系统。</p>
-<p>我们常常把 CPU 比喻成计算机的“大脑”。我们思考的东西，就好比 CPU 中的寄存器（Register）。 寄存器更像是 CPU 本身的一部分，只能存放极其有限的信息，但是速度非常快，和 CPU 同步。</p>
-<p>而我们大脑中的记忆，就好比 CPU Cache（CPU 高速缓存，我们常常简称为“缓存”）。CPU Cache 用的是一种叫作  <strong>SRAM</strong>（Static Random-Access Memory，<strong>静态随机存取存储器</strong>）的芯片。</p>
-<h2 id="SRAM"><a href="#SRAM" class="headerlink" title="SRAM"></a>SRAM</h2><p>SRAM 之所以被称为“静态”存储器，是因为只要处在通电状态，里面的数据就可以保持存在。而一旦断电，里面的数据就会丢失了。在 SRAM 里面，一个比特的数据，需要 6～8 个晶体管。所以 SRAM 的存储密度不高。同样的物理空间下，能够存储的数据有限。不过，因为 SRAM 的电路简单，所以访问速度非常快。</p>
-<img src="/img/computer_img/6个晶体管组成的SRAM 一个比特.webp" alt="6个晶体管组成的SRAM 一个比特" style="zoom:50%;" />
-
-<center>6 个晶体管组成 SRAM 的一个比特</center>
-
-
-
-<p>在 CPU 里，通常会有 L1、L2、L3 这样三层高速缓存。每个 CPU 核心都有一块属于自己的 L1 高速缓存，通常分成指令缓存和数据缓存，分开存放 CPU 使用的指令和数据。L1 的 Cache 往往就嵌在 CPU 核心的内部。</p>
-<p><strong>L2</strong> 的 Cache 同样是每个 CPU 核心都有的，不过它往往不在 CPU 核心的内部。所以，L2 Cache 的访问速度会比 L1 稍微慢一些。而 <strong>L3 Cache，</strong>则通常是多个 CPU 核心共用的，尺寸会更大一些，访问速度自然也就更慢一些。</p>
-<p>你可以把 CPU 中的 L1 Cache 理解为我们的短期记忆，把 L2&#x2F;L3 Cache 理解成长期记忆，把内存当成我们拥有的书架或者书桌。 当我们自己记忆中没有资料的时候，可以从书桌或者书架上拿书来翻阅。<em><strong>这个过程中就相当于，数据从内存中加载到 CPU 的寄存器和 Cache 中，然后通过“大脑”，也就是 CPU，进行处理和运算。</strong></em></p>
-<h2 id="DRAM"><a href="#DRAM" class="headerlink" title="DRAM"></a>DRAM</h2><p>内存用的芯片和 Cache 有所不同，它用的是一种叫作 DRAM（Dynamic Random Access Memory，动态随机存取存储器）的芯片，比起 SRAM 来说，它的密度更高，有更大的容量，而且它也比 SRAM 芯片便宜不少。</p>
-<p>DRAM 被称为“动态”存储器，是因为 DRAM 需要靠不断地“刷新”，才能保持数据被存储起来。DRAM 的一个比特，只需要<em><strong>一个晶体管和一个电容</strong></em>就能存储。所以，DRAM 在同样的物理空间下，能够存储的数据也就更多，也就是存储的“密度”更大。但是，因为数据是存储在电容里的，电容会不断漏电，所以需要定时刷新充电，才能保持数据不丢失。DRAM 的数据访问电路和刷新电路都比 SRAM 更复杂，所以访问延时也就更长。</p>
-<img src="/img/computer_img/L1L2L3.webp" alt="L1L2L3" style="zoom:50%;" />
-
-
-
-<h2 id="存储器的层级结构"><a href="#存储器的层级结构" class="headerlink" title="存储器的层级结构"></a>存储器的层级结构</h2><p>整个存储器的层次结构，其实都类似于 SRAM 和 DRAM 在性能和价格上的差异。SRAM 更贵，速度更快。DRAM 更便宜，容量更大。SRAM 好像我们的大脑中的记忆，而 DRAM 就好像属于我们自己的书桌。</p>
-<p>大脑（CPU）中的记忆（L1 Cache），不仅受成本层面的限制，更受物理层面的限制。这就好比 L1 Cache 不仅昂贵，其访问速度和它到 CPU 的物理距离有关。芯片造得越大，总有部分离 CPU 的距离会变远。电信号的传输速度又受物理原理的限制，没法超过光速。所以想要快，并不是靠多花钱就能解决的。</p>
-<p>我们自己的书房和书桌（也就是内存）空间一般是有限的，没有办法放下所有书（也就是数据）。如果想要扩大空间的话，就相当于要多买几平方米的房子，成本就会很高。于是，想要放下更多的书，我们就要寻找更加廉价的解决方案。</p>
-<hr>
-<p>没错，我们想到了公共图书馆。对于内存来说，SSD（Solid-state drive 或 Solid-state disk，固态硬盘）、HDD（Hard Disk Drive，硬盘）这些被称为硬盘的外部存储设备，就是公共图书馆。于是，我们就可以去家附近的图书馆借书了。图书馆有更多的空间（存储空间）和更多的书（数据）。</p>
-<p>SSD 这种基于 NAND 芯片的高速硬盘，价格已经大幅度下降。而 HDD 硬盘则是一种完全符合“磁盘”这个名字的传统硬件。“磁盘”的硬件结构，决定了它的访问速度受限于它的物理结构，是最慢的。</p>
-<img src="/img/computer_img/存储器层次结构.webp" alt="存储器层次结构" style="zoom:50%;" />
-
-<center> 存储器层次结构 </center>
-
-<p>从 Cache、内存，到 SSD 和 HDD 硬盘，一台现代计算机中，就用上了所有这些存储器设备。其中，容量越小的设备速度越快，而且，CPU 并不是直接和每一种存储器设备打交道，而是每一种存储器设备，只和他相邻的存储器设备打交道。</p>
-<p>比如，CPU Cache 是从内存里加载而来的，或者需要写回内存，并不会直接写回数据到硬盘，也不会直接从硬盘加载数据到 CPU Cache 中，而是先加载到内存，再从内存加载到 Cache 中。</p>
-<p><strong>这样，各个存储器只和相邻的一层存储器打交道，并且随着一层层向下，存储器的容量逐层增大，访问速度逐层变慢，而单位存储成本也逐层下降，也就构成了我们日常所说的存储器层次结构。</strong></p>
-<h3 id="使用存储器的时候，该如何权衡价格和性能？"><a href="#使用存储器的时候，该如何权衡价格和性能？" class="headerlink" title="使用存储器的时候，该如何权衡价格和性能？"></a>使用存储器的时候，该如何权衡价格和性能？</h3><p>存储器在不同层级之间的性能差异和价格差异，都至少在一个数量级以上。L1 Cache 的访问延时是 1 纳秒（ns），而内存就已经是 100 纳秒了。在价格上，这两者也差出了 400 倍。</p>
-<p>因为这个价格和性能的差异，你会看到，我们实际在进行电脑硬件配置的时候，会去组合配置各种存储设备。</p>
-<p>我们可以找一台现在主流的笔记本电脑来看看，比如，一款入门级的惠普战 66 的笔记本电脑。今天在京东上的价格是 4999 人民币。它的配置是下面这样的。</p>
-<ol>
-<li>Intle i5-8265U 的 CPU（这是一块 4 核的 CPU）</li>
-</ol>
-<ul>
-<li>这块 CPU 每个核有 32KB，一共 128KB 的 L1 指令 Cache。</li>
-<li>同样，每个核还有 32KB，一共 128KB 的 L1 数据 Cache，指令 Cache 和数据 Cache 都是采用 8 路组相连的放置策略。</li>
-<li>每个核有 256KB，一共 1MB 的 L2 Cache。L2 Cache 是用 4 路组相连的放置策略。</li>
-<li>最后还有一块多个核心共用的 12MB 的 L3 Cache，采用的是 12 路组相连的放置策略。</li>
-</ul>
-<ol start="2">
-<li><p>8GB 的内存</p>
-</li>
-<li><p>一块 128G 的 SSD 硬盘</p>
-</li>
-<li><p>一块 1T 的 HDD 硬盘</p>
-</li>
-</ol>
-<p>你可以看到，在一台实际的计算机里面，越是速度快的设备，容量就越小。这里一共十多兆的 Cache，成本只是几十美元。而 8GB 的内存、128G 的 SSD 以及 1T 的 HDD，大概零售价格加在一起，也就和我们的高速缓存的价格差不多。</p>
-<h3 id="总结延伸"><a href="#总结延伸" class="headerlink" title="总结延伸"></a>总结延伸</h3><p>我们常常把 CPU 比喻成高速运转的大脑，那么和大脑同步的寄存器（Register），就存放着我们当下正在思考和处理的数据。<strong>而 L1-L3 的 CPU Cache，好比存放在我们大脑中的短期到长期的记忆。</strong>我们需要小小花费一点时间，就能调取并进行处理。</p>
-<p>我们自己的书桌书架就好比计算机的内存，能放下更多的书也就是数据，但是找起来和看起来就要慢上不少。而图书馆更像硬盘这个外存，能够放下更多的数据，找起来也更费时间。<strong>从寄存器、CPU Cache，到内存、硬盘，这样一层层下来的存储器，速度越来越慢，空间越来越大，价格也越来越便宜。</strong></p>
-]]></content>
-      <categories>
-        <category>计算机组成原理</category>
-      </categories>
-      <tags>
-        <tag>寄存器</tag>
-        <tag>cache</tag>
       </tags>
   </entry>
   <entry>
@@ -1698,43 +1698,6 @@ SPEC 提供的 CPU 基准测试程序，就好像 CPU 届的“高考”，通�
       </tags>
   </entry>
   <entry>
-    <title>Hexo 主题下Next主题目录解析</title>
-    <url>/posts/dc9e0770/</url>
-    <content><![CDATA[<h1 id="Next-主题的-Hexo-博客配置目录结构"><a href="#Next-主题的-Hexo-博客配置目录结构" class="headerlink" title="Next 主题的 Hexo 博客配置目录结构"></a>Next 主题的 Hexo 博客配置目录结构</h1><blockquote>
-<p> Next 主题的简约明亮的风格深受广大网友喜爱，其集成功能繁多，主要涉及对主站点的配置以及主题的配置文件进行定制（_config.yml）,为了对Hexo博客下各个子目录有一个大致认知，现将目录结构展示如下：</p>
-</blockquote>
-<span id="more"></span>
-
-<h2 id="Hexo-博客下默认目录结构"><a href="#Hexo-博客下默认目录结构" class="headerlink" title="Hexo 博客下默认目录结构"></a>Hexo 博客下默认目录结构</h2><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">.</span><br><span class="line">├── .deploy</span><br><span class="line">├── public</span><br><span class="line">├── scaffolds</span><br><span class="line">├── scripts</span><br><span class="line">├── source</span><br><span class="line">|   ├── _drafts</span><br><span class="line">|   └── _posts</span><br><span class="line">├── themes</span><br><span class="line">├── _config.yml</span><br><span class="line">└── package.json</span><br></pre></td></tr></table></figure>
-
-<p>详细对应于：</p>
-<ul>
-<li>deploy：执行hexo deploy命令部署到GitHub上的内容目录</li>
-<li>public：执行hexo generate命令，输出的静态网页内容目录</li>
-<li>scaffolds：layout模板文件目录，其中的md文件可以添加编辑</li>
-<li>scripts：扩展脚本目录，这里可以自定义一些javascript脚本</li>
-<li>source：文章源码目录，该目录下的markdown和html文件均会被hexo处理。该页面对应repo的根目录，404文件、favicon.ico文件，CNAME文件等都应该放这里，该目录下可新建页面目录。<ol>
-<li>drafts：草稿文章</li>
-<li>posts：发布文章</li>
-</ol>
-</li>
-<li>themes：主题文件目录</li>
-<li>_config.yml：全局配置文件，大多数的设置都在这里</li>
-<li>package.json：应用程序数据，指明hexo的版本等信息，类似于一般软件中的关于按钮</li>
-</ul>
-<h2 id="Next主题下的子目录结构"><a href="#Next主题下的子目录结构" class="headerlink" title="Next主题下的子目录结构"></a>Next主题下的子目录结构</h2><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">├── .github            #git信息</span><br><span class="line">├── languages          #多语言</span><br><span class="line">|   ├── default.yml    #默认语言</span><br><span class="line">|   └── zh-Hans.yml      #简体中文</span><br><span class="line">|   └── zh-tw.yml      #繁体中文</span><br><span class="line">├── layout             #布局，根目录下的*.ejs文件是对主页，分页，存档等的控制</span><br><span class="line">|   ├── _custom        #可以自己修改的模板，覆盖原有模板</span><br><span class="line">|   |   ├── _header.swig    #头部样式</span><br><span class="line">|   |   ├── _sidebar.swig   #侧边栏样式</span><br><span class="line">|   ├── _macro        #可以自己修改的模板，覆盖原有模板</span><br><span class="line">|   |   ├── post.swig    #文章模板</span><br><span class="line">|   |   ├── reward.swig    #打赏模板</span><br><span class="line">|   |   ├── sidebar.swig   #侧边栏模板</span><br><span class="line">|   ├── _partial       #局部的布局</span><br><span class="line">|   |   ├── head       #头部模板</span><br><span class="line">|   |   ├── search     #搜索模板</span><br><span class="line">|   |   ├── share      #分享模板</span><br><span class="line">|   ├── _script        #局部的布局</span><br><span class="line">|   ├── _third-party   #第三方模板</span><br><span class="line">|   ├── _layout.swig   #主页面模板</span><br><span class="line">|   ├── index.swig     #主页面模板</span><br><span class="line">|   ├── page           #页面模板</span><br><span class="line">|   └── tag.swig       #tag模板</span><br><span class="line">├── scripts            #script源码</span><br><span class="line">|   ├── tags           #tags的script源码</span><br><span class="line">|   ├── marge.js       #页面模板</span><br><span class="line">├── source             #源码</span><br><span class="line">|   ├── css            #css源码</span><br><span class="line">|   |   ├── _common    #*.styl基础css</span><br><span class="line">|   |   ├── _custom    #*.styl局部css</span><br><span class="line">|   |   └── _mixins    #mixins的css</span><br><span class="line">|   ├── fonts          #字体</span><br><span class="line">|   ├── images         #图片</span><br><span class="line">|   ├── uploads        #添加的文件</span><br><span class="line">|   └── js             #javascript源代码</span><br><span class="line">├── _config.yml        #主题配置文件</span><br><span class="line">└── README.md          #用GitHub的都知道</span><br></pre></td></tr></table></figure>
-
-
-]]></content>
-      <categories>
-        <category>目录集</category>
-      </categories>
-      <tags>
-        <tag>Next</tag>
-        <tag>Hexo博客</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Hexo博客下集成Gitalk评论</title>
     <url>/posts/d37d3bf7/</url>
     <content><![CDATA[<h1 id="Hexo-Next博客下集成-Gitalk-评论功能"><a href="#Hexo-Next博客下集成-Gitalk-评论功能" class="headerlink" title="Hexo+Next博客下集成 Gitalk 评论功能"></a>Hexo+Next博客下集成 Gitalk 评论功能</h1><blockquote>
@@ -1801,6 +1764,43 @@ SPEC 提供的 CPU 基准测试程序，就好像 CPU 届的“高考”，通�
       </tags>
   </entry>
   <entry>
+    <title>Hexo 主题下Next主题目录解析</title>
+    <url>/posts/dc9e0770/</url>
+    <content><![CDATA[<h1 id="Next-主题的-Hexo-博客配置目录结构"><a href="#Next-主题的-Hexo-博客配置目录结构" class="headerlink" title="Next 主题的 Hexo 博客配置目录结构"></a>Next 主题的 Hexo 博客配置目录结构</h1><blockquote>
+<p> Next 主题的简约明亮的风格深受广大网友喜爱，其集成功能繁多，主要涉及对主站点的配置以及主题的配置文件进行定制（_config.yml）,为了对Hexo博客下各个子目录有一个大致认知，现将目录结构展示如下：</p>
+</blockquote>
+<span id="more"></span>
+
+<h2 id="Hexo-博客下默认目录结构"><a href="#Hexo-博客下默认目录结构" class="headerlink" title="Hexo 博客下默认目录结构"></a>Hexo 博客下默认目录结构</h2><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">.</span><br><span class="line">├── .deploy</span><br><span class="line">├── public</span><br><span class="line">├── scaffolds</span><br><span class="line">├── scripts</span><br><span class="line">├── source</span><br><span class="line">|   ├── _drafts</span><br><span class="line">|   └── _posts</span><br><span class="line">├── themes</span><br><span class="line">├── _config.yml</span><br><span class="line">└── package.json</span><br></pre></td></tr></table></figure>
+
+<p>详细对应于：</p>
+<ul>
+<li>deploy：执行hexo deploy命令部署到GitHub上的内容目录</li>
+<li>public：执行hexo generate命令，输出的静态网页内容目录</li>
+<li>scaffolds：layout模板文件目录，其中的md文件可以添加编辑</li>
+<li>scripts：扩展脚本目录，这里可以自定义一些javascript脚本</li>
+<li>source：文章源码目录，该目录下的markdown和html文件均会被hexo处理。该页面对应repo的根目录，404文件、favicon.ico文件，CNAME文件等都应该放这里，该目录下可新建页面目录。<ol>
+<li>drafts：草稿文章</li>
+<li>posts：发布文章</li>
+</ol>
+</li>
+<li>themes：主题文件目录</li>
+<li>_config.yml：全局配置文件，大多数的设置都在这里</li>
+<li>package.json：应用程序数据，指明hexo的版本等信息，类似于一般软件中的关于按钮</li>
+</ul>
+<h2 id="Next主题下的子目录结构"><a href="#Next主题下的子目录结构" class="headerlink" title="Next主题下的子目录结构"></a>Next主题下的子目录结构</h2><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">├── .github            #git信息</span><br><span class="line">├── languages          #多语言</span><br><span class="line">|   ├── default.yml    #默认语言</span><br><span class="line">|   └── zh-Hans.yml      #简体中文</span><br><span class="line">|   └── zh-tw.yml      #繁体中文</span><br><span class="line">├── layout             #布局，根目录下的*.ejs文件是对主页，分页，存档等的控制</span><br><span class="line">|   ├── _custom        #可以自己修改的模板，覆盖原有模板</span><br><span class="line">|   |   ├── _header.swig    #头部样式</span><br><span class="line">|   |   ├── _sidebar.swig   #侧边栏样式</span><br><span class="line">|   ├── _macro        #可以自己修改的模板，覆盖原有模板</span><br><span class="line">|   |   ├── post.swig    #文章模板</span><br><span class="line">|   |   ├── reward.swig    #打赏模板</span><br><span class="line">|   |   ├── sidebar.swig   #侧边栏模板</span><br><span class="line">|   ├── _partial       #局部的布局</span><br><span class="line">|   |   ├── head       #头部模板</span><br><span class="line">|   |   ├── search     #搜索模板</span><br><span class="line">|   |   ├── share      #分享模板</span><br><span class="line">|   ├── _script        #局部的布局</span><br><span class="line">|   ├── _third-party   #第三方模板</span><br><span class="line">|   ├── _layout.swig   #主页面模板</span><br><span class="line">|   ├── index.swig     #主页面模板</span><br><span class="line">|   ├── page           #页面模板</span><br><span class="line">|   └── tag.swig       #tag模板</span><br><span class="line">├── scripts            #script源码</span><br><span class="line">|   ├── tags           #tags的script源码</span><br><span class="line">|   ├── marge.js       #页面模板</span><br><span class="line">├── source             #源码</span><br><span class="line">|   ├── css            #css源码</span><br><span class="line">|   |   ├── _common    #*.styl基础css</span><br><span class="line">|   |   ├── _custom    #*.styl局部css</span><br><span class="line">|   |   └── _mixins    #mixins的css</span><br><span class="line">|   ├── fonts          #字体</span><br><span class="line">|   ├── images         #图片</span><br><span class="line">|   ├── uploads        #添加的文件</span><br><span class="line">|   └── js             #javascript源代码</span><br><span class="line">├── _config.yml        #主题配置文件</span><br><span class="line">└── README.md          #用GitHub的都知道</span><br></pre></td></tr></table></figure>
+
+
+]]></content>
+      <categories>
+        <category>目录集</category>
+      </categories>
+      <tags>
+        <tag>Next</tag>
+        <tag>Hexo博客</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Java中的关键字和标识符号</title>
     <url>/posts/89799f4a/</url>
     <content><![CDATA[<h1 id="Java-的关键字和标识符"><a href="#Java-的关键字和标识符" class="headerlink" title="Java 的关键字和标识符"></a>Java 的关键字和标识符</h1><h2 id="常用关键字展示："><a href="#常用关键字展示：" class="headerlink" title="常用关键字展示："></a>常用关键字展示：</h2><span id="more"></span>
@@ -1859,6 +1859,51 @@ SPEC 提供的 CPU 基准测试程序，就好像 CPU 届的“高考”，通�
       <tags>
         <tag>Next</tag>
         <tag>博客定制</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>反转链表</title>
+    <url>/posts/82b7a1a9/</url>
+    <content><![CDATA[<h1 id="关于链表反转"><a href="#关于链表反转" class="headerlink" title="关于链表反转"></a>关于链表反转</h1><h2 id="一、整个链表的反转"><a href="#一、整个链表的反转" class="headerlink" title="一、整个链表的反转"></a>一、整个链表的反转</h2><blockquote>
+<p>说明：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">输入: 1 -&gt;2 -&gt;3 -&gt;4 -&gt;5 -&gt;null</span><br><span class="line">输出：null &lt;-1 &lt;-2 &lt;-3&lt;- 4 &lt;-5 </span><br></pre></td></tr></table></figure>
+</blockquote>
+<span id="more"></span>
+<p>先给出其代码吧</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ListNode reverse(ListNode head)&#123;</span><br><span class="line">	if(head==null || head.next==null)      return head;</span><br><span class="line">	ListNode next=reverse(head.next);</span><br><span class="line">	head.next.next=head;</span><br><span class="line">	head.next=null;</span><br><span class="line">	return next;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>释义:</strong><br><em><strong>输入一个结点<code>head</code>，将 [以<code>head</code>为起点]的链表进行反转，并且返回反转之后的头结点</strong></em><br><img src="/img/codeing/reverseListNode1.png" alt="reverseListNode1" style="zoom: 67%;"/></p>
+<p>那么输入<code> reverse(head)</code> 后，会在这里进行递归：<br><code>ListNode last=reverse(head.next) </code> 可以 理解为，<strong>见下图</strong> :<br><img src="/img/coding/reverseListNode2.png" alt="reverseListNode2" style="zoom: 67%;"/></p>
+<p>当<code> reverse(head.next)</code>执行完之后，整个链表就会变成:<br><img src="/img/coding/reverseListNode3.png" alt="reverseListNode3" style="zoom: 67%;"/><br>此外， <code>reverse</code> 反转之后的头结点，就会被我们用变量 last 接收了</p>
+<ul>
+<li>关于<code>head.next.next=head;</code><img src="/img/coding/reverseListNode4.png" alt="reverseListNode4" style="zoom: 67%;"/></li>
+</ul>
+<p>之后：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">head.next=null;</span><br><span class="line">  return last;</span><br></pre></td></tr></table></figure>
+<img src="/img/coding/reverseListNode5.png" alt="reverseListNode5" style="zoom: 67%;"/>
+这样，就完成了单链表的反转，值得注意的是***每次 `reverse()` 函数会返回反转之后的头结点！*** 
+---
+
+<h2 id="二、进阶-反转前N个节点"><a href="#二、进阶-反转前N个节点" class="headerlink" title="二、进阶 反转前N个节点"></a>二、进阶 反转前N个节点</h2><p>例如我们来实现这样的一个函数</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">//将链表的前n 个节点反转（n&lt;= 链表长度）</span><br><span class="line">  ListNode reverseN(ListNode head,int n)</span><br></pre></td></tr></table></figure>
+<img src="/img/coding/reverseListNode21.png" alt="reverseListNode21" style="zoom: 67%;"/>
+这需要对之前的代码稍加修改：
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ListNode successor=null;   //后驱节点</span><br><span class="line">// 反转以 head 为起点的 n 个节点，返回 新的头节点。</span><br><span class="line">ListNode reverseN(ListNode head,int n)&#123;</span><br><span class="line">	if(n==1)&#123;</span><br><span class="line">		successor=head.next;</span><br><span class="line">		return head;</span><br><span class="line">	&#125;</span><br><span class="line">	ListNode last=reverseN(head,n-1);</span><br><span class="line">	head.next.next=head;</span><br><span class="line">	head.next=successor;</span><br><span class="line">	return last;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>之前我们直接把 <code> head.next</code> 设置为 null，因为整个链表反转后原来的 <code>head</code> 变成了整个链表的最后一个节点。但现在 <code>head</code> 节点在递归反转之后不一定是最后一个节点了，所以要记录后驱 <code>successor</code>（第 n + 1 个节点），反转之后将 <code>head</code> 连接上。<br><img src="/img/coding/reverseListNode22.png" alt="reverseListNode22" style="zoom: 67%;"/></p>
+<hr>
+<h2 id="三、再进阶-反转链表中的一部分"><a href="#三、再进阶-反转链表中的一部分" class="headerlink" title="三、再进阶 反转链表中的一部分"></a>三、再进阶 反转链表中的一部分</h2><p>我们现在来解决对于一个链表中，索引区间在[m,n] 之间的部分进行反转<code>ListNode reverseBetween(ListNode head,int m,int n)</code> 首先，如果 <code>m==1</code> ,就相当于反转链表开头的 n 个元素，也就是：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ListNode reverseBetween(ListNode head, int m, int n) &#123;</span><br><span class="line">    // base case</span><br><span class="line">    if (m == 1) &#123;</span><br><span class="line">        // 相当于反转前 n 个元素</span><br><span class="line">     	return reverseN(head,n);</span><br><span class="line">     &#125;</span><br><span class="line">     // ....</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<p>那么当<code>m!=1</code> 时呢？ 如果我们把<code>head</code> 的索引视为 1 ，那么是要从第m 个元       素开始反转，索引我们可以将<code>head.next</code> 的索引视为 1 时，那么反转区间相对应的就是从 第 <code>m -1</code> 个元素开始的； 同理可以继续推 <code>head.next.next</code>  ……..</p>
+<p><strong>代码如下：</strong></p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">ListNode reverseBetween(ListNode head, int m, int n) &#123;</span><br><span class="line">    // base case</span><br><span class="line">    if(m==1)&#123;</span><br><span class="line">    	return reverseN(head,n);</span><br><span class="line">    &#125;</span><br><span class="line">    // 前进到反转的起点触发 base case</span><br><span class="line">    head.next=reverseBetween(head,m-1,n-1);</span><br><span class="line">    return head;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>LeeCode Coding</category>
+      </categories>
+      <tags>
+        <tag>数据结构</tag>
+        <tag>链表</tag>
+        <tag>ListNode</tag>
       </tags>
   </entry>
   <entry>
