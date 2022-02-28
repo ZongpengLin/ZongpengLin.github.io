@@ -93,6 +93,61 @@
       </tags>
   </entry>
   <entry>
+    <title>初窥计算机指令</title>
+    <url>/posts/d754f544/</url>
+    <content><![CDATA[<h1 id="初窥计算机指令"><a href="#初窥计算机指令" class="headerlink" title="初窥计算机指令"></a>初窥计算机指令</h1><h2 id="在软硬件接口中，CPU-帮我们做了什么事？"><a href="#在软硬件接口中，CPU-帮我们做了什么事？" class="headerlink" title="在软硬件接口中，CPU 帮我们做了什么事？"></a>在软硬件接口中，CPU 帮我们做了什么事？</h2><ul>
+<li><p>从硬件角度来看，CPU就是一个超大规模集成电路<span id="more"></span>，通过电路实现了加法、乘法乃至各种各样的处理逻辑。</p>
+</li>
+<li><p>从软件上来看，CPU 就是一个执行各种计算机指令的逻辑机器。这里的计算机指令，就好比一门 CPU 能够听得懂的语言，我们也可以把它叫作机器语言（Machine Language）。</p>
+</li>
+</ul>
+<p>不同的 CPU 能够听懂的语言不太一样。比如，我们的个人电脑用的是 Intel 的 CPU，苹果手机用的是 ARM 的 CPU。这两者能听懂的语言就不太一样。类似这样两种 CPU 各自支持的语言，就是两组不同的<strong>计算机指令集</strong>，英文叫 Instruction Set。<br>一个计算机程序实际上是由成千上万条指令组成的，但是CPU里不能一直放着所有指令，所以计算机程序平时是存储在存储器中的，这种程序指令存储在存储器里面的计算机，我们就叫作存储程序型计算机（Stored-program Computer）。</p>
+<h2 id="从编译到汇编，代码怎么变成机器码？"><a href="#从编译到汇编，代码怎么变成机器码？" class="headerlink" title="从编译到汇编，代码怎么变成机器码？"></a>从编译到汇编，代码怎么变成机器码？</h2><p>平时编写的代码，到底是怎么变成一条条计算机指令，最后被 CPU 执行的呢？我们拿一小段真实的 C 语言程序来看看。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">// test.c</span><br><span class="line">int main()</span><br><span class="line">&#123;</span><br><span class="line">  int a = 1; </span><br><span class="line">  int b = 2;</span><br><span class="line">  a = a + b;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>要让这段程序在一个 Linux 操作系统上跑起来，我们需要把整个程序翻译成一个汇编语言（ASM，Assembly Language）的程序，这个过程我们一般叫编译（Compile）成汇编代码。</p>
+<p>正对汇编代码，我们可以再用汇编器（Assember）翻译成机器码（Machine Code）。这些机器码由“0”和“1”组成的机器语言表示。这一条条机器码，就是一条条的计算机指令。这样一串串的 16 进制数字，就是我们 CPU 能够真正认识的计算机指令。</p>
+<p>在一个 Linux 操作系统上，我们可以简单地使用 <strong>gcc</strong> 和 <strong>objdump</strong> 这样两条命令，把对应的汇编代码和机器码都打印出来。</p>
+<p>可以看到，左边对应的是一条条机器码，右边有一系列的 push、mov、add、pop 等，这些就是对应的汇编代码。</p>
+<img src="/img/computer_img/机器码和汇编.png" alt="机器码和汇编" style="zoom:50%;" />
+
+<center style:"color:C0C0C0">机器码和汇编代码</center>
+
+<h2 id=""><a href="#" class="headerlink" title=""></a><img src="/img/computer_img/汇编过程.webp" alt="汇编过程" style="zoom:50%;" /></h2><p>从高级语言到汇编代码，再到机器码，就是一个日常开发程序，最终变成了CPU 可以执行的计算机指令的过程。</p>
+<h2 id="常见指令"><a href="#常见指令" class="headerlink" title="常见指令"></a>常见指令</h2><ol>
+<li>算数类指令。我们的加减乘除，在 CPU 层面，都会变成一条条算术类指令。</li>
+<li>数据传输类指令。给变量赋值、在内存里读写数据，用的都是数据传输类指令。</li>
+<li>逻辑类指令。逻辑上的与或非，都是这一类指令。</li>
+<li>条件分支类指令。比如“if&#x2F;else”</li>
+<li>无条件条转指令。写一些大一点的程序，我们常常需要写一些函数或者方法。在调用函数的时候，其实就是发起了一个无条件跳转指令。</li>
+</ol>
+<p>&lt;img src&#x3D;”&#x2F;img&#x2F;computer_img&#x2F;各种指令.webp style&#x3D;”zoom:67%;)</p>
+<center style="color:#C0C0C0;">常见指令</center>
+
+<h2 id="MIPS-指令集"><a href="#MIPS-指令集" class="headerlink" title="MIPS 指令集"></a>MIPS 指令集</h2><img src="/img/computer_img/MIPS位数.webp" alt="MIPS位数" style="zoom:67%;" />
+
+<p>MIPS 的指令是一个 32 位的整数，高 6 位叫操作码（Opcode），也就是代表这条指令具体是一条什么样的指令，剩下的 26 位有三种格式，分别是 R、I 和 J。</p>
+<p><strong>R指令</strong>一般用来算术和逻辑操作，里面有读取和写入数据的寄存器的地址。如果是逻辑位移操作，后面还有位移操作的位移量，而最后的功能码，则是在前面的操作码不够的时候，扩展操作码表示对应的具体指令的。</p>
+<p><strong>I 指令</strong>，则通常是用数据传输、条件分支，以及在运算的时候使用的并非变量还是常数的时候。这个时候，没有了位移量和操作码，也没有了第三个寄存器，而是把这三部分直接合并成了一个地址值或者一个常数。</p>
+<p><strong>J 指令</strong>就是一个跳转指令，高 6 位之外的 26 位都是一个跳转后的地址。</p>
+<p>我以一个简单的加法算术指令 add t0,s1, $s2, 为例，</p>
+<p>​                                <code>add  $t0,$s2,$s1</code> </p>
+<p>对应的 MIPS 指令里 opcode 是 0，rs 代表第一个寄存器 s1 的地址是 17，rt 代表第二个寄存器 s2 的地址是 18，rd 代表目标的临时寄存器 t0 的地址，是 8。因为不是位移操作，所以位移量是 0。把这些数字拼在一起，就变成了一个 MIPS 的加法指令。</p>
+<p>为了读起来方便，我们一般把对应的二进制数，用 16 进制表示出来。在这里，也就是 0X02324020。这个数字也就是这条指令对应的机器码。</p>
+ <img src="/img/computer_img/指令表示.webp" alt="指令表示" style="zoom:50%;" />
+
+<p>为了读起来方便，我们一般把对应的二进制数，用 16 进制表示出来。在这里，也就是 0X02324020。这个数字也就是这条指令对应的机器码。</p>
+]]></content>
+      <categories>
+        <category>计算机组成原理</category>
+      </categories>
+      <tags>
+        <tag>CPU</tag>
+        <tag>指令集</tag>
+        <tag>机器码</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>CPU的主频</title>
     <url>/posts/5dfefcf1/</url>
     <content><![CDATA[<h1 id="透过CPU的主频，谈谈性能究竟是什么"><a href="#透过CPU的主频，谈谈性能究竟是什么" class="headerlink" title="透过CPU的主频，谈谈性能究竟是什么"></a>透过CPU的主频，谈谈性能究竟是什么</h1><h2 id="计算机的性能衡量"><a href="#计算机的性能衡量" class="headerlink" title="计算机的性能衡量"></a>计算机的性能衡量</h2><p>于计算机的性能，我们需要有个标准来衡量。这个标准中主要有两个指标。</p>
@@ -153,124 +208,6 @@ SPEC 提供的 CPU 基准测试程序，就好像 CPU 届的“高考”，通�
       </categories>
       <tags>
         <tag>性能与主频</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>初窥计算机指令</title>
-    <url>/posts/d754f544/</url>
-    <content><![CDATA[<h1 id="初窥计算机指令"><a href="#初窥计算机指令" class="headerlink" title="初窥计算机指令"></a>初窥计算机指令</h1><h2 id="在软硬件接口中，CPU-帮我们做了什么事？"><a href="#在软硬件接口中，CPU-帮我们做了什么事？" class="headerlink" title="在软硬件接口中，CPU 帮我们做了什么事？"></a>在软硬件接口中，CPU 帮我们做了什么事？</h2><ul>
-<li><p>从硬件角度来看，CPU就是一个超大规模集成电路<span id="more"></span>，通过电路实现了加法、乘法乃至各种各样的处理逻辑。</p>
-</li>
-<li><p>从软件上来看，CPU 就是一个执行各种计算机指令的逻辑机器。这里的计算机指令，就好比一门 CPU 能够听得懂的语言，我们也可以把它叫作机器语言（Machine Language）。</p>
-</li>
-</ul>
-<p>不同的 CPU 能够听懂的语言不太一样。比如，我们的个人电脑用的是 Intel 的 CPU，苹果手机用的是 ARM 的 CPU。这两者能听懂的语言就不太一样。类似这样两种 CPU 各自支持的语言，就是两组不同的<strong>计算机指令集</strong>，英文叫 Instruction Set。<br>一个计算机程序实际上是由成千上万条指令组成的，但是CPU里不能一直放着所有指令，所以计算机程序平时是存储在存储器中的，这种程序指令存储在存储器里面的计算机，我们就叫作存储程序型计算机（Stored-program Computer）。</p>
-<h2 id="从编译到汇编，代码怎么变成机器码？"><a href="#从编译到汇编，代码怎么变成机器码？" class="headerlink" title="从编译到汇编，代码怎么变成机器码？"></a>从编译到汇编，代码怎么变成机器码？</h2><p>平时编写的代码，到底是怎么变成一条条计算机指令，最后被 CPU 执行的呢？我们拿一小段真实的 C 语言程序来看看。</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">// test.c</span><br><span class="line">int main()</span><br><span class="line">&#123;</span><br><span class="line">  int a = 1; </span><br><span class="line">  int b = 2;</span><br><span class="line">  a = a + b;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>要让这段程序在一个 Linux 操作系统上跑起来，我们需要把整个程序翻译成一个汇编语言（ASM，Assembly Language）的程序，这个过程我们一般叫编译（Compile）成汇编代码。</p>
-<p>正对汇编代码，我们可以再用汇编器（Assember）翻译成机器码（Machine Code）。这些机器码由“0”和“1”组成的机器语言表示。这一条条机器码，就是一条条的计算机指令。这样一串串的 16 进制数字，就是我们 CPU 能够真正认识的计算机指令。</p>
-<p>在一个 Linux 操作系统上，我们可以简单地使用 <strong>gcc</strong> 和 <strong>objdump</strong> 这样两条命令，把对应的汇编代码和机器码都打印出来。</p>
-<p>可以看到，左边对应的是一条条机器码，右边有一系列的 push、mov、add、pop 等，这些就是对应的汇编代码。</p>
-<img src="/img/computer_img/机器码和汇编.png" alt="机器码和汇编" style="zoom:50%;" />
-
-<center style:"color:C0C0C0">机器码和汇编代码</center>
-
-<h2 id=""><a href="#" class="headerlink" title=""></a><img src="/img/computer_img/汇编过程.webp" alt="汇编过程" style="zoom:50%;" /></h2><p>从高级语言到汇编代码，再到机器码，就是一个日常开发程序，最终变成了CPU 可以执行的计算机指令的过程。</p>
-<h2 id="常见指令"><a href="#常见指令" class="headerlink" title="常见指令"></a>常见指令</h2><ol>
-<li>算数类指令。我们的加减乘除，在 CPU 层面，都会变成一条条算术类指令。</li>
-<li>数据传输类指令。给变量赋值、在内存里读写数据，用的都是数据传输类指令。</li>
-<li>逻辑类指令。逻辑上的与或非，都是这一类指令。</li>
-<li>条件分支类指令。比如“if&#x2F;else”</li>
-<li>无条件条转指令。写一些大一点的程序，我们常常需要写一些函数或者方法。在调用函数的时候，其实就是发起了一个无条件跳转指令。</li>
-</ol>
-<p>&lt;img src&#x3D;”&#x2F;img&#x2F;computer_img&#x2F;各种指令.webp style&#x3D;”zoom:67%;)</p>
-<center style="color:#C0C0C0;">常见指令</center>
-
-<h2 id="MIPS-指令集"><a href="#MIPS-指令集" class="headerlink" title="MIPS 指令集"></a>MIPS 指令集</h2><img src="/img/computer_img/MIPS位数.webp" alt="MIPS位数" style="zoom:67%;" />
-
-<p>MIPS 的指令是一个 32 位的整数，高 6 位叫操作码（Opcode），也就是代表这条指令具体是一条什么样的指令，剩下的 26 位有三种格式，分别是 R、I 和 J。</p>
-<p><strong>R指令</strong>一般用来算术和逻辑操作，里面有读取和写入数据的寄存器的地址。如果是逻辑位移操作，后面还有位移操作的位移量，而最后的功能码，则是在前面的操作码不够的时候，扩展操作码表示对应的具体指令的。</p>
-<p><strong>I 指令</strong>，则通常是用数据传输、条件分支，以及在运算的时候使用的并非变量还是常数的时候。这个时候，没有了位移量和操作码，也没有了第三个寄存器，而是把这三部分直接合并成了一个地址值或者一个常数。</p>
-<p><strong>J 指令</strong>就是一个跳转指令，高 6 位之外的 26 位都是一个跳转后的地址。</p>
-<p>我以一个简单的加法算术指令 add t0,s1, $s2, 为例，</p>
-<p>​                                <code>add  $t0,$s2,$s1</code> </p>
-<p>对应的 MIPS 指令里 opcode 是 0，rs 代表第一个寄存器 s1 的地址是 17，rt 代表第二个寄存器 s2 的地址是 18，rd 代表目标的临时寄存器 t0 的地址，是 8。因为不是位移操作，所以位移量是 0。把这些数字拼在一起，就变成了一个 MIPS 的加法指令。</p>
-<p>为了读起来方便，我们一般把对应的二进制数，用 16 进制表示出来。在这里，也就是 0X02324020。这个数字也就是这条指令对应的机器码。</p>
- <img src="/img/computer_img/指令表示.webp" alt="指令表示" style="zoom:50%;" />
-
-<p>为了读起来方便，我们一般把对应的二进制数，用 16 进制表示出来。在这里，也就是 0X02324020。这个数字也就是这条指令对应的机器码。</p>
-]]></content>
-      <categories>
-        <category>计算机组成原理</category>
-      </categories>
-      <tags>
-        <tag>CPU</tag>
-        <tag>指令集</tag>
-        <tag>机器码</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>函数调用</title>
-    <url>/posts/f4b9b599/</url>
-    <content><![CDATA[<h1 id="函数调用：为什么会发生stack-overflow？"><a href="#函数调用：为什么会发生stack-overflow？" class="headerlink" title="函数调用：为什么会发生stack overflow？"></a>函数调用：为什么会发生stack overflow？</h1><p>Stack Overflow 的名字来自于一个常见的报错，就是栈溢出（stack overflow）。</p>
-<p>从程序的函数调用开始<span id="more"></span>，讲讲函数间的相互调用，在计算机指令层面是怎么实现的，以及什么情况下会发生栈溢出这个错误。</p>
-<h2 id="为什么我们需要程序栈"><a href="#为什么我们需要程序栈" class="headerlink" title="为什么我们需要程序栈"></a>为什么我们需要程序栈</h2><p>我们还是从一个非常简单的 C 程序 function_example.c 看起。</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">// function_example.c</span><br><span class="line"></span><br><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">int static add(int a, int b)</span><br><span class="line">&#123;</span><br><span class="line">    return a+b;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">int main()</span><br><span class="line">&#123;</span><br><span class="line">    int x = 5;</span><br><span class="line">    int y = 10;</span><br><span class="line">    int u = add(x, y);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>这个程序定义了一个简单的函数 add，接受两个参数 a 和 b，返回值就是 a+b。而 main 函数里则定义了两个变量 x 和 y，然后通过调用这个 add 函数，来计算 u&#x3D;x+y，最后把 u 的数值打印出来。</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">$ gcc -g -c function_example.c</span><br><span class="line">$ objdump -d -M intel -S function_example.o</span><br></pre></td></tr></table></figure>
-
-<p>我们把这个程序编译之后，objdump 出来。我们来看一看对应的汇编代码。</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">int static add(int a, int b)</span><br><span class="line">&#123;</span><br><span class="line">   0:   55                      push   rbp</span><br><span class="line">   1:   48 89 e5                mov    rbp,rsp</span><br><span class="line">   4:   89 7d fc                mov    DWORD PTR [rbp-0x4],edi</span><br><span class="line">   7:   89 75 f8                mov    DWORD PTR [rbp-0x8],esi</span><br><span class="line">    return a+b;</span><br><span class="line">   a:   8b 55 fc                mov    edx,DWORD PTR [rbp-0x4]</span><br><span class="line">   d:   8b 45 f8                mov    eax,DWORD PTR [rbp-0x8]</span><br><span class="line">  10:   01 d0                   add    eax,edx</span><br><span class="line">&#125;</span><br><span class="line">  12:   5d                      pop    rbp</span><br><span class="line">  13:   c3                      ret    </span><br><span class="line">0000000000000014 &lt;main&gt;:</span><br><span class="line">int main()</span><br><span class="line">&#123;</span><br><span class="line">  14:   55                      push   rbp</span><br><span class="line">  15:   48 89 e5                mov    rbp,rsp</span><br><span class="line">  18:   48 83 ec 10             sub    rsp,0x10</span><br><span class="line">    int x = 5;</span><br><span class="line">  1c:   c7 45 fc 05 00 00 00    mov    DWORD PTR [rbp-0x4],0x5</span><br><span class="line">    int y = 10;</span><br><span class="line">  23:   c7 45 f8 0a 00 00 00    mov    DWORD PTR [rbp-0x8],0xa</span><br><span class="line">    int u = add(x, y);</span><br><span class="line">  2a:   8b 55 f8                mov    edx,DWORD PTR [rbp-0x8]</span><br><span class="line">  2d:   8b 45 fc                mov    eax,DWORD PTR [rbp-0x4]</span><br><span class="line">  30:   89 d6                   mov    esi,edx</span><br><span class="line">  32:   89 c7                   mov    edi,eax</span><br><span class="line">  34:   e8 c7 ff ff ff          call   0 &lt;add&gt;</span><br><span class="line">  39:   89 45 f4                mov    DWORD PTR [rbp-0xc],eax</span><br><span class="line">  3c:   b8 00 00 00 00          mov    eax,0x0</span><br><span class="line">&#125;</span><br><span class="line">  41:   c9                      leave  </span><br><span class="line">  42:   c3                      ret    </span><br><span class="line">  </span><br></pre></td></tr></table></figure>
-
-<p>可以看出，这里的跳转主要是函数调用的call指令。call指令后面跟着的仍然是跳转后的程序地址。</p>
-<p>来看 add 函数。可以看到，add 函数编译之后，代码先执行了一条 push 指令和一条 mov 指令；在函数执行结束的时候，又执行了一条 pop 和一条 ret 指令。这四条指令的执行，其实就是在进行我们接下来要讲<strong>压栈（Push）</strong>和<strong>出栈（Pop）</strong>操作。</p>
-<p>这与if…else 和 for&#x2F;while 循环的跳转是有区别的，if…else 和 for&#x2F;while 的跳转，是跳转走了就不再回来了，就在跳转后的新地址开始顺序地执行指令，而函数调用的跳转，在对应函数的指令执行完了之后，还要再回到函数调用的地方，继续执行 call 之后的指令。</p>
-<p>可以把调用的函数指令直接插入调用函数的地方，替换掉对应的 c a l l 自立，然后在编译器编译代码时，直接就把函数调用变成对应的指令替换掉。然而，仔细想来，果函数 A 调用了函数 B，然后函数 B 再调用函数 A，我们就得面临在 A 里面插入 B 的指令，然后在 B 里面插入 A 的指令，这样就会产生无穷无尽地替换。就好像两面镜子面对面放在一块儿，任何一面镜子里面都会看到无穷多面镜子。</p>
-<p>所以，把被调用函数的指令直接插入在调用处的方法行不通。可不可以专门设立一个“程序调用寄存器”，来 存储接下来要跳转回来执行的指令地址。 等到函数调用结束，从这寄存器里取出地址，再跳转到这个记录的地址，继续执行就好。</p>
-<p>但是在多层函数调用里，简单只记录一个地址也是不够的。我们在调用函数 A 之后，A 还可以调用函数 B，B 还能调用函数 C。这一层又一层的调用并没有数量上的限制。在所有函数调用返回之前，每一次调用的返回地址都要记录下来，<strong>但是CPU 里的寄存器的数量并不多，</strong>像我们一般使用的 Intel i7 CPU 只有 16 个 64 位寄存器，调用的层数一多就存不下了。</p>
-<p>在内存里面开辟一段空间，用栈这个<strong>后进先出（LIFO，Last In First Out）</strong>的数据结构。栈就像一个乒乓球桶，每次程序调用函数之前，我们都把调用返回后的地址写在一个乒乓球上，然后塞进这个球桶。这个操作其实就是我们常说的<strong>压栈</strong>。如果函数执行完了，我们就从球桶里取出最上面的那个乒乓球，很显然，这就是<strong>出栈</strong>。</p>
-<img src="/img/computer_img/栈结构.webp" alt="栈结构" style="zoom:33%;" />
-
-<p>在真实的程序里，压栈的不只有函数调用完成后的返回地址。比如函数 A 在调用 B 的时候，需要传输一些参数数据，这些参数数据在寄存器不够用的时候也会被压入栈中。整个函数 A 所占用的所有内存空间，就是函数 A 的<strong>栈帧（Stack Frame）</strong>。Frame 在中文里也有“相框”的意思，所以，每次到这里，我都有种感觉，整个函数 A 所需要的内存空间就像是被这么一个“相框”给框了起来，放在了栈里面。</p>
-<img src="/img/computer_img/栈指令.webp" alt="栈指令" style="zoom:50%;" />
-
-<p>图中，rbp 是 register base pointer 栈基址寄存器（栈帧指针），指向当前栈帧的栈底地址。rsp 是 register stack pointer 栈顶寄存器（栈指针），指向栈顶元素。</p>
-<p>对应上面函数 add 的汇编代码，我们来仔细看看，main 函数调用 add 函数时，add 函数入口在 0～1 行，add 函数结束之后在 12～13 行。</p>
-<p>我们在调用第 34 行的 call 指令时，会把当前的 PC 寄存器里的下一条指令的地址压栈，保留函数调用结束后要执行的指令地址。而 add 函数的第 0 行，push rbp 这个指令，就是在进行压栈。这里的 rbp 又叫栈帧指针（Frame Pointer），是一个存放了当前栈帧位置的寄存器。push rbp 就把之前调用函数，也就是 main 函数的栈帧的栈底地址，压到栈顶。</p>
-<p>接着，第 1 行的一条命令 mov rbp, rsp 里，则是把 rsp 这个栈指针（Stack Pointer）的值复制到 rbp 里，而 rsp 始终会指向栈顶。这个命令意味着，rbp 这个栈帧指针指向的地址，变成当前最新的栈顶，也就是 add 函数的栈帧的栈底地址了。</p>
-<p>而在函数 add 执行完成之后，又会分别调用第 12 行的 pop rbp 来将当前的栈顶出栈，这部分操作维护好了我们整个栈帧。然后，我们可以调用第 13 行的 ret 指令，这时候同时要把 call 调用的时候压入的 PC 寄存器里的下一条指令出栈，更新到 PC 寄存器中，将程序的控制权返回到出栈后的栈顶。</p>
-<h2 id="如何构造一个-stack-overflow？"><a href="#如何构造一个-stack-overflow？" class="headerlink" title="如何构造一个 stack overflow？"></a>如何构造一个 stack overflow？</h2><p>通过引入栈，我们可以看到，无论有多少层的函数调用，或者在函数 A 里调用函数 B，再在函数 B 里调用 A，这样的递归调用，我们都只需要通过维持 rbp 和 rsp，这两个维护栈顶所在地址的寄存器，就能管理好不同函数之间的跳转。不过，栈的大小也是有限的。如果函数调用层数太多，我们往栈里压入它存不下的内容，程序在执行的过程中就会遇到栈溢出的错误，这就是大名鼎鼎的<strong>“stack  overflow”</strong>。</p>
-<p>要构造一个栈溢出的错误并不困难，最简单的办法，就是我们上面说的 Infiinite Mirror Effect 的方式，让函数 A 调用自己，并且不设任何终止条件。这样一个无限递归的程序，在不断地压栈过程中，将整个栈空间填满，并最终遇上 stack overflow。</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">比如： </span><br><span class="line">int a()</span><br><span class="line">&#123;</span><br><span class="line">  return a();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">int main()</span><br><span class="line">&#123;</span><br><span class="line">  a();</span><br><span class="line">  return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="如何利用函数内联进行性能优化？"><a href="#如何利用函数内联进行性能优化？" class="headerlink" title="如何利用函数内联进行性能优化？"></a>如何利用函数内联进行性能优化？</h2><p>上面我们提到一个方法，把一个实际调用的函数产生的指令，直接插入到的位置，来替换对应的函数调用指令。尽管这个通用的函数调用方案，被我们否决了，但是如果被调用的函数里，没有调用其他函数，这个方法还是可以行得通的。</p>
-<p>事实上，这就是一个常见的编译器进行自动优化的场景，我们通常叫<strong>函数内联（Inline）</strong>。我们只要在 GCC 编译的时候，加上对应的一个让编译器自动优化的参数 -O，编译器就会在可行的情况下，进行这样的指令替换。</p>
-<p>来看这样一段代码</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">#include &lt;time.h&gt;</span><br><span class="line">#include &lt;stdlib.h&gt;</span><br><span class="line"></span><br><span class="line">int static add(int a, int b)</span><br><span class="line">&#123;</span><br><span class="line">    return a+b;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">int main()</span><br><span class="line">&#123;</span><br><span class="line">    srand(time(NULL));</span><br><span class="line">    int x = rand() % 5</span><br><span class="line">    int y = rand() % 10;</span><br><span class="line">    int u = add(x, y)</span><br><span class="line">    printf(&quot;u = %d\n&quot;, u)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>在代码的最后加上将 u 通过 printf 打印出来的语句。</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">$ gcc -g -c -O function_example_inline.c</span><br><span class="line">$ objdump -d -M intel -S function_example_inline.o</span><br></pre></td></tr></table></figure>
-
-<p>面的 function_example_inline.c 的编译出来的汇编代码，没有把 add 函数单独编译成一段指令顺序，而是在调用 u &#x3D; add(x, y) 的时候，直接替换成了一个 add 指令。</p>
-<p>除了依靠编译器的自动优化，你还可以在定义函数的地方，加上 inline 的关键字，来提示编译器对函数进行内联。</p>
-<p>内联带来的优化： CPU需要执行的指令数变少了，根据地址跳转的过程不需要了，压栈和出栈的过程也不用了。</p>
-<p>不过付出的代价是把可以复用的程序指令在调用它的地方完全展开了。如果一个函数在很多地方都被调用了，意味着整个程序占用的空间就会变大。</p>
-<img src="/img/computer_img/叶子函数.webp" alt="叶子函数" style="zoom:33%;" />
-
-<p>这样没有调用其他函数，只会被调用的函数，我们一般称之为叶子函数（或叶子过程）。</p>
-<h2 id="总结延伸"><a href="#总结延伸" class="headerlink" title="总结延伸"></a>总结延伸</h2><p>主要讲了一个程序的函数间调用，在CPU指令层面是怎么执行的，其中程序栈这个概念一定要记着。</p>
-<p>可以方便地通过压栈和出栈操作，使得程序在不同的函数调用过程中进行转移。而函数内联和栈溢出，一个是我们常常可以选择的优化方案，另一个则是我们会常遇到的程序 bug。</p>
-<p>通过加入了程序栈，我们相当于在指令跳转的过程中，加入了一个“记忆”的功能，能在跳转去运行新的指令之后，再回到跳出去的位置，能够实现更加丰富和灵活的指令执行流程。这个为我们在程序开发的过程中，提供了“函数”这样一个抽象，使我们在程序开发的过程中，可以复用代码和指令。而不是简单粗暴的复制、粘贴。</p>
-]]></content>
-      <categories>
-        <category>计算机组成原理</category>
-      </categories>
-      <tags>
-        <tag>机器码</tag>
-        <tag>stack overflow</tag>
-        <tag>函数内联</tag>
       </tags>
   </entry>
   <entry>
@@ -390,6 +327,69 @@ SPEC 提供的 CPU 基准测试程序，就好像 CPU 届的“高考”，通�
       <tags>
         <tag>程序</tag>
         <tag>链接</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>函数调用</title>
+    <url>/posts/f4b9b599/</url>
+    <content><![CDATA[<h1 id="函数调用：为什么会发生stack-overflow？"><a href="#函数调用：为什么会发生stack-overflow？" class="headerlink" title="函数调用：为什么会发生stack overflow？"></a>函数调用：为什么会发生stack overflow？</h1><p>Stack Overflow 的名字来自于一个常见的报错，就是栈溢出（stack overflow）。</p>
+<p>从程序的函数调用开始<span id="more"></span>，讲讲函数间的相互调用，在计算机指令层面是怎么实现的，以及什么情况下会发生栈溢出这个错误。</p>
+<h2 id="为什么我们需要程序栈"><a href="#为什么我们需要程序栈" class="headerlink" title="为什么我们需要程序栈"></a>为什么我们需要程序栈</h2><p>我们还是从一个非常简单的 C 程序 function_example.c 看起。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">// function_example.c</span><br><span class="line"></span><br><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">int static add(int a, int b)</span><br><span class="line">&#123;</span><br><span class="line">    return a+b;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">int main()</span><br><span class="line">&#123;</span><br><span class="line">    int x = 5;</span><br><span class="line">    int y = 10;</span><br><span class="line">    int u = add(x, y);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这个程序定义了一个简单的函数 add，接受两个参数 a 和 b，返回值就是 a+b。而 main 函数里则定义了两个变量 x 和 y，然后通过调用这个 add 函数，来计算 u&#x3D;x+y，最后把 u 的数值打印出来。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">$ gcc -g -c function_example.c</span><br><span class="line">$ objdump -d -M intel -S function_example.o</span><br></pre></td></tr></table></figure>
+
+<p>我们把这个程序编译之后，objdump 出来。我们来看一看对应的汇编代码。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">int static add(int a, int b)</span><br><span class="line">&#123;</span><br><span class="line">   0:   55                      push   rbp</span><br><span class="line">   1:   48 89 e5                mov    rbp,rsp</span><br><span class="line">   4:   89 7d fc                mov    DWORD PTR [rbp-0x4],edi</span><br><span class="line">   7:   89 75 f8                mov    DWORD PTR [rbp-0x8],esi</span><br><span class="line">    return a+b;</span><br><span class="line">   a:   8b 55 fc                mov    edx,DWORD PTR [rbp-0x4]</span><br><span class="line">   d:   8b 45 f8                mov    eax,DWORD PTR [rbp-0x8]</span><br><span class="line">  10:   01 d0                   add    eax,edx</span><br><span class="line">&#125;</span><br><span class="line">  12:   5d                      pop    rbp</span><br><span class="line">  13:   c3                      ret    </span><br><span class="line">0000000000000014 &lt;main&gt;:</span><br><span class="line">int main()</span><br><span class="line">&#123;</span><br><span class="line">  14:   55                      push   rbp</span><br><span class="line">  15:   48 89 e5                mov    rbp,rsp</span><br><span class="line">  18:   48 83 ec 10             sub    rsp,0x10</span><br><span class="line">    int x = 5;</span><br><span class="line">  1c:   c7 45 fc 05 00 00 00    mov    DWORD PTR [rbp-0x4],0x5</span><br><span class="line">    int y = 10;</span><br><span class="line">  23:   c7 45 f8 0a 00 00 00    mov    DWORD PTR [rbp-0x8],0xa</span><br><span class="line">    int u = add(x, y);</span><br><span class="line">  2a:   8b 55 f8                mov    edx,DWORD PTR [rbp-0x8]</span><br><span class="line">  2d:   8b 45 fc                mov    eax,DWORD PTR [rbp-0x4]</span><br><span class="line">  30:   89 d6                   mov    esi,edx</span><br><span class="line">  32:   89 c7                   mov    edi,eax</span><br><span class="line">  34:   e8 c7 ff ff ff          call   0 &lt;add&gt;</span><br><span class="line">  39:   89 45 f4                mov    DWORD PTR [rbp-0xc],eax</span><br><span class="line">  3c:   b8 00 00 00 00          mov    eax,0x0</span><br><span class="line">&#125;</span><br><span class="line">  41:   c9                      leave  </span><br><span class="line">  42:   c3                      ret    </span><br><span class="line">  </span><br></pre></td></tr></table></figure>
+
+<p>可以看出，这里的跳转主要是函数调用的call指令。call指令后面跟着的仍然是跳转后的程序地址。</p>
+<p>来看 add 函数。可以看到，add 函数编译之后，代码先执行了一条 push 指令和一条 mov 指令；在函数执行结束的时候，又执行了一条 pop 和一条 ret 指令。这四条指令的执行，其实就是在进行我们接下来要讲<strong>压栈（Push）</strong>和<strong>出栈（Pop）</strong>操作。</p>
+<p>这与if…else 和 for&#x2F;while 循环的跳转是有区别的，if…else 和 for&#x2F;while 的跳转，是跳转走了就不再回来了，就在跳转后的新地址开始顺序地执行指令，而函数调用的跳转，在对应函数的指令执行完了之后，还要再回到函数调用的地方，继续执行 call 之后的指令。</p>
+<p>可以把调用的函数指令直接插入调用函数的地方，替换掉对应的 c a l l 自立，然后在编译器编译代码时，直接就把函数调用变成对应的指令替换掉。然而，仔细想来，果函数 A 调用了函数 B，然后函数 B 再调用函数 A，我们就得面临在 A 里面插入 B 的指令，然后在 B 里面插入 A 的指令，这样就会产生无穷无尽地替换。就好像两面镜子面对面放在一块儿，任何一面镜子里面都会看到无穷多面镜子。</p>
+<p>所以，把被调用函数的指令直接插入在调用处的方法行不通。可不可以专门设立一个“程序调用寄存器”，来 存储接下来要跳转回来执行的指令地址。 等到函数调用结束，从这寄存器里取出地址，再跳转到这个记录的地址，继续执行就好。</p>
+<p>但是在多层函数调用里，简单只记录一个地址也是不够的。我们在调用函数 A 之后，A 还可以调用函数 B，B 还能调用函数 C。这一层又一层的调用并没有数量上的限制。在所有函数调用返回之前，每一次调用的返回地址都要记录下来，<strong>但是CPU 里的寄存器的数量并不多，</strong>像我们一般使用的 Intel i7 CPU 只有 16 个 64 位寄存器，调用的层数一多就存不下了。</p>
+<p>在内存里面开辟一段空间，用栈这个<strong>后进先出（LIFO，Last In First Out）</strong>的数据结构。栈就像一个乒乓球桶，每次程序调用函数之前，我们都把调用返回后的地址写在一个乒乓球上，然后塞进这个球桶。这个操作其实就是我们常说的<strong>压栈</strong>。如果函数执行完了，我们就从球桶里取出最上面的那个乒乓球，很显然，这就是<strong>出栈</strong>。</p>
+<img src="/img/computer_img/栈结构.webp" alt="栈结构" style="zoom:33%;" />
+
+<p>在真实的程序里，压栈的不只有函数调用完成后的返回地址。比如函数 A 在调用 B 的时候，需要传输一些参数数据，这些参数数据在寄存器不够用的时候也会被压入栈中。整个函数 A 所占用的所有内存空间，就是函数 A 的<strong>栈帧（Stack Frame）</strong>。Frame 在中文里也有“相框”的意思，所以，每次到这里，我都有种感觉，整个函数 A 所需要的内存空间就像是被这么一个“相框”给框了起来，放在了栈里面。</p>
+<img src="/img/computer_img/栈指令.webp" alt="栈指令" style="zoom:50%;" />
+
+<p>图中，rbp 是 register base pointer 栈基址寄存器（栈帧指针），指向当前栈帧的栈底地址。rsp 是 register stack pointer 栈顶寄存器（栈指针），指向栈顶元素。</p>
+<p>对应上面函数 add 的汇编代码，我们来仔细看看，main 函数调用 add 函数时，add 函数入口在 0～1 行，add 函数结束之后在 12～13 行。</p>
+<p>我们在调用第 34 行的 call 指令时，会把当前的 PC 寄存器里的下一条指令的地址压栈，保留函数调用结束后要执行的指令地址。而 add 函数的第 0 行，push rbp 这个指令，就是在进行压栈。这里的 rbp 又叫栈帧指针（Frame Pointer），是一个存放了当前栈帧位置的寄存器。push rbp 就把之前调用函数，也就是 main 函数的栈帧的栈底地址，压到栈顶。</p>
+<p>接着，第 1 行的一条命令 mov rbp, rsp 里，则是把 rsp 这个栈指针（Stack Pointer）的值复制到 rbp 里，而 rsp 始终会指向栈顶。这个命令意味着，rbp 这个栈帧指针指向的地址，变成当前最新的栈顶，也就是 add 函数的栈帧的栈底地址了。</p>
+<p>而在函数 add 执行完成之后，又会分别调用第 12 行的 pop rbp 来将当前的栈顶出栈，这部分操作维护好了我们整个栈帧。然后，我们可以调用第 13 行的 ret 指令，这时候同时要把 call 调用的时候压入的 PC 寄存器里的下一条指令出栈，更新到 PC 寄存器中，将程序的控制权返回到出栈后的栈顶。</p>
+<h2 id="如何构造一个-stack-overflow？"><a href="#如何构造一个-stack-overflow？" class="headerlink" title="如何构造一个 stack overflow？"></a>如何构造一个 stack overflow？</h2><p>通过引入栈，我们可以看到，无论有多少层的函数调用，或者在函数 A 里调用函数 B，再在函数 B 里调用 A，这样的递归调用，我们都只需要通过维持 rbp 和 rsp，这两个维护栈顶所在地址的寄存器，就能管理好不同函数之间的跳转。不过，栈的大小也是有限的。如果函数调用层数太多，我们往栈里压入它存不下的内容，程序在执行的过程中就会遇到栈溢出的错误，这就是大名鼎鼎的<strong>“stack  overflow”</strong>。</p>
+<p>要构造一个栈溢出的错误并不困难，最简单的办法，就是我们上面说的 Infiinite Mirror Effect 的方式，让函数 A 调用自己，并且不设任何终止条件。这样一个无限递归的程序，在不断地压栈过程中，将整个栈空间填满，并最终遇上 stack overflow。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">比如： </span><br><span class="line">int a()</span><br><span class="line">&#123;</span><br><span class="line">  return a();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">int main()</span><br><span class="line">&#123;</span><br><span class="line">  a();</span><br><span class="line">  return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="如何利用函数内联进行性能优化？"><a href="#如何利用函数内联进行性能优化？" class="headerlink" title="如何利用函数内联进行性能优化？"></a>如何利用函数内联进行性能优化？</h2><p>上面我们提到一个方法，把一个实际调用的函数产生的指令，直接插入到的位置，来替换对应的函数调用指令。尽管这个通用的函数调用方案，被我们否决了，但是如果被调用的函数里，没有调用其他函数，这个方法还是可以行得通的。</p>
+<p>事实上，这就是一个常见的编译器进行自动优化的场景，我们通常叫<strong>函数内联（Inline）</strong>。我们只要在 GCC 编译的时候，加上对应的一个让编译器自动优化的参数 -O，编译器就会在可行的情况下，进行这样的指令替换。</p>
+<p>来看这样一段代码</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">#include &lt;time.h&gt;</span><br><span class="line">#include &lt;stdlib.h&gt;</span><br><span class="line"></span><br><span class="line">int static add(int a, int b)</span><br><span class="line">&#123;</span><br><span class="line">    return a+b;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">int main()</span><br><span class="line">&#123;</span><br><span class="line">    srand(time(NULL));</span><br><span class="line">    int x = rand() % 5</span><br><span class="line">    int y = rand() % 10;</span><br><span class="line">    int u = add(x, y)</span><br><span class="line">    printf(&quot;u = %d\n&quot;, u)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在代码的最后加上将 u 通过 printf 打印出来的语句。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">$ gcc -g -c -O function_example_inline.c</span><br><span class="line">$ objdump -d -M intel -S function_example_inline.o</span><br></pre></td></tr></table></figure>
+
+<p>面的 function_example_inline.c 的编译出来的汇编代码，没有把 add 函数单独编译成一段指令顺序，而是在调用 u &#x3D; add(x, y) 的时候，直接替换成了一个 add 指令。</p>
+<p>除了依靠编译器的自动优化，你还可以在定义函数的地方，加上 inline 的关键字，来提示编译器对函数进行内联。</p>
+<p>内联带来的优化： CPU需要执行的指令数变少了，根据地址跳转的过程不需要了，压栈和出栈的过程也不用了。</p>
+<p>不过付出的代价是把可以复用的程序指令在调用它的地方完全展开了。如果一个函数在很多地方都被调用了，意味着整个程序占用的空间就会变大。</p>
+<img src="/img/computer_img/叶子函数.webp" alt="叶子函数" style="zoom:33%;" />
+
+<p>这样没有调用其他函数，只会被调用的函数，我们一般称之为叶子函数（或叶子过程）。</p>
+<h2 id="总结延伸"><a href="#总结延伸" class="headerlink" title="总结延伸"></a>总结延伸</h2><p>主要讲了一个程序的函数间调用，在CPU指令层面是怎么执行的，其中程序栈这个概念一定要记着。</p>
+<p>可以方便地通过压栈和出栈操作，使得程序在不同的函数调用过程中进行转移。而函数内联和栈溢出，一个是我们常常可以选择的优化方案，另一个则是我们会常遇到的程序 bug。</p>
+<p>通过加入了程序栈，我们相当于在指令跳转的过程中，加入了一个“记忆”的功能，能在跳转去运行新的指令之后，再回到跳出去的位置，能够实现更加丰富和灵活的指令执行流程。这个为我们在程序开发的过程中，提供了“函数”这样一个抽象，使我们在程序开发的过程中，可以复用代码和指令。而不是简单粗暴的复制、粘贴。</p>
+]]></content>
+      <categories>
+        <category>计算机组成原理</category>
+      </categories>
+      <tags>
+        <tag>机器码</tag>
+        <tag>stack overflow</tag>
+        <tag>函数内联</tag>
       </tags>
   </entry>
   <entry>
@@ -1121,6 +1121,81 @@ SPEC 提供的 CPU 基准测试程序，就好像 CPU 届的“高考”，通�
       </tags>
   </entry>
   <entry>
+    <title>高速缓存（上）</title>
+    <url>/posts/dccb8a89/</url>
+    <content><![CDATA[<h1 id="高速缓存（上）：“4毫秒”究竟值多少钱？"><a href="#高速缓存（上）：“4毫秒”究竟值多少钱？" class="headerlink" title="高速缓存（上）：“4毫秒”究竟值多少钱？"></a>高速缓存（上）：“4毫秒”究竟值多少钱？</h1><p>这一节内容开始之前，我们先来看一个 3 行的小程序。你可以猜一猜，这个程序里的循环 1 和循环 2，运行所花费的时间会差多少？<span id="more"></span>你可以先思考几分钟，然后再看我下面的解释。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">int[] arr = new int[64 * 1024 * 1024];</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">// 循环1</span><br><span class="line">for (int i = 0; i &lt; arr.length; i++) arr[i] *= 3;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">// 循环2</span><br><span class="line">for (int i = 0; i &lt; arr.length; i += 16) arr[i] *= 3</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>在这段 Java 程序中，我们首先构造了一个 64×1024×1024 大小的整型数组。在循环 1 里，我们遍历整个数组，将数组中每一项的值变成了原来的 3 倍；在循环 2 里，我们每隔 16 个索引访问一个数组元素，将这一项的值变成了原来的 3 倍。</p>
+<p>按道理来说，循环 2 只访问循环 1 中 1&#x2F;16 的数组元素，只进行了循环 1 中 1&#x2F;16 的乘法计算，那循环 2 花费的时间应该是循环 1 的 1&#x2F;16 左右。但是实际上，循环 1 在我的电脑上运行需要 50 毫秒，循环 2 只需要 46 毫秒。这两个循环花费时间之差在 15% 之内。</p>
+<hr>
+<p>为什么会有这 15% 的差异呢？这和我们今天要讲的 CPU Cache 有关。之前我们看到了内存和硬盘之间存在的巨大性能差异。在 CPU 眼里，内存也慢得不行。于是，聪明的工程师们就在 CPU 里面嵌入了 CPU Cache（高速缓存），来解决这一问题。</p>
+<h2 id="我们为什么需要高速缓存"><a href="#我们为什么需要高速缓存" class="headerlink" title="我们为什么需要高速缓存?"></a>我们为什么需要高速缓存?</h2><p>按照摩尔定律，CPU 的访问速度每 18 个月便会翻一番，相当于每年增长 60%。内存的访问速度虽然也在不断增长，却远没有这么快，每年只增长 7% 左右。而这两个增长速度的差异，使得 CPU 性能和内存访问性能的差距不断拉大。到今天来看，一次内存的访问，大约需要 120 个 CPU Cycle，这也意味着，在今天，CPU 和内存的访问速度已经有了 120 倍的差距。</p>
+<p>如果拿我们现实生活来打个比方的话，CPU 的速度好比风驰电掣的高铁，每小时 350 公里，然而，它却只能等着旁边腿脚不太灵便的老太太，也就是内存，以每小时 3 公里的速度缓慢步行。因为 CPU 需要执行的指令、需要访问的数据，都在这个速度不到自己 1% 的内存里。</p>
+<img src="/img/computer_img/CPU和内存性能差异.webp" alt="CPU和内存性能差异" style="zoom:50%;" />
+
+
+
+<p>为了弥补两者之间的性能差异，我们能真实地把 CPU 的性能提升用起来，而不是让它在那儿空转，我们在现代 CPU 中引入了高速缓存。</p>
+<p>从 CPU Cache 被加入到现有的 CPU 里开始，内存中的指令、数据，会被加载到 L1-L3 Cache 中，而不是直接由 CPU 访问内存去拿。在 95% 的情况下，CPU 都只需要访问 L1-L3 Cache，从里面读取指令和数据，而无需访问内存。要注意的是，要注意的是，这里我们说的 CPU  cache 或者 L1&#x2F;L3  Cache，不是一个单纯的、概念上的缓存（比如之前我们说的拿内存作为硬盘的缓存）），而是指特定的由 SRAM 组成的物理芯片。 </p>
+<p>这里是一张 Intel CPU 的放大照片。这里面大片的长方形芯片，就是这个 CPU 使用的 20MB 的  L3 Cache。</p>
+<img src="/img/computer_img/SRAM缓存.webp" alt="SRAM缓存" style="zoom:50%;" />
+
+<p> 这一讲一开始的程序里，运行程序的时间主要花在将对应的数据从内存中读取出来，加载到CPU cache 里。 CPU 从内存中读取数据到 CPU Cache 的过程中，是<strong>一小块一小块来读取数据的</strong>（是一小块一小块来读取数据的），而不是按照单个数组元素来读取数据的。这样一小块一小块的数据，在 CPU Cache 里面，我们把它叫作  <strong>Cache Line（缓存块）</strong>。</p>
+<p>在我们日常使用的 Intel 服务器或者 PC 里，Cache Line 的大小通常是 64 字节。而在上面的循环 2 里面，我们每隔 16 个整型数计算一次，16 个整型数正好是 64 个字节。于是，循环 1 和循环 2，需要把同样数量的 Cache Line 数据从内存中读取到 CPU Cache 中，最终两个程序花费的时间就差别不大了。</p>
+<p>知道了为什么需要 CPU Cache，接下来，我们就来看一看，CPU 究竟是如何访问 CPU Cache 的，以及 CPU Cache 是如何组织数据，使得 CPU 可以找到自己想要访问的数据的。    因为 Cache 作为“缓存”的意思，在很多别的存储设备里面都会用到。为了避免你混淆，在表示抽象的“缓存“概念时，用中文的“缓存”；如果是 CPU Cache，我会用“高速缓存“或者英文的“Cache”，来表示。</p>
+<h2 id="Cache-的数据结构和读取过程是什么样的？"><a href="#Cache-的数据结构和读取过程是什么样的？" class="headerlink" title="Cache 的数据结构和读取过程是什么样的？"></a>Cache 的数据结构和读取过程是什么样的？</h2><p>现代 CPU 进行数据读取的时候，无论数据是否已经存储在 Cache 中，CPU 始终会首先访问 Cache。只有当 CPU 在 Cache 中找不到数据的时候，才会去访问内存，并将读取到的数据写入 Cache 之中。  当时间局部性原理起作用后，这个最近刚刚被访问的数据，会很快再次被访问。而 Cache 的访问速度远远快于内存，这样，CPU 花在等待内存访问上的时间就大大变短了。</p>
+<img src="/img/computer_img/访问cache.webp" alt="访问cache" style="zoom:50%;" />
+
+<p>这样的访问机制，和我们自己在开发应用系统的时候，“使用内存作为硬盘的缓存”的逻辑是一样的。在各类基准测试（Benchmark）和实际应用场景中，CPU Cache 的命中率通常能达到 95% 以上。</p>
+<p>问题来了，CPU 如何知道要访问的内存数据，存储在 Cache 的哪个位置呢？接下来，我就从最基本的直接映射 Cache（Direct Mapped Cache）说起，带你来看整个 Cache 的数据结构和访问逻辑。</p>
+<h3 id="直接映射-Cache"><a href="#直接映射-Cache" class="headerlink" title="直接映射 Cache"></a>直接映射 Cache</h3><p>CPU 访问内存数据，是一小块一小块数据来读取的。对于读取内存中的数据，我们首先拿到的是数据所在的内存块（Block）的地址。 而直接映射 Cache 采用的策略，就是确保任何一个内存块的地址，始终映射到一个固定的 <strong>CPU Cache</strong> 地址（Cache Line）。而这个映射关系，通常用 mod 运算（求余运算）来实现。下面我举个例子帮你理解一下。</p>
+<p>比如说，我们的主内存被分成 0～31 号这样 32 个块。我们一共有 8个缓存块。用户想要访问第 21 号内存块。如果 21 号内存块内容在缓存块中的话，它一定在 5 号缓存块（21 mod 8 &#x3D; 5）中。</p>
+<img src="/img/computer_img/直接映射cache.webp" alt="直接映射cache" style="zoom:50%;" />
+
+
+
+<p>实际计算中，有一个小小的技巧，通常我们会把缓存块的数量设置成 2 的 N 次方。这样在计算取模的时候，可以直接取地址的低 N 位，也就是二进制里面的后几位。比如这里的 8 个缓存块，就是 2 的 3 次方。那么，在对 21 取模的时候，可以对 21 的 2 进制表示 10101 取地址的低三位，也就是 101，对应的 5，就是对应的缓存块地址。</p>
+<img src="/img/computer_img/低3位cache.webp" alt="低3位cache" style="zoom:33%;" />
+
+<p>取 Block 地址的低位，就能得到对应的 Cache Line 地址，除了 21 号内存块外，13 号、5 号等很多内存块的数据，都对应着 5 号缓存块中。既然如此，假如现在 CPU 想要读取 21 号内存块，在读取到 5 号缓存块的时候，我们怎么知道里面的数据，究竟是不是 21 号对应的数据呢？</p>
+<hr>
+<p>这个时候，在对应的缓存块中，我们会存储一个<strong>组标记</strong>（Tag）。这个组标记会记录，当前缓存块内存存储的数据对应的内存块，而缓存块本身的地址表示访问地址的低 N 位。就像上面的例子，21 的低 3 位 101，缓存块本身的地址已经涵盖了对应的信息、对应的组标记，我们只需要记录 21 剩余的高 2 位的信息，也就是 10 就可以了。</p>
+<p>除了组标记信息之外，缓存块中还有两个数据。一个自然是从主内存中加载来的实际存放的数据，另一个是<strong>有效位</strong>（valid bit），它其实就是用来标记，对应的缓存块中的数据是否是有效的，确保不是机器刚刚启动时候的空数据 。 <em>如果有效位是 0，无论其中的组标记和 Cache Line 里的数据内容是什么，CPU 都不会管这些数据，而要直接访问内存，重新加载数据。</em></p>
+<hr>
+<p>CPU 在读取数据的时候，并不是要读取一整个 Block，而是读取一个他需要的数据片段。这样的数据，我们叫作 CPU 里的一个字（Word）。具体是哪个字，就用这个字在整个 Block 里面的位置来决定。这个位置，我们叫作偏移量（Offset）</p>
+<p>总结一下，<strong>一个内存的访问地址，最终包括高位代表的组标记、低位代表的索引，以及在对应的 Data Block 中定位对应字的位置偏移量。</strong></p>
+<img src="/img/computer_img/内存地址到Cache Line.webp" alt="内存地址到Cache Line" style="zoom:50%;" />
+
+<center>内存地址到 Cache Line 的关系</center>
+
+<p>而内存地址对应到 Cache 里的数据结构，则多了一个有效位和对应的数据，由“索引 + 有效位 + 组标记 + 数据”组成。如果内存中的数据已经在 CPU Cache 里了，那一个内存地址的访问，就会经历这样 4 个步骤：</p>
+<ol>
+<li>根据内存地址的低位，计算在 Cache 中的索引；</li>
+<li>判断有效位，确认 Cache 中的数据是有效的；</li>
+<li>对比内存访问地址的高位，和 Cache 中的组标记，确认 Cache 中的数据就是我们要访问的内存数据，从 Cache Line 中读取到对应的数据块（Data Block）；</li>
+<li>根据内存地址的 Offset 位，从 Data Block 中，读取希望读取到的字。</li>
+</ol>
+<p>如果在 2、3 这两个步骤中，CPU 发现，Cache 中的数据并不是要访问的内存地址的数据，那CPU 就会访问内存，并把对应的Block Data 更新到 Cache Line 中，同时更新对应的有效位和组标记的数据。</p>
+<hr>
+<p>讲到这里，相信你明白现代 CPU，是如何通过直接映射 Cache，来定位一个内存访问地址在 Cache 中的位置了。其实，除了直接映射 Cache 之外，我们常见的缓存放置策略还有全相连 Cache（Fully Associative Cache）、组相连 Cache（Set Associative Cache）。这几种策略的数据结构都是相似的，理解了最简单的直接映射 Cache，其他的策略你很容易就能理解了。</p>
+<h2 id="减少-4-毫秒，公司挣了多少钱"><a href="#减少-4-毫秒，公司挣了多少钱" class="headerlink" title="减少 4 毫秒，公司挣了多少钱?"></a>减少 4 毫秒，公司挣了多少钱?</h2><p>讲了 CPU 和内存之间的性能差异，以及我们如何通过 CPU Cache 来尽可能解决这两者之间的性能鸿沟。你可能要问了，这样做的意义和价值究竟是什么？毕竟，一次内存的访问，只不过需要 100 纳秒而已。1 秒钟时间内，足有 1000 万个 100 纳秒。别着急，我们先来看一个故事。</p>
+<p>2008 年，一家叫作 Spread Networks 的通信公司花费 3 亿美元，做了一个光缆建设项目。目标是建设一条从芝加哥到新泽西，总长 1331 公里的光缆线路。建设这条线路的目的，其实是为了将两地之间原有的网络访问延时，从 17 毫秒降低到 13 毫秒。</p>
+<p>你可能会说，仅仅缩短了 4 毫秒时间啊，却花费 3 个亿，真的值吗？为这 4 毫秒时间买单的，其实是一批高频交易公司。它们以 5 年 1400 万美元的价格，使用这条线路。利用这短短的 4 毫秒的时间优势，这些公司通过高性能的计算机程序，在芝加哥和新泽西两地的交易所进行高频套利，以获得每年以 10 亿美元计的利润。现在你还觉得这个不值得吗？</p>
+<p>其实，只要 350 微秒的差异，就足够高频交易公司用来进行无风险套利了。而 350 微秒，如果用来进行 100 纳秒一次的内存访问，大约只够进行 3500 次。而引入 CPU Cache 之后，我们可以进行的数据访问次数，提升了数十倍，使得各种交易策略成为可能。</p>
+<h2 id="总结延伸"><a href="#总结延伸" class="headerlink" title="总结延伸"></a>总结延伸</h2><p>很多时候，程序的性能瓶颈，来自使用 DRAM 芯片的内存访问速度。</p>
+<p>根据摩尔定律，自上世纪 80 年代以来，CPU 和内存的性能鸿沟越拉越大。于是，现代 CPU 的设计者们，直接在 CPU 中嵌入了使用更高性能的 SRAM 芯片的 Cache，来弥补这一性能差异。通过巧妙地将内存地址，拆分成“索引 + 组标记 + 偏移量”的方式，使得我们可以将很大的内存地址，映射到很小的 CPU Cache 地址里。而 CPU Cache 带来的毫秒乃至微秒级别的性能差异，又能带来巨大的商业利益。</p>
+<p>在搞清楚从内存加载数据到 Cache，以及从 Cache 里读取到想要的数据之后，我们又要面临一个新的挑战了。CPU 不仅要读数据，还需要写数据，我们不能只把数据写入到 Cache 里面就结束了。下一讲会来说 CPU 要写入数据的时候，怎么既不牺牲性能，又能保持数据的一致性。</p>
+]]></content>
+      <categories>
+        <category>计算机组成原理</category>
+      </categories>
+      <tags>
+        <tag>cache</tag>
+        <tag> 虚拟内存</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>高速缓存（下）</title>
     <url>/posts/6477edec/</url>
     <content><![CDATA[<h1 id="高速缓存（下）：你确定你的数据更新了么？"><a href="#高速缓存（下）：你确定你的数据更新了么？" class="headerlink" title="高速缓存（下）：你确定你的数据更新了么？"></a>高速缓存（下）：你确定你的数据更新了么？</h1><p>面试过大量的 Java 工程师。对于一些表示自己深入了解和擅长多线程的同学，我经常会问这样一个面试题：<strong>“volatile 这个关键字有什么作用？”</strong><span id="more"></span><br>就我面试过的工程师而言，即使是工作了多年的 Java 工程师，也很少有人能准确说出 volatile 这个关键字的含义。这里面最常见的理解错误有两个，一个是把 volatile 当成一种锁机制，认为给变量加上了 volatile，就好像是给函数加了 sychronized 关键字一样，不同的线程对于特定变量的访问会去加锁；    另一个是把 volatile 当成一种原子化的操作机制，认为加了 volatile 之后，对于一个变量的自增的操作就会变成原子性的了。</p>
@@ -1208,81 +1283,6 @@ SPEC 提供的 CPU 基准测试程序，就好像 CPU 届的“高考”，通�
       </tags>
   </entry>
   <entry>
-    <title>高速缓存（上）</title>
-    <url>/posts/dccb8a89/</url>
-    <content><![CDATA[<h1 id="高速缓存（上）：“4毫秒”究竟值多少钱？"><a href="#高速缓存（上）：“4毫秒”究竟值多少钱？" class="headerlink" title="高速缓存（上）：“4毫秒”究竟值多少钱？"></a>高速缓存（上）：“4毫秒”究竟值多少钱？</h1><p>这一节内容开始之前，我们先来看一个 3 行的小程序。你可以猜一猜，这个程序里的循环 1 和循环 2，运行所花费的时间会差多少？<span id="more"></span>你可以先思考几分钟，然后再看我下面的解释。</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">int[] arr = new int[64 * 1024 * 1024];</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">// 循环1</span><br><span class="line">for (int i = 0; i &lt; arr.length; i++) arr[i] *= 3;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">// 循环2</span><br><span class="line">for (int i = 0; i &lt; arr.length; i += 16) arr[i] *= 3</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p>在这段 Java 程序中，我们首先构造了一个 64×1024×1024 大小的整型数组。在循环 1 里，我们遍历整个数组，将数组中每一项的值变成了原来的 3 倍；在循环 2 里，我们每隔 16 个索引访问一个数组元素，将这一项的值变成了原来的 3 倍。</p>
-<p>按道理来说，循环 2 只访问循环 1 中 1&#x2F;16 的数组元素，只进行了循环 1 中 1&#x2F;16 的乘法计算，那循环 2 花费的时间应该是循环 1 的 1&#x2F;16 左右。但是实际上，循环 1 在我的电脑上运行需要 50 毫秒，循环 2 只需要 46 毫秒。这两个循环花费时间之差在 15% 之内。</p>
-<hr>
-<p>为什么会有这 15% 的差异呢？这和我们今天要讲的 CPU Cache 有关。之前我们看到了内存和硬盘之间存在的巨大性能差异。在 CPU 眼里，内存也慢得不行。于是，聪明的工程师们就在 CPU 里面嵌入了 CPU Cache（高速缓存），来解决这一问题。</p>
-<h2 id="我们为什么需要高速缓存"><a href="#我们为什么需要高速缓存" class="headerlink" title="我们为什么需要高速缓存?"></a>我们为什么需要高速缓存?</h2><p>按照摩尔定律，CPU 的访问速度每 18 个月便会翻一番，相当于每年增长 60%。内存的访问速度虽然也在不断增长，却远没有这么快，每年只增长 7% 左右。而这两个增长速度的差异，使得 CPU 性能和内存访问性能的差距不断拉大。到今天来看，一次内存的访问，大约需要 120 个 CPU Cycle，这也意味着，在今天，CPU 和内存的访问速度已经有了 120 倍的差距。</p>
-<p>如果拿我们现实生活来打个比方的话，CPU 的速度好比风驰电掣的高铁，每小时 350 公里，然而，它却只能等着旁边腿脚不太灵便的老太太，也就是内存，以每小时 3 公里的速度缓慢步行。因为 CPU 需要执行的指令、需要访问的数据，都在这个速度不到自己 1% 的内存里。</p>
-<img src="/img/computer_img/CPU和内存性能差异.webp" alt="CPU和内存性能差异" style="zoom:50%;" />
-
-
-
-<p>为了弥补两者之间的性能差异，我们能真实地把 CPU 的性能提升用起来，而不是让它在那儿空转，我们在现代 CPU 中引入了高速缓存。</p>
-<p>从 CPU Cache 被加入到现有的 CPU 里开始，内存中的指令、数据，会被加载到 L1-L3 Cache 中，而不是直接由 CPU 访问内存去拿。在 95% 的情况下，CPU 都只需要访问 L1-L3 Cache，从里面读取指令和数据，而无需访问内存。要注意的是，要注意的是，这里我们说的 CPU  cache 或者 L1&#x2F;L3  Cache，不是一个单纯的、概念上的缓存（比如之前我们说的拿内存作为硬盘的缓存）），而是指特定的由 SRAM 组成的物理芯片。 </p>
-<p>这里是一张 Intel CPU 的放大照片。这里面大片的长方形芯片，就是这个 CPU 使用的 20MB 的  L3 Cache。</p>
-<img src="/img/computer_img/SRAM缓存.webp" alt="SRAM缓存" style="zoom:50%;" />
-
-<p> 这一讲一开始的程序里，运行程序的时间主要花在将对应的数据从内存中读取出来，加载到CPU cache 里。 CPU 从内存中读取数据到 CPU Cache 的过程中，是<strong>一小块一小块来读取数据的</strong>（是一小块一小块来读取数据的），而不是按照单个数组元素来读取数据的。这样一小块一小块的数据，在 CPU Cache 里面，我们把它叫作  <strong>Cache Line（缓存块）</strong>。</p>
-<p>在我们日常使用的 Intel 服务器或者 PC 里，Cache Line 的大小通常是 64 字节。而在上面的循环 2 里面，我们每隔 16 个整型数计算一次，16 个整型数正好是 64 个字节。于是，循环 1 和循环 2，需要把同样数量的 Cache Line 数据从内存中读取到 CPU Cache 中，最终两个程序花费的时间就差别不大了。</p>
-<p>知道了为什么需要 CPU Cache，接下来，我们就来看一看，CPU 究竟是如何访问 CPU Cache 的，以及 CPU Cache 是如何组织数据，使得 CPU 可以找到自己想要访问的数据的。    因为 Cache 作为“缓存”的意思，在很多别的存储设备里面都会用到。为了避免你混淆，在表示抽象的“缓存“概念时，用中文的“缓存”；如果是 CPU Cache，我会用“高速缓存“或者英文的“Cache”，来表示。</p>
-<h2 id="Cache-的数据结构和读取过程是什么样的？"><a href="#Cache-的数据结构和读取过程是什么样的？" class="headerlink" title="Cache 的数据结构和读取过程是什么样的？"></a>Cache 的数据结构和读取过程是什么样的？</h2><p>现代 CPU 进行数据读取的时候，无论数据是否已经存储在 Cache 中，CPU 始终会首先访问 Cache。只有当 CPU 在 Cache 中找不到数据的时候，才会去访问内存，并将读取到的数据写入 Cache 之中。  当时间局部性原理起作用后，这个最近刚刚被访问的数据，会很快再次被访问。而 Cache 的访问速度远远快于内存，这样，CPU 花在等待内存访问上的时间就大大变短了。</p>
-<img src="/img/computer_img/访问cache.webp" alt="访问cache" style="zoom:50%;" />
-
-<p>这样的访问机制，和我们自己在开发应用系统的时候，“使用内存作为硬盘的缓存”的逻辑是一样的。在各类基准测试（Benchmark）和实际应用场景中，CPU Cache 的命中率通常能达到 95% 以上。</p>
-<p>问题来了，CPU 如何知道要访问的内存数据，存储在 Cache 的哪个位置呢？接下来，我就从最基本的直接映射 Cache（Direct Mapped Cache）说起，带你来看整个 Cache 的数据结构和访问逻辑。</p>
-<h3 id="直接映射-Cache"><a href="#直接映射-Cache" class="headerlink" title="直接映射 Cache"></a>直接映射 Cache</h3><p>CPU 访问内存数据，是一小块一小块数据来读取的。对于读取内存中的数据，我们首先拿到的是数据所在的内存块（Block）的地址。 而直接映射 Cache 采用的策略，就是确保任何一个内存块的地址，始终映射到一个固定的 <strong>CPU Cache</strong> 地址（Cache Line）。而这个映射关系，通常用 mod 运算（求余运算）来实现。下面我举个例子帮你理解一下。</p>
-<p>比如说，我们的主内存被分成 0～31 号这样 32 个块。我们一共有 8个缓存块。用户想要访问第 21 号内存块。如果 21 号内存块内容在缓存块中的话，它一定在 5 号缓存块（21 mod 8 &#x3D; 5）中。</p>
-<img src="/img/computer_img/直接映射cache.webp" alt="直接映射cache" style="zoom:50%;" />
-
-
-
-<p>实际计算中，有一个小小的技巧，通常我们会把缓存块的数量设置成 2 的 N 次方。这样在计算取模的时候，可以直接取地址的低 N 位，也就是二进制里面的后几位。比如这里的 8 个缓存块，就是 2 的 3 次方。那么，在对 21 取模的时候，可以对 21 的 2 进制表示 10101 取地址的低三位，也就是 101，对应的 5，就是对应的缓存块地址。</p>
-<img src="/img/computer_img/低3位cache.webp" alt="低3位cache" style="zoom:33%;" />
-
-<p>取 Block 地址的低位，就能得到对应的 Cache Line 地址，除了 21 号内存块外，13 号、5 号等很多内存块的数据，都对应着 5 号缓存块中。既然如此，假如现在 CPU 想要读取 21 号内存块，在读取到 5 号缓存块的时候，我们怎么知道里面的数据，究竟是不是 21 号对应的数据呢？</p>
-<hr>
-<p>这个时候，在对应的缓存块中，我们会存储一个<strong>组标记</strong>（Tag）。这个组标记会记录，当前缓存块内存存储的数据对应的内存块，而缓存块本身的地址表示访问地址的低 N 位。就像上面的例子，21 的低 3 位 101，缓存块本身的地址已经涵盖了对应的信息、对应的组标记，我们只需要记录 21 剩余的高 2 位的信息，也就是 10 就可以了。</p>
-<p>除了组标记信息之外，缓存块中还有两个数据。一个自然是从主内存中加载来的实际存放的数据，另一个是<strong>有效位</strong>（valid bit），它其实就是用来标记，对应的缓存块中的数据是否是有效的，确保不是机器刚刚启动时候的空数据 。 <em>如果有效位是 0，无论其中的组标记和 Cache Line 里的数据内容是什么，CPU 都不会管这些数据，而要直接访问内存，重新加载数据。</em></p>
-<hr>
-<p>CPU 在读取数据的时候，并不是要读取一整个 Block，而是读取一个他需要的数据片段。这样的数据，我们叫作 CPU 里的一个字（Word）。具体是哪个字，就用这个字在整个 Block 里面的位置来决定。这个位置，我们叫作偏移量（Offset）</p>
-<p>总结一下，<strong>一个内存的访问地址，最终包括高位代表的组标记、低位代表的索引，以及在对应的 Data Block 中定位对应字的位置偏移量。</strong></p>
-<img src="/img/computer_img/内存地址到Cache Line.webp" alt="内存地址到Cache Line" style="zoom:50%;" />
-
-<center>内存地址到 Cache Line 的关系</center>
-
-<p>而内存地址对应到 Cache 里的数据结构，则多了一个有效位和对应的数据，由“索引 + 有效位 + 组标记 + 数据”组成。如果内存中的数据已经在 CPU Cache 里了，那一个内存地址的访问，就会经历这样 4 个步骤：</p>
-<ol>
-<li>根据内存地址的低位，计算在 Cache 中的索引；</li>
-<li>判断有效位，确认 Cache 中的数据是有效的；</li>
-<li>对比内存访问地址的高位，和 Cache 中的组标记，确认 Cache 中的数据就是我们要访问的内存数据，从 Cache Line 中读取到对应的数据块（Data Block）；</li>
-<li>根据内存地址的 Offset 位，从 Data Block 中，读取希望读取到的字。</li>
-</ol>
-<p>如果在 2、3 这两个步骤中，CPU 发现，Cache 中的数据并不是要访问的内存地址的数据，那CPU 就会访问内存，并把对应的Block Data 更新到 Cache Line 中，同时更新对应的有效位和组标记的数据。</p>
-<hr>
-<p>讲到这里，相信你明白现代 CPU，是如何通过直接映射 Cache，来定位一个内存访问地址在 Cache 中的位置了。其实，除了直接映射 Cache 之外，我们常见的缓存放置策略还有全相连 Cache（Fully Associative Cache）、组相连 Cache（Set Associative Cache）。这几种策略的数据结构都是相似的，理解了最简单的直接映射 Cache，其他的策略你很容易就能理解了。</p>
-<h2 id="减少-4-毫秒，公司挣了多少钱"><a href="#减少-4-毫秒，公司挣了多少钱" class="headerlink" title="减少 4 毫秒，公司挣了多少钱?"></a>减少 4 毫秒，公司挣了多少钱?</h2><p>讲了 CPU 和内存之间的性能差异，以及我们如何通过 CPU Cache 来尽可能解决这两者之间的性能鸿沟。你可能要问了，这样做的意义和价值究竟是什么？毕竟，一次内存的访问，只不过需要 100 纳秒而已。1 秒钟时间内，足有 1000 万个 100 纳秒。别着急，我们先来看一个故事。</p>
-<p>2008 年，一家叫作 Spread Networks 的通信公司花费 3 亿美元，做了一个光缆建设项目。目标是建设一条从芝加哥到新泽西，总长 1331 公里的光缆线路。建设这条线路的目的，其实是为了将两地之间原有的网络访问延时，从 17 毫秒降低到 13 毫秒。</p>
-<p>你可能会说，仅仅缩短了 4 毫秒时间啊，却花费 3 个亿，真的值吗？为这 4 毫秒时间买单的，其实是一批高频交易公司。它们以 5 年 1400 万美元的价格，使用这条线路。利用这短短的 4 毫秒的时间优势，这些公司通过高性能的计算机程序，在芝加哥和新泽西两地的交易所进行高频套利，以获得每年以 10 亿美元计的利润。现在你还觉得这个不值得吗？</p>
-<p>其实，只要 350 微秒的差异，就足够高频交易公司用来进行无风险套利了。而 350 微秒，如果用来进行 100 纳秒一次的内存访问，大约只够进行 3500 次。而引入 CPU Cache 之后，我们可以进行的数据访问次数，提升了数十倍，使得各种交易策略成为可能。</p>
-<h2 id="总结延伸"><a href="#总结延伸" class="headerlink" title="总结延伸"></a>总结延伸</h2><p>很多时候，程序的性能瓶颈，来自使用 DRAM 芯片的内存访问速度。</p>
-<p>根据摩尔定律，自上世纪 80 年代以来，CPU 和内存的性能鸿沟越拉越大。于是，现代 CPU 的设计者们，直接在 CPU 中嵌入了使用更高性能的 SRAM 芯片的 Cache，来弥补这一性能差异。通过巧妙地将内存地址，拆分成“索引 + 组标记 + 偏移量”的方式，使得我们可以将很大的内存地址，映射到很小的 CPU Cache 地址里。而 CPU Cache 带来的毫秒乃至微秒级别的性能差异，又能带来巨大的商业利益。</p>
-<p>在搞清楚从内存加载数据到 Cache，以及从 Cache 里读取到想要的数据之后，我们又要面临一个新的挑战了。CPU 不仅要读数据，还需要写数据，我们不能只把数据写入到 Cache 里面就结束了。下一讲会来说 CPU 要写入数据的时候，怎么既不牺牲性能，又能保持数据的一致性。</p>
-]]></content>
-      <categories>
-        <category>计算机组成原理</category>
-      </categories>
-      <tags>
-        <tag>cache</tag>
-        <tag> 虚拟内存</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>MESI协议</title>
     <url>/posts/a2fa04e/</url>
     <content><![CDATA[<h1 id="MESI协议：如何让多核CPU的高速缓存保持一致？"><a href="#MESI协议：如何让多核CPU的高速缓存保持一致？" class="headerlink" title="MESI协议：如何让多核CPU的高速缓存保持一致？"></a>MESI协议：如何让多核CPU的高速缓存保持一致？</h1><p>多核 CPU 有很多好处，其中最重要的一个就是，它使得我们在不能提升 CPU 的主频之后，找到了另一种提升 CPU 吞吐率<span id="more"></span>的办法。</p>
@@ -1352,132 +1352,6 @@ SPEC 提供的 CPU 基准测试程序，就好像 CPU 届的“高考”，通�
       </categories>
       <tags>
         <tag>缓存一致性</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>总线-计算机内部的高速公路</title>
-    <url>/posts/d6a63846/</url>
-    <content><![CDATA[<h1 id="总线：计算机内部的高速公路"><a href="#总线：计算机内部的高速公路" class="headerlink" title="总线：计算机内部的高速公路"></a>总线：计算机内部的高速公路</h1><p>CPU所代表的控制器和运算器，要和存储器，也就是我们的主内存，以及输入和输出设备进行通信。 那问题来了，CP U从我们的键盘、鼠标接收输入信号，向显示器输出信号，这之间究竟是怎么通信的呢<span id="more"></span>？换句话说，计算机是用什么样的方式来完成，CPU 和内存、以及外部输入输出设备的通信呢？</p>
-<hr>
-<h2 id="降低复杂性：总线的设计思路来源"><a href="#降低复杂性：总线的设计思路来源" class="headerlink" title="降低复杂性：总线的设计思路来源"></a>降低复杂性：总线的设计思路来源</h2><p>计算机里其实有很多不同的硬件设备，除了 CPU 和内存之外，我们还有大量的输入输出设备。可以说，你计算机上的每一个接口，键盘、鼠标、显示器、硬盘，乃至通过 USB 接口连接的各种外部设备，都对应了一个设备或者模块。</p>
-<p>如果各个设备间的通信，都是互相之间单独进行的。如果我们有 N 个不同的设备，他们之间需要各自单独连接，那么系统复杂度就会变成 N2。每一个设备或者功能电路模块，都要和其他 N−1 个设备去通信。<u>为了简化系统的复杂度，我们就引入了总线，把这个 N2 的复杂度，变成一个 N 的复杂度。</u></p>
-<p>与其让各个设备之间互相单独通信，不如我们去设计一个公用的线路。</p>
-<blockquote>
-<p>CPU 想要和什么设备通信，通信的指令是什么，对应的数据是什么，都发送到这个线路上；设备要向 CPU 发送什么信息呢，也发送到这个线路上。这个线路就好像一个高速公路，各个设备和其他设备之间，不需要单独建公路，只建一条小路通向这条高速公路就好了。</p>
-</blockquote>
-<img src="/img/computer_img/总线降低复杂度.webp" alt="总线降低复杂度" style="zoom:50%;" />
-
-<p>这个设计思路，就是我们今天要说的总线（Bus）。</p>
-<p>总线，其实就是一组线路。我们的 CPU、内存以及输入和输出设备，都是通过这组线路，进行相互间通信的。总线的英文叫作 <strong>Bus</strong>，就是一辆公交车。这个名字很好地描述了总线的含义。我们的“公交车”的各个站点，就是各个接入设备。要想向一个设备传输数据，我们只要把数据放上公交车，在对应的车站下车就可以了。</p>
-<p>其实，对应的设计思路，在软件开发中也是非常常见的。我们在做大型系统开发的过程中，经常会用到一种叫作<a href="https://dzone.com/articles/design-patterns-event-bus"><strong>事件总线</strong></a>（Event Bus）的设计模式。</p>
-<p>进行大规模应用系统开发的时候，系统中的各个组件之间也需要相互通信。模块之间如果是两两之间单独去定义协议，这个软件系统一样会遇到一个复杂度变成了 N2 的问题。所以常见的一个解决方案，就是事件总线这个设计模式。</p>
-<p>在事件总线这个设计模式里，各个模块触发对应的事件，并把事件对象发送到总线上。 也就是说，每个模块就是一个发布者。而每个模块也会把自己注册到总线上，去监听总线上的事件，并根据事件的对象类型或者是对象内容，来决定自己是否要进行特定的处理或者响应。<br><img src="/img/computer_img/事件总线.webp" alt="事件总线" style="zoom:50%;" /></p>
-<p>这样的设计下，注册在总线上的各个模块就是松耦合的。模块互相之间并没有依赖关系。无论代码的维护，还是未来的扩展，都会很方便。</p>
-<p><strong>发布者、订阅者</strong></p>
-<h2 id="理解总线：-三种线路和多总线架构"><a href="#理解总线：-三种线路和多总线架构" class="headerlink" title="理解总线： 三种线路和多总线架构"></a>理解总线： 三种线路和多总线架构</h2><p>现代的 Intel CPU 的体系结构里面，通常有好几条总线。</p>
-<p>首先，CPU 和内存以及高速缓存通信的总线，这里面通常有两种总线。</p>
-<p>这种方式，我们称之为<strong>双独立总线</strong> （Dual Independent Bus，缩写为 DIB）。CPU 里，有一个快速的<strong>本地总线（</strong>Local Bus），以及一个速度相对较慢的<strong>前端总线</strong>（Front-side Bus）。</p>
-<p>在前面几讲刚刚讲过，现代的 CPU 里，通常有专门的高速缓存芯片。这里的高速本地总线，就是用来和高速缓存通信的。而前端总线，则是用来和主内存以及输入输出设备通信的。有时候，我们会把本地总线也叫作后端总线（Back-side Bus），和前面的前端总线对应起来。而前端总线也有很多其他名字，比如处理器总线（Processor Bus）、内存总线（Memory Bus）。</p>
-<p>除了前端总线呢，我们常常还会听到 PCI 总线、I&#x2F;O 总线或者系统总线（System Bus）。看到这么多总线的名字，你是不是已经有点晕了。这些名词确实容易混为一谈。其实各种总线的命名一直都很混乱，我们不如直接来看一看 <strong>CPU 的硬件架构图</strong>。对照图来看，一切问题就都清楚了。</p>
-<p>CPU 里面的北桥芯片，把我们上面说的前端总线，一分为二，变成了三个总线。</p>
-<img src="/img/computer_img/双独立总线.webp" alt="双独立总线" style="zoom:50%;" />
-
-<p>我们的前端总线，其实就是 <strong>系统总线</strong> 。CPU 里面的内存接口，直接和系统总线通信，然后系统总线再接入一个 I&#x2F;O 桥接器（I&#x2F;O Bridge）。这个 I&#x2F;O 桥接器，一边接入了我们的内存总线，使得我们的 CPU 和内存通信；另一边呢，又接入了一个 I&#x2F;O 总线，用来连接 I&#x2F;O 设备。</p>
-<hr>
-<p>事实上，真实的计算机里，这个总线层面拆分得更细。根据不同的设备，还会分成独立的 PCI 总线、ISA 总线等等。</p>
-<img src="/img/computer_img/总线细分.webp" alt="总线细分" style="zoom:50%;" />
-
-
-
-<p>在物理层面，其实我们完全可以把总线看作一组“电线”。不过呢，这些电线之间也是有分工的，我们通常有三类线路。</p>
-<ol>
-<li><p>数据线（Data Bus），用来传输实际的数据信息，也就是实际上了公交车的“人”。</p>
-</li>
-<li><p>地址线（Address Bus），用来确定到底把数据传输到哪里去，是内存的某个位置，还是某一个 I&#x2F;O 设备。这个其实就相当于拿了个纸条，写下了上面的人要下车的站点。</p>
-</li>
-<li><p>控制线（Control Bus），用来控制对于总线的访问。虽然我们把总线比喻成了一辆公交车。那么有人想要做公交车的时候，需要告诉公交车司机，这个就是我们的控制信号。</p>
-</li>
-</ol>
-<ul>
-<li>尽管总线减少客设备之间的耦合，降低了系统设计的复杂度，但同时带来了一个问题，就是总线不能同时给多个设备提供通信功能。</li>
-</ul>
-<p>我们的总线是很多个设备公用的，那多个设备都想要用总线，我们就需要有一个机制，去决定这种情况下，到底把总线给哪一个设备用。这个机制，就叫作总线裁决（Bus Arbitraction）。总线裁决的机制有很多种不同的实现，如果你对这个实现的细节感兴趣，可以去看一看 <a href="https://en.wikipedia.org/wiki/Arbiter_(electronics)">Wiki</a> 里面关于裁决器的对应条目，这里我们就不多说了。</p>
-<h2 id="总线延伸"><a href="#总线延伸" class="headerlink" title="总线延伸"></a>总线延伸</h2><p>讲解了计算机里各个不同的组件之间用来通信的渠道，也就是总线。总线的设计思路，核心是为了减少多个模块之间交互的复杂性和耦合度。实际上，总线这个设计思路在我们的软件开发过程中也经常会被用到。事件总线就是我们常见的一个设计模式，通常事件总线也会和订阅者发布者模式结合起来，成为大型系统的各个松耦合的模块之间交互的一种主要模式。</p>
-<p>在实际的硬件层面，总线其实就是一组连接电路的线路。因为不同设备之间的速度有差异，所以一台计算机里往往会有多个总线。  常见的就有在 CPU 内部和高速缓存通信的本地总线，以及和外部 I&#x2F;O 设备以及内存通信的前端总线。</p>
-<p>前端总线通常也被叫作<strong>系统总线</strong>。它可以通过一个 I&#x2F;O 桥接器，拆分成两个总线，分别来和 I&#x2F;O 设备以及内存通信。自然，这样拆开的两个总线，就叫作 I&#x2F;O 总线和内存总线<u>。总线本身的电路功能，又可以拆分成用来传输数据的数据线、用来传输地址的地址线，以及用来传输控制信号的控制线。</u></p>
-<hr>
-<p>总线是一个各个接入的设备公用的线路，所以自然会在各个设备之间争夺总线所有权的情况。于是，我们需要一个机制来决定让谁来使用总线，这个决策机制就是总线裁决。</p>
-]]></content>
-      <categories>
-        <category>计算机组成原理</category>
-      </categories>
-  </entry>
-  <entry>
-    <title>理解IO_WAIT - I/O性能</title>
-    <url>/posts/99a5f054/</url>
-    <content><![CDATA[<h1 id="理解IO-WAIT-I-x2F-O性能到底是怎么回事儿？"><a href="#理解IO-WAIT-I-x2F-O性能到底是怎么回事儿？" class="headerlink" title="理解IO_WAIT : I&#x2F;O性能到底是怎么回事儿？"></a>理解IO_WAIT : I&#x2F;O性能到底是怎么回事儿？</h1><p>大部分程序员开发的都是应用系统。在开发应用系统的时候，我们遇到的性能瓶颈大部分都在 I&#x2F;O 上<span id="more"></span>。在第 36 讲讲解局部性原理的时候，我们一起看了通过把内存当作是缓存，来提升系统的整体性能。在第 37 讲讲解 CPU Cache 的时候，我们一起看了 CPU Cache 和主内存之间性能的巨大差异。</p>
-<p>然而，我们知道，并不是所有问题都能靠利用内存或者 CPU Cache 做一层缓存来解决。特别是在这个“大数据”的时代。我们在硬盘上存储了越来越多的数据，一个 MySQL 数据库的单表有个几千万条记录，早已经不算是什么罕见现象了。这也就意味着，用内存当缓存，存储空间是不够用的。大部分时间，我们的请求还是要打到硬盘上。那么，这一讲我们就来看看硬盘 I&#x2F;O 性能的事儿。</p>
-<hr>
-<h2 id="IO性能、顺序访问和随机访问"><a href="#IO性能、顺序访问和随机访问" class="headerlink" title="IO性能、顺序访问和随机访问"></a>IO性能、顺序访问和随机访问</h2><p>如果去看硬盘厂商的性能报告，通常会看到两个指标，一个是响应时间（Response Time）,另一个是数据传输率（Data Transfer Rate）。</p>
-<p>我们先来看一看后面这个指标，数据传输率</p>
-<p>我们现在常用的硬盘有两种。一种是 HDD 硬盘，也就是我们常说的机械硬盘。另一种是 SSD 硬盘，一般也被叫作固态硬盘。现在的 HDD 硬盘，用的是 SATA 3.0 的接口。而 SSD 硬盘呢，通常会用两种接口，一部分用的也是 SATA 3.0 的接口；另一部分呢，用的是 PCI Express 的接口。</p>
-<p>现在我们常用的 SATA 3.0 的接口，带宽是 6Gb&#x2F;s。这里的“b”是比特。这个带宽相当于每秒可以传输 768MB 的数据。而我们日常用的 HDD 硬盘的数据传输率，差不多在 200MB&#x2F;s 左右。</p>
-<p>当我们换成 SSD 的硬盘，性能自然会好上不少。比如，我最近刚把自己电脑的 HDD 硬盘，换成了一块 Crucial MX500 的 SSD 硬盘。它的数据传输速率能到差不多 500MB&#x2F;s，比 HDD 的硬盘快了一倍不止。不过 SATA 接口的硬盘，差不多到这个速度，性能也就到顶了。因为 SATA 接口的速度也就这么快。</p>
-<p>不过，实际 SSD 硬盘能够更快，所以我们可以换用 PCI Express 的接口。我自己电脑的系统盘就是一块使用了 PCI Express 的三星 SSD 硬盘。它的数据传输率，在读取的时候就能做到 2GB&#x2F;s 左右，差不多是 HDD 硬盘的 10 倍，而在写入的时候也能有 1.2GB&#x2F;s。</p>
-<p>除了数据传输率这个吞吐率指标，另一个我们关心的指标响应时间，其实也可以在 AS SSD 的测试结果里面看到，就是这里面的 Acc.Time 指标。</p>
-<p>这个指标，其实就是程序发起一个硬盘的写入请求，直到这个请求返回的时间。可以看到，在上面的两块 SSD 硬盘上，大概时间都是在几十微秒这个级别。如果你去测试一块 HDD 的硬盘，通常会在几毫秒到十几毫秒这个级别。这个性能的差异，就不是 10 倍了，而是在几十倍，乃至几百倍。</p>
-<p>光看响应时间和吞吐率这两个指标，似乎我们的硬盘性能很不错。即使是廉价的 HDD 硬盘，接收一个来自 CPU 的请求，也能够在几毫秒时间返回。一秒钟能够传输的数据，也有 200MB 左右。你想一想，我们平时往数据库里写入一条记录，也就是 1KB 左右的大小。我们拿 200MB 去除以 1KB，那差不多每秒钟可以插入 20 万条数据呢。但是这个计算出来的数字，似乎和我们日常的经验不符合啊？这又是为什么呢？</p>
-<hr>
-<p>答案就来自于硬盘的读写。在<strong>顺序读写</strong>和<strong>随机读写</strong>的情况下，硬盘的性能是完全不同的。</p>
-<p>我们回头看一下上面的 AS SSD 的性能指标。你会看到，里面有一个“4K”的指标。这个指标是什么意思呢？它其实就是我们的程序，去随机读取磁盘上某一个 4KB 大小的数据，一秒之内可以读取到多少数据。</p>
-<p>你会发现，在这个指标上，我们使用 SATA 3.0 接口的硬盘和 PCI Express 接口的硬盘，性能差异变得很小。这是因为，在这个时候，接口本身的速度已经不是我们硬盘访问速度的瓶颈了。更重要的是，你会发现，即使我们用 PCI Express 的接口，在随机读写的时候，数据传输率也只能到 40MB&#x2F;s 左右，是顺序读写情况下的几十分之一。</p>
-<p>我们拿这个 40MB&#x2F;s 和一次读取 4KB 的数据算一下。</p>
-<p>​                    40MB &#x2F; 4KB &#x3D; 10,000</p>
-<p>也就是说，一秒之内，这块 SSD 硬盘可以随机读取 1 万次的 4KB 的数据。如果是写入的话呢，会更多一些，90MB &#x2F;4KB 差不多是 2 万多次。</p>
-<p>这个每秒读写的次数，我们称之为  <em><strong>IOPS</strong></em>，也就是每秒输入输出操作的次数。事实上，比起响应时间，我们更关注 IOPS 这个性能指标。IOPS 和 DTR（Data Transfer Rate，数据传输率）才是输入输出性能的核心指标。</p>
-<p>我们在实际的应用开发当中，<em>对于数据的访问，更多的是随机读写，而不是顺序读写。</em>我们<strong>平时所说的服务器承受的“并发”，其实是在说，会有很多个不同的进程和请求来访问服务器</strong>。自然，它们在硬盘上访问的数据，是很难顺序放在一起的。这种情况下，随机读写的 IOPS 才是服务器性能的核心指标。</p>
-<p>我们引出 IOPS 这个问题的 HDD 硬盘。我现在要问你了，那一块 HDD 硬盘能够承受的 IOPS 是多少呢？</p>
-<p>HDD 硬盘的 IOPS 通常也就在 100 左右，而不是在 20 万次。在后面讲解机械硬盘的原理和性能优化的时候，我们还会再来一起看一看，这个 100 是怎么来的，以及我们可以有哪些优化的手段。</p>
-<hr>
-<h2 id="如何定位-IO-WAIT"><a href="#如何定位-IO-WAIT" class="headerlink" title="如何定位 IO_WAIT"></a>如何定位 IO_WAIT</h2><p>我们看到，即使是用上了 PCI Express 接口的 SSD 硬盘，IOPS 也就是在 2 万左右。而我们的 CPU 的主频通常在 2GHz 以上，也就是每秒可以做 20 亿次操作。</p>
-<p>即使 CPU 向硬盘发起一条读写指令，需要很多个时钟周期，一秒钟 CPU 能够执行的指令数，和我们硬盘能够进行的操作数，也有好几个数量级的差异。这也是为什么，我们在应用开发的时候往往会说“性能瓶颈在 I&#x2F;O 上”。   因为很多时候，CPU 指令发出去之后，不得不去“等”我们的 I&#x2F;O 操作完成，才能进行下一步的操作 .</p>
-<p>那么，在实际遇到服务端程序的性能问题的时候，我们怎么知道这个问题是不是来自于 CPU 等 I&#x2F;O 来完成操作呢？别着急，我们接下来，就通过 top 和 iostat 这些命令，一起来看看 CPU 到底有没有在等待 io 操作。</p>
-<hr>
-<p>你一定在 Linux 下用过 top 命令。对于很多刚刚入门 Linux 的同学，会用 top 去看服务的负载，也就是 load average。不过，在 top 命令里面，我们一样可以看到 CPU 是否在等待 IO 操作完成。</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">top - 06:26:30 up 4 days, 53 min,  1 user,  load average: 0.79, 0.69, 0.65</span><br><span class="line">Tasks: 204 total,   1 running, 203 sleeping,   0 stopped,   0 zombie</span><br><span class="line">%Cpu(s): 20.0 us,  1.7 sy,  0.0 ni, 77.7 id,  0.0 wa,  0.0 hi,  0.7 si,  0.0 st</span><br><span class="line">KiB Mem:   7679792 total,  6646248 used,  1033544 free,   251688 buffers</span><br><span class="line">KiB Swap:        0 total,        0 used,        0 free.  4115536 cached Mem</span><br></pre></td></tr></table></figure>
-
-<p>在 top 命令的输出结果里面，有一行是以 %CPU 开头的。这一行里，有一个叫作 wa 的指标，这个指标就代表着 iowait，也就是 CPU 等待IO 完成操作花费时间占 CPU 的百分比。</p>
-<p>下一次，当你自己的服务器遇到性能瓶颈，load 很大的时候，你就可以通过 top 看一看这个指标。</p>
-<p>知道了 iowait 很大，那么我们就要去看一看，实际的 I&#x2F;O 操作情况是什么样的。这个时候，你就可以去用  <em>iostat</em>  这个命令了。我们输入 “iostat”，就能够看到实际的硬盘读写情况。</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">avg-cpu:  %user   %nice %system %iowait  %steal   %idle</span><br><span class="line">          17.02    0.01    2.18    0.04    0.00   80.76</span><br><span class="line">Device:            tps    kB_read/s    kB_wrtn/s    kB_read    kB_wrtn</span><br><span class="line">sda               1.81         2.02        30.87     706768   10777408</span><br></pre></td></tr></table></figure>
-
-<p>你会看到，这个命令里，不仅有 iowait 这个 CPU 等待时间的百分比，还有一些更加具体的指标了，并且它还是按照你机器上安装的多块不同的硬盘划分的。</p>
-<p>这里的 tps 指标，其实就对应着我们上面所说的硬盘的 IOPS 性能。而 kB_read&#x2F;s 和 kB_wrtn&#x2F;s 指标，就对应着我们的数据传输率的指标。</p>
-<p>知道实际硬盘读写的 tps、kB_read&#x2F;s 和 kb_wrtn&#x2F;s 的指标，我们基本上可以判断出，机器的性能是不是卡在 I&#x2F;O 上了。那么，接下来，我们就是要找出到底是哪一个进程是这些 I&#x2F;O 读写的来源了。这个时候，你需要 <em>“iotop”</em> 这个命令。</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">Total DISK READ :       0.00 B/s | Total DISK WRITE :      15.75 K/s</span><br><span class="line">Actual DISK READ:       0.00 B/s | Actual DISK WRITE:      35.44 K/s</span><br><span class="line">  TID  PRIO  USER     DISK READ  DISK WRITE  SWAPIN     IO&gt;    COMMAND                                             </span><br><span class="line">  104 be/3 root        0.00 B/s    7.88 K/s  0.00 %  0.18 % [jbd2/sda1-8]</span><br><span class="line">  383 be/4 root        0.00 B/s    3.94 K/s  0.00 %  0.00 % rsyslogd -n [rs:main Q:Reg]</span><br><span class="line"> 1514 be/4 www-data    0.00 B/s    3.94 K/s  0.00 %  0.00 % nginx: worker process</span><br></pre></td></tr></table></figure>
-
-<p>通过 iotop 这个命令，你可以看到具体是哪一个进程实际占用了大量 I&#x2F;O，那么你就可以有的放矢，去优化对应的程序了。上面的这些示例里，不管是 wa 也好，tps 也好，它们都很小。那么，接下来，我就给你用 Linux 下，用 stress 命令，来模拟一个高 I&#x2F;O 复杂的情况，来看看这个时候的 iowait 是怎么样的。</p>
-<p>通过 top、iostat 以及 iotop，一步一步快速定位服务器端的 I&#x2F;O 带来的性能瓶颈了。</p>
-<ul>
-<li><p>top    、iostat 查看实际的IO 操作情况</p>
-</li>
-<li><p>找出哪一些进程是这些 IO 读写的来源，使用 <strong>iotop</strong></p>
-</li>
-</ul>
-<h2 id="总结延伸"><a href="#总结延伸" class="headerlink" title="总结延伸"></a>总结延伸</h2><ul>
-<li><p>这一讲里，我们从硬盘的两个核心指标，响应时间和数据传输率，来理解和研究 I&#x2F;O 的性能问题。在顺序读取的情况下，无论是 HDD 硬盘还是 SSD 硬盘，性能看起来都是很不错的。不过，等到进行随机读取测试的时候，硬盘的性能才能见了真章。因为在大部分的应用开发场景下，我们关心的并不是在顺序读写下的数据量，而是每秒钟能够进行输入输出的操作次数，也就是 IOPS 这个核心性能指标 (tps)。</p>
-</li>
-<li><p>你会发现，即使是使用 PCI Express 接口的 SSD 硬盘，IOPS 也就只是到了 2 万左右。这个性能，和我们 CPU 的每秒 20 亿次操作的能力比起来，可就差得远了。所以很多时候，我们的程序对外响应慢，其实都是 CPU 在等待 I&#x2F;O 操作完成。</p>
-</li>
-<li><p>在 Linux 下，我们可以通过 top 这样的命令，来看整个服务器的整体负载。在应用响应慢的时候，我们可以先通过这个指令，来看 CPU 是否在等待 I&#x2F;O 完成自己的操作。进一步地，我们可以通过 iostat 这个命令，来看到各个硬盘这个时候的读写情况。而 iotop 这个命令，能够帮助我们定位到到底是哪一个进程在进行大量的 I&#x2F;O 操作。这些命令的组合，可以快速帮你定位到是不是我们的程序遇到了 I&#x2F;O 的瓶颈，以及这些瓶颈来自于哪些程序，你就可以根据定位的结果来优化你自己的程序了。</p>
-</li>
-</ul>
-]]></content>
-      <categories>
-        <category>计算机组成原理</category>
-      </categories>
-      <tags>
-        <tag>SSD</tag>
       </tags>
   </entry>
   <entry>
@@ -1660,6 +1534,132 @@ SPEC 提供的 CPU 基准测试程序，就好像 CPU 届的“高考”，通�
       </tags>
   </entry>
   <entry>
+    <title>总线-计算机内部的高速公路</title>
+    <url>/posts/d6a63846/</url>
+    <content><![CDATA[<h1 id="总线：计算机内部的高速公路"><a href="#总线：计算机内部的高速公路" class="headerlink" title="总线：计算机内部的高速公路"></a>总线：计算机内部的高速公路</h1><p>CPU所代表的控制器和运算器，要和存储器，也就是我们的主内存，以及输入和输出设备进行通信。 那问题来了，CP U从我们的键盘、鼠标接收输入信号，向显示器输出信号，这之间究竟是怎么通信的呢<span id="more"></span>？换句话说，计算机是用什么样的方式来完成，CPU 和内存、以及外部输入输出设备的通信呢？</p>
+<hr>
+<h2 id="降低复杂性：总线的设计思路来源"><a href="#降低复杂性：总线的设计思路来源" class="headerlink" title="降低复杂性：总线的设计思路来源"></a>降低复杂性：总线的设计思路来源</h2><p>计算机里其实有很多不同的硬件设备，除了 CPU 和内存之外，我们还有大量的输入输出设备。可以说，你计算机上的每一个接口，键盘、鼠标、显示器、硬盘，乃至通过 USB 接口连接的各种外部设备，都对应了一个设备或者模块。</p>
+<p>如果各个设备间的通信，都是互相之间单独进行的。如果我们有 N 个不同的设备，他们之间需要各自单独连接，那么系统复杂度就会变成 N2。每一个设备或者功能电路模块，都要和其他 N−1 个设备去通信。<u>为了简化系统的复杂度，我们就引入了总线，把这个 N2 的复杂度，变成一个 N 的复杂度。</u></p>
+<p>与其让各个设备之间互相单独通信，不如我们去设计一个公用的线路。</p>
+<blockquote>
+<p>CPU 想要和什么设备通信，通信的指令是什么，对应的数据是什么，都发送到这个线路上；设备要向 CPU 发送什么信息呢，也发送到这个线路上。这个线路就好像一个高速公路，各个设备和其他设备之间，不需要单独建公路，只建一条小路通向这条高速公路就好了。</p>
+</blockquote>
+<img src="/img/computer_img/总线降低复杂度.webp" alt="总线降低复杂度" style="zoom:50%;" />
+
+<p>这个设计思路，就是我们今天要说的总线（Bus）。</p>
+<p>总线，其实就是一组线路。我们的 CPU、内存以及输入和输出设备，都是通过这组线路，进行相互间通信的。总线的英文叫作 <strong>Bus</strong>，就是一辆公交车。这个名字很好地描述了总线的含义。我们的“公交车”的各个站点，就是各个接入设备。要想向一个设备传输数据，我们只要把数据放上公交车，在对应的车站下车就可以了。</p>
+<p>其实，对应的设计思路，在软件开发中也是非常常见的。我们在做大型系统开发的过程中，经常会用到一种叫作<a href="https://dzone.com/articles/design-patterns-event-bus"><strong>事件总线</strong></a>（Event Bus）的设计模式。</p>
+<p>进行大规模应用系统开发的时候，系统中的各个组件之间也需要相互通信。模块之间如果是两两之间单独去定义协议，这个软件系统一样会遇到一个复杂度变成了 N2 的问题。所以常见的一个解决方案，就是事件总线这个设计模式。</p>
+<p>在事件总线这个设计模式里，各个模块触发对应的事件，并把事件对象发送到总线上。 也就是说，每个模块就是一个发布者。而每个模块也会把自己注册到总线上，去监听总线上的事件，并根据事件的对象类型或者是对象内容，来决定自己是否要进行特定的处理或者响应。<br><img src="/img/computer_img/事件总线.webp" alt="事件总线" style="zoom:50%;" /></p>
+<p>这样的设计下，注册在总线上的各个模块就是松耦合的。模块互相之间并没有依赖关系。无论代码的维护，还是未来的扩展，都会很方便。</p>
+<p><strong>发布者、订阅者</strong></p>
+<h2 id="理解总线：-三种线路和多总线架构"><a href="#理解总线：-三种线路和多总线架构" class="headerlink" title="理解总线： 三种线路和多总线架构"></a>理解总线： 三种线路和多总线架构</h2><p>现代的 Intel CPU 的体系结构里面，通常有好几条总线。</p>
+<p>首先，CPU 和内存以及高速缓存通信的总线，这里面通常有两种总线。</p>
+<p>这种方式，我们称之为<strong>双独立总线</strong> （Dual Independent Bus，缩写为 DIB）。CPU 里，有一个快速的<strong>本地总线（</strong>Local Bus），以及一个速度相对较慢的<strong>前端总线</strong>（Front-side Bus）。</p>
+<p>在前面几讲刚刚讲过，现代的 CPU 里，通常有专门的高速缓存芯片。这里的高速本地总线，就是用来和高速缓存通信的。而前端总线，则是用来和主内存以及输入输出设备通信的。有时候，我们会把本地总线也叫作后端总线（Back-side Bus），和前面的前端总线对应起来。而前端总线也有很多其他名字，比如处理器总线（Processor Bus）、内存总线（Memory Bus）。</p>
+<p>除了前端总线呢，我们常常还会听到 PCI 总线、I&#x2F;O 总线或者系统总线（System Bus）。看到这么多总线的名字，你是不是已经有点晕了。这些名词确实容易混为一谈。其实各种总线的命名一直都很混乱，我们不如直接来看一看 <strong>CPU 的硬件架构图</strong>。对照图来看，一切问题就都清楚了。</p>
+<p>CPU 里面的北桥芯片，把我们上面说的前端总线，一分为二，变成了三个总线。</p>
+<img src="/img/computer_img/双独立总线.webp" alt="双独立总线" style="zoom:50%;" />
+
+<p>我们的前端总线，其实就是 <strong>系统总线</strong> 。CPU 里面的内存接口，直接和系统总线通信，然后系统总线再接入一个 I&#x2F;O 桥接器（I&#x2F;O Bridge）。这个 I&#x2F;O 桥接器，一边接入了我们的内存总线，使得我们的 CPU 和内存通信；另一边呢，又接入了一个 I&#x2F;O 总线，用来连接 I&#x2F;O 设备。</p>
+<hr>
+<p>事实上，真实的计算机里，这个总线层面拆分得更细。根据不同的设备，还会分成独立的 PCI 总线、ISA 总线等等。</p>
+<img src="/img/computer_img/总线细分.webp" alt="总线细分" style="zoom:50%;" />
+
+
+
+<p>在物理层面，其实我们完全可以把总线看作一组“电线”。不过呢，这些电线之间也是有分工的，我们通常有三类线路。</p>
+<ol>
+<li><p>数据线（Data Bus），用来传输实际的数据信息，也就是实际上了公交车的“人”。</p>
+</li>
+<li><p>地址线（Address Bus），用来确定到底把数据传输到哪里去，是内存的某个位置，还是某一个 I&#x2F;O 设备。这个其实就相当于拿了个纸条，写下了上面的人要下车的站点。</p>
+</li>
+<li><p>控制线（Control Bus），用来控制对于总线的访问。虽然我们把总线比喻成了一辆公交车。那么有人想要做公交车的时候，需要告诉公交车司机，这个就是我们的控制信号。</p>
+</li>
+</ol>
+<ul>
+<li>尽管总线减少客设备之间的耦合，降低了系统设计的复杂度，但同时带来了一个问题，就是总线不能同时给多个设备提供通信功能。</li>
+</ul>
+<p>我们的总线是很多个设备公用的，那多个设备都想要用总线，我们就需要有一个机制，去决定这种情况下，到底把总线给哪一个设备用。这个机制，就叫作总线裁决（Bus Arbitraction）。总线裁决的机制有很多种不同的实现，如果你对这个实现的细节感兴趣，可以去看一看 <a href="https://en.wikipedia.org/wiki/Arbiter_(electronics)">Wiki</a> 里面关于裁决器的对应条目，这里我们就不多说了。</p>
+<h2 id="总线延伸"><a href="#总线延伸" class="headerlink" title="总线延伸"></a>总线延伸</h2><p>讲解了计算机里各个不同的组件之间用来通信的渠道，也就是总线。总线的设计思路，核心是为了减少多个模块之间交互的复杂性和耦合度。实际上，总线这个设计思路在我们的软件开发过程中也经常会被用到。事件总线就是我们常见的一个设计模式，通常事件总线也会和订阅者发布者模式结合起来，成为大型系统的各个松耦合的模块之间交互的一种主要模式。</p>
+<p>在实际的硬件层面，总线其实就是一组连接电路的线路。因为不同设备之间的速度有差异，所以一台计算机里往往会有多个总线。  常见的就有在 CPU 内部和高速缓存通信的本地总线，以及和外部 I&#x2F;O 设备以及内存通信的前端总线。</p>
+<p>前端总线通常也被叫作<strong>系统总线</strong>。它可以通过一个 I&#x2F;O 桥接器，拆分成两个总线，分别来和 I&#x2F;O 设备以及内存通信。自然，这样拆开的两个总线，就叫作 I&#x2F;O 总线和内存总线<u>。总线本身的电路功能，又可以拆分成用来传输数据的数据线、用来传输地址的地址线，以及用来传输控制信号的控制线。</u></p>
+<hr>
+<p>总线是一个各个接入的设备公用的线路，所以自然会在各个设备之间争夺总线所有权的情况。于是，我们需要一个机制来决定让谁来使用总线，这个决策机制就是总线裁决。</p>
+]]></content>
+      <categories>
+        <category>计算机组成原理</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>理解IO_WAIT - I/O性能</title>
+    <url>/posts/99a5f054/</url>
+    <content><![CDATA[<h1 id="理解IO-WAIT-I-x2F-O性能到底是怎么回事儿？"><a href="#理解IO-WAIT-I-x2F-O性能到底是怎么回事儿？" class="headerlink" title="理解IO_WAIT : I&#x2F;O性能到底是怎么回事儿？"></a>理解IO_WAIT : I&#x2F;O性能到底是怎么回事儿？</h1><p>大部分程序员开发的都是应用系统。在开发应用系统的时候，我们遇到的性能瓶颈大部分都在 I&#x2F;O 上<span id="more"></span>。在第 36 讲讲解局部性原理的时候，我们一起看了通过把内存当作是缓存，来提升系统的整体性能。在第 37 讲讲解 CPU Cache 的时候，我们一起看了 CPU Cache 和主内存之间性能的巨大差异。</p>
+<p>然而，我们知道，并不是所有问题都能靠利用内存或者 CPU Cache 做一层缓存来解决。特别是在这个“大数据”的时代。我们在硬盘上存储了越来越多的数据，一个 MySQL 数据库的单表有个几千万条记录，早已经不算是什么罕见现象了。这也就意味着，用内存当缓存，存储空间是不够用的。大部分时间，我们的请求还是要打到硬盘上。那么，这一讲我们就来看看硬盘 I&#x2F;O 性能的事儿。</p>
+<hr>
+<h2 id="IO性能、顺序访问和随机访问"><a href="#IO性能、顺序访问和随机访问" class="headerlink" title="IO性能、顺序访问和随机访问"></a>IO性能、顺序访问和随机访问</h2><p>如果去看硬盘厂商的性能报告，通常会看到两个指标，一个是响应时间（Response Time）,另一个是数据传输率（Data Transfer Rate）。</p>
+<p>我们先来看一看后面这个指标，数据传输率</p>
+<p>我们现在常用的硬盘有两种。一种是 HDD 硬盘，也就是我们常说的机械硬盘。另一种是 SSD 硬盘，一般也被叫作固态硬盘。现在的 HDD 硬盘，用的是 SATA 3.0 的接口。而 SSD 硬盘呢，通常会用两种接口，一部分用的也是 SATA 3.0 的接口；另一部分呢，用的是 PCI Express 的接口。</p>
+<p>现在我们常用的 SATA 3.0 的接口，带宽是 6Gb&#x2F;s。这里的“b”是比特。这个带宽相当于每秒可以传输 768MB 的数据。而我们日常用的 HDD 硬盘的数据传输率，差不多在 200MB&#x2F;s 左右。</p>
+<p>当我们换成 SSD 的硬盘，性能自然会好上不少。比如，我最近刚把自己电脑的 HDD 硬盘，换成了一块 Crucial MX500 的 SSD 硬盘。它的数据传输速率能到差不多 500MB&#x2F;s，比 HDD 的硬盘快了一倍不止。不过 SATA 接口的硬盘，差不多到这个速度，性能也就到顶了。因为 SATA 接口的速度也就这么快。</p>
+<p>不过，实际 SSD 硬盘能够更快，所以我们可以换用 PCI Express 的接口。我自己电脑的系统盘就是一块使用了 PCI Express 的三星 SSD 硬盘。它的数据传输率，在读取的时候就能做到 2GB&#x2F;s 左右，差不多是 HDD 硬盘的 10 倍，而在写入的时候也能有 1.2GB&#x2F;s。</p>
+<p>除了数据传输率这个吞吐率指标，另一个我们关心的指标响应时间，其实也可以在 AS SSD 的测试结果里面看到，就是这里面的 Acc.Time 指标。</p>
+<p>这个指标，其实就是程序发起一个硬盘的写入请求，直到这个请求返回的时间。可以看到，在上面的两块 SSD 硬盘上，大概时间都是在几十微秒这个级别。如果你去测试一块 HDD 的硬盘，通常会在几毫秒到十几毫秒这个级别。这个性能的差异，就不是 10 倍了，而是在几十倍，乃至几百倍。</p>
+<p>光看响应时间和吞吐率这两个指标，似乎我们的硬盘性能很不错。即使是廉价的 HDD 硬盘，接收一个来自 CPU 的请求，也能够在几毫秒时间返回。一秒钟能够传输的数据，也有 200MB 左右。你想一想，我们平时往数据库里写入一条记录，也就是 1KB 左右的大小。我们拿 200MB 去除以 1KB，那差不多每秒钟可以插入 20 万条数据呢。但是这个计算出来的数字，似乎和我们日常的经验不符合啊？这又是为什么呢？</p>
+<hr>
+<p>答案就来自于硬盘的读写。在<strong>顺序读写</strong>和<strong>随机读写</strong>的情况下，硬盘的性能是完全不同的。</p>
+<p>我们回头看一下上面的 AS SSD 的性能指标。你会看到，里面有一个“4K”的指标。这个指标是什么意思呢？它其实就是我们的程序，去随机读取磁盘上某一个 4KB 大小的数据，一秒之内可以读取到多少数据。</p>
+<p>你会发现，在这个指标上，我们使用 SATA 3.0 接口的硬盘和 PCI Express 接口的硬盘，性能差异变得很小。这是因为，在这个时候，接口本身的速度已经不是我们硬盘访问速度的瓶颈了。更重要的是，你会发现，即使我们用 PCI Express 的接口，在随机读写的时候，数据传输率也只能到 40MB&#x2F;s 左右，是顺序读写情况下的几十分之一。</p>
+<p>我们拿这个 40MB&#x2F;s 和一次读取 4KB 的数据算一下。</p>
+<p>​                    40MB &#x2F; 4KB &#x3D; 10,000</p>
+<p>也就是说，一秒之内，这块 SSD 硬盘可以随机读取 1 万次的 4KB 的数据。如果是写入的话呢，会更多一些，90MB &#x2F;4KB 差不多是 2 万多次。</p>
+<p>这个每秒读写的次数，我们称之为  <em><strong>IOPS</strong></em>，也就是每秒输入输出操作的次数。事实上，比起响应时间，我们更关注 IOPS 这个性能指标。IOPS 和 DTR（Data Transfer Rate，数据传输率）才是输入输出性能的核心指标。</p>
+<p>我们在实际的应用开发当中，<em>对于数据的访问，更多的是随机读写，而不是顺序读写。</em>我们<strong>平时所说的服务器承受的“并发”，其实是在说，会有很多个不同的进程和请求来访问服务器</strong>。自然，它们在硬盘上访问的数据，是很难顺序放在一起的。这种情况下，随机读写的 IOPS 才是服务器性能的核心指标。</p>
+<p>我们引出 IOPS 这个问题的 HDD 硬盘。我现在要问你了，那一块 HDD 硬盘能够承受的 IOPS 是多少呢？</p>
+<p>HDD 硬盘的 IOPS 通常也就在 100 左右，而不是在 20 万次。在后面讲解机械硬盘的原理和性能优化的时候，我们还会再来一起看一看，这个 100 是怎么来的，以及我们可以有哪些优化的手段。</p>
+<hr>
+<h2 id="如何定位-IO-WAIT"><a href="#如何定位-IO-WAIT" class="headerlink" title="如何定位 IO_WAIT"></a>如何定位 IO_WAIT</h2><p>我们看到，即使是用上了 PCI Express 接口的 SSD 硬盘，IOPS 也就是在 2 万左右。而我们的 CPU 的主频通常在 2GHz 以上，也就是每秒可以做 20 亿次操作。</p>
+<p>即使 CPU 向硬盘发起一条读写指令，需要很多个时钟周期，一秒钟 CPU 能够执行的指令数，和我们硬盘能够进行的操作数，也有好几个数量级的差异。这也是为什么，我们在应用开发的时候往往会说“性能瓶颈在 I&#x2F;O 上”。   因为很多时候，CPU 指令发出去之后，不得不去“等”我们的 I&#x2F;O 操作完成，才能进行下一步的操作 .</p>
+<p>那么，在实际遇到服务端程序的性能问题的时候，我们怎么知道这个问题是不是来自于 CPU 等 I&#x2F;O 来完成操作呢？别着急，我们接下来，就通过 top 和 iostat 这些命令，一起来看看 CPU 到底有没有在等待 io 操作。</p>
+<hr>
+<p>你一定在 Linux 下用过 top 命令。对于很多刚刚入门 Linux 的同学，会用 top 去看服务的负载，也就是 load average。不过，在 top 命令里面，我们一样可以看到 CPU 是否在等待 IO 操作完成。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">top - 06:26:30 up 4 days, 53 min,  1 user,  load average: 0.79, 0.69, 0.65</span><br><span class="line">Tasks: 204 total,   1 running, 203 sleeping,   0 stopped,   0 zombie</span><br><span class="line">%Cpu(s): 20.0 us,  1.7 sy,  0.0 ni, 77.7 id,  0.0 wa,  0.0 hi,  0.7 si,  0.0 st</span><br><span class="line">KiB Mem:   7679792 total,  6646248 used,  1033544 free,   251688 buffers</span><br><span class="line">KiB Swap:        0 total,        0 used,        0 free.  4115536 cached Mem</span><br></pre></td></tr></table></figure>
+
+<p>在 top 命令的输出结果里面，有一行是以 %CPU 开头的。这一行里，有一个叫作 wa 的指标，这个指标就代表着 iowait，也就是 CPU 等待IO 完成操作花费时间占 CPU 的百分比。</p>
+<p>下一次，当你自己的服务器遇到性能瓶颈，load 很大的时候，你就可以通过 top 看一看这个指标。</p>
+<p>知道了 iowait 很大，那么我们就要去看一看，实际的 I&#x2F;O 操作情况是什么样的。这个时候，你就可以去用  <em>iostat</em>  这个命令了。我们输入 “iostat”，就能够看到实际的硬盘读写情况。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">avg-cpu:  %user   %nice %system %iowait  %steal   %idle</span><br><span class="line">          17.02    0.01    2.18    0.04    0.00   80.76</span><br><span class="line">Device:            tps    kB_read/s    kB_wrtn/s    kB_read    kB_wrtn</span><br><span class="line">sda               1.81         2.02        30.87     706768   10777408</span><br></pre></td></tr></table></figure>
+
+<p>你会看到，这个命令里，不仅有 iowait 这个 CPU 等待时间的百分比，还有一些更加具体的指标了，并且它还是按照你机器上安装的多块不同的硬盘划分的。</p>
+<p>这里的 tps 指标，其实就对应着我们上面所说的硬盘的 IOPS 性能。而 kB_read&#x2F;s 和 kB_wrtn&#x2F;s 指标，就对应着我们的数据传输率的指标。</p>
+<p>知道实际硬盘读写的 tps、kB_read&#x2F;s 和 kb_wrtn&#x2F;s 的指标，我们基本上可以判断出，机器的性能是不是卡在 I&#x2F;O 上了。那么，接下来，我们就是要找出到底是哪一个进程是这些 I&#x2F;O 读写的来源了。这个时候，你需要 <em>“iotop”</em> 这个命令。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">Total DISK READ :       0.00 B/s | Total DISK WRITE :      15.75 K/s</span><br><span class="line">Actual DISK READ:       0.00 B/s | Actual DISK WRITE:      35.44 K/s</span><br><span class="line">  TID  PRIO  USER     DISK READ  DISK WRITE  SWAPIN     IO&gt;    COMMAND                                             </span><br><span class="line">  104 be/3 root        0.00 B/s    7.88 K/s  0.00 %  0.18 % [jbd2/sda1-8]</span><br><span class="line">  383 be/4 root        0.00 B/s    3.94 K/s  0.00 %  0.00 % rsyslogd -n [rs:main Q:Reg]</span><br><span class="line"> 1514 be/4 www-data    0.00 B/s    3.94 K/s  0.00 %  0.00 % nginx: worker process</span><br></pre></td></tr></table></figure>
+
+<p>通过 iotop 这个命令，你可以看到具体是哪一个进程实际占用了大量 I&#x2F;O，那么你就可以有的放矢，去优化对应的程序了。上面的这些示例里，不管是 wa 也好，tps 也好，它们都很小。那么，接下来，我就给你用 Linux 下，用 stress 命令，来模拟一个高 I&#x2F;O 复杂的情况，来看看这个时候的 iowait 是怎么样的。</p>
+<p>通过 top、iostat 以及 iotop，一步一步快速定位服务器端的 I&#x2F;O 带来的性能瓶颈了。</p>
+<ul>
+<li><p>top    、iostat 查看实际的IO 操作情况</p>
+</li>
+<li><p>找出哪一些进程是这些 IO 读写的来源，使用 <strong>iotop</strong></p>
+</li>
+</ul>
+<h2 id="总结延伸"><a href="#总结延伸" class="headerlink" title="总结延伸"></a>总结延伸</h2><ul>
+<li><p>这一讲里，我们从硬盘的两个核心指标，响应时间和数据传输率，来理解和研究 I&#x2F;O 的性能问题。在顺序读取的情况下，无论是 HDD 硬盘还是 SSD 硬盘，性能看起来都是很不错的。不过，等到进行随机读取测试的时候，硬盘的性能才能见了真章。因为在大部分的应用开发场景下，我们关心的并不是在顺序读写下的数据量，而是每秒钟能够进行输入输出的操作次数，也就是 IOPS 这个核心性能指标 (tps)。</p>
+</li>
+<li><p>你会发现，即使是使用 PCI Express 接口的 SSD 硬盘，IOPS 也就只是到了 2 万左右。这个性能，和我们 CPU 的每秒 20 亿次操作的能力比起来，可就差得远了。所以很多时候，我们的程序对外响应慢，其实都是 CPU 在等待 I&#x2F;O 操作完成。</p>
+</li>
+<li><p>在 Linux 下，我们可以通过 top 这样的命令，来看整个服务器的整体负载。在应用响应慢的时候，我们可以先通过这个指令，来看 CPU 是否在等待 I&#x2F;O 完成自己的操作。进一步地，我们可以通过 iostat 这个命令，来看到各个硬盘这个时候的读写情况。而 iotop 这个命令，能够帮助我们定位到到底是哪一个进程在进行大量的 I&#x2F;O 操作。这些命令的组合，可以快速帮你定位到是不是我们的程序遇到了 I&#x2F;O 的瓶颈，以及这些瓶颈来自于哪些程序，你就可以根据定位的结果来优化你自己的程序了。</p>
+</li>
+</ul>
+]]></content>
+      <categories>
+        <category>计算机组成原理</category>
+      </categories>
+      <tags>
+        <tag>SSD</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Hexo 主题下Next主题目录解析</title>
     <url>/posts/dc9e0770/</url>
     <content><![CDATA[<h1 id="Next-主题的-Hexo-博客配置目录结构"><a href="#Next-主题的-Hexo-博客配置目录结构" class="headerlink" title="Next 主题的 Hexo 博客配置目录结构"></a>Next 主题的 Hexo 博客配置目录结构</h1><blockquote>
@@ -1735,6 +1735,72 @@ SPEC 提供的 CPU 基准测试程序，就好像 CPU 届的“高考”，通�
       </tags>
   </entry>
   <entry>
+    <title>Hexo博客下集成Gitalk评论</title>
+    <url>/posts/d37d3bf7/</url>
+    <content><![CDATA[<h1 id="Hexo-Next博客下集成-Gitalk-评论功能"><a href="#Hexo-Next博客下集成-Gitalk-评论功能" class="headerlink" title="Hexo+Next博客下集成 Gitalk 评论功能"></a>Hexo+Next博客下集成 Gitalk 评论功能</h1><blockquote>
+<p>Gitalk 是基于 GitHub Issues 的评论系统 ，面向程序员，不能匿名评论，需博主初始化话题，用户需登录 github 账号评论。并且支持markdown 格式。</p>
+</blockquote>
+<span id="more"></span>
+
+<h2 id="Gitalk-功能集成过程："><a href="#Gitalk-功能集成过程：" class="headerlink" title="Gitalk 功能集成过程："></a>Gitalk 功能集成过程：</h2><h3 id="新建评论仓库"><a href="#新建评论仓库" class="headerlink" title="新建评论仓库"></a><strong>新建评论仓库</strong></h3><p>如果 Hexo博客是通过Github的仓库（repositories）部署到远端的话，该仓库即可以作为评论仓库，在setting中启动该仓库的Issues即可。</p>
+<p> 否则的话，需要新建一个空的仓库来使用，并且启动该仓库的 Issues。</p>
+<h3 id="注册OAuth-Application"><a href="#注册OAuth-Application" class="headerlink" title="注册OAuth Application"></a>注册OAuth Application</h3><ul>
+<li><p>进入GitHub官网<a href="https://github.com/">https://github.com/</a> ，点击右上角头像，选择setting.</p>
+</li>
+<li><p>接着在setting后选择developer setting 。<img src="/img/Next/talk1.png" alt="talk1" style="zoom:67%;" /></p>
+</li>
+<li><p>然后 new OAuth app</p>
+</li>
+</ul>
+<img src="/img/Next/talk2.png" alt="talk2" style="zoom:67%;" />
+
+<ul>
+<li>接着完成注册信息。<br>​                    <img src="/img/Next/talk3.png" alt="talk3" style="zoom: 50%;" /></li>
+</ul>
+<p>值得注意的是第四个参数信息很重要！是回调URL，这个一定不能填写错，一般填写你博客主页地址。</p>
+<p><img src="/img/Next/talk4.png" alt="talk4" style="zoom:67%;" />注册成功之后会有 Client ID和 Client Secret ，需要记录下来之后会用到。</p>
+<h3 id="配置文件修改"><a href="#配置文件修改" class="headerlink" title="配置文件修改"></a>配置文件修改</h3><p>第一步：新建或修改<code>/layout/_third-party/comments/gitalk.swig</code>文件，并添加内容（若该文件下载后已存在则无需进行更改，Next8.0 版本后为.njk 后缀结尾文件）。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&#123;%- if page.comments %&#125;</span><br><span class="line">&#123;%- set gitalk_css_uri = theme.vendors.gitalk_css | default(&#x27;//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css&#x27;) %&#125;</span><br><span class="line">&lt;link rel=&quot;stylesheet&quot; href=&quot;&#123;&#123; gitalk_css_uri &#125;&#125;&quot;&gt;</span><br><span class="line"></span><br><span class="line">&#123;%- set gitalk_js_uri = theme.vendors.gitalk_js | default(&#x27;//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js&#x27;) %&#125;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line">  NexT.utils.getScript(&#x27;&#123;&#123; gitalk_js_uri &#125;&#125;&#x27;, () =&gt; &#123;</span><br><span class="line">    var gitalk = new Gitalk(&#123;</span><br><span class="line">      clientID: &#x27;&#123;&#123; theme.gitalk.client_id &#125;&#125;&#x27;,</span><br><span class="line">      clientSecret: &#x27;&#123;&#123; theme.gitalk.client_secret &#125;&#125;&#x27;,</span><br><span class="line">      repo: &#x27;&#123;&#123; theme.gitalk.repo &#125;&#125;&#x27;,</span><br><span class="line">      owner: &#x27;&#123;&#123; theme.gitalk.github_id &#125;&#125;&#x27;,</span><br><span class="line">      admin: [&#x27;&#123;&#123; theme.gitalk.admin_user &#125;&#125;&#x27;],</span><br><span class="line">      id: &#x27;&#123;&#123; gitalk_md5(page.path) &#125;&#125;&#x27;,</span><br><span class="line">      &#123;%- if theme.gitalk.language == &#x27;&#x27; %&#125;</span><br><span class="line">        language: window.navigator.language || window.navigator.userLanguage,</span><br><span class="line">      &#123;% else %&#125;</span><br><span class="line">        language: &#x27;&#123;&#123; theme.gitalk.language &#125;&#125;&#x27;,</span><br><span class="line">      &#123;%- endif %&#125;</span><br><span class="line">      distractionFreeMode: &#x27;&#123;&#123; theme.gitalk.distraction_free_mode &#125;&#125;&#x27;</span><br><span class="line">    &#125;);</span><br><span class="line">    gitalk.render(&#x27;gitalk-container&#x27;);</span><br><span class="line">  &#125;, window.Gitalk);</span><br><span class="line">&lt;/script&gt;</span><br><span class="line">&#123;%- endif %&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>comments.swig</strong></p>
+<p>第二步：修改<code>/layout/_partials/comments.swig</code>文件，在最后一个<code>&#123;%- endif %&#125;</code>前面加上如下内容 (十分重要)：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&#123;% elseif theme.gitalk.enable %&#125;</span><br><span class="line"> &lt;div id=&quot;gitalk-container&quot;&gt;&lt;/div&gt;</span><br></pre></td></tr></table></figure>
+
+<p><strong>index.swig</strong></p>
+<p>第三步：新建或者修改<code>layout/_third-party/comments/index.swig</code>文件，在最后添加内容</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&#123;% include &#x27;gitalk.swig&#x27; %&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>gitalk.styl</strong></p>
+<p>第四步：新建或者修改<code>/source/css/_common/components/third-party/gitalk.styl</code>文件，添加内容：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">if (hexo-config(&#x27;gitalk.enable&#x27;)) &#123;</span><br><span class="line">  .gt-header a, .gt-comments a, .gt-popup a &#123;</span><br><span class="line">    border-bottom: 0;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  .gt-container .gt-popup .gt-action.is--active::before &#123;</span><br><span class="line">    top: .7em;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>_config.xml</strong></p>
+<p>第五步：在主题配置文件<code>next/_config.xml</code>中找到<code>gitalk处</code>修改或者添加如下内容：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">gitalk:</span><br><span class="line">  enable: true</span><br><span class="line">  githubID: github帐号  # 例：TateTang</span><br><span class="line">  repo: 仓库名称   # 例：blog-comments</span><br><span class="line">  ClientID: Client ID</span><br><span class="line">  ClientSecret: Client Secret</span><br><span class="line">  adminUser: github帐号 #指定可初始化评论账户 如：TateTang</span><br><span class="line">  distractionFreeMode: true</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>这时我们就需要用到之前记录的 Client ID和 Client Secret ，需要注意的是<strong>repo必须是你存放评论并启动Issues的仓库（repository）名称</strong>。</p>
+<h3 id="初始化-Issues"><a href="#初始化-Issues" class="headerlink" title="初始化 Issues"></a>初始化 Issues</h3><p>完成上述工作后，即可在博客主目录下输入命令<code>hexo clean &amp;&amp; hexo g &amp;&amp; hexo d</code> 运行</p>
+<p>进入博客后在评论会出现下图情况，这时使用注册 OAuth Application 的GitHub登录进行初始化创建即可。   <img src="/img/Next/talk5.png" alt="talk5" style="zoom:67%;" /></p>
+<p>首次初始化会有如下结果，点击授权即可完成！（Gitalk Lin 是我OAuth APP注册的项目名称）<br><img src="/img/Next/talk6.png" alt="talk6" style="zoom:67%;" /></p>
+<h2 id="注意事项："><a href="#注意事项：" class="headerlink" title="注意事项："></a>注意事项：</h2><ol>
+<li><p>有时授权完成后可能显示 <code>Error Not Found</code> 问题，很可能的情况是没有创建或者已经存在 (在Setting中) 启动了 Issues的 GitHub 仓库，或者在 Next主题的配置文件中 <em><strong>repo</strong></em>名称输入有误（请与创建的评论仓库的名称相一致）。</p>
+<p>例如： repo: blog-Comments</p>
+<p>(blog-Comments 即为创建时的仓库名)</p>
+</li>
+<li><p>虽然已完成 Gitalk功能的集成，但是需要每篇博客都允许其他人可以评论的话，那么你要在该博客下登陆评论仓库（repo）使用的 GitHub 账号来完成 Issues的初始化！</p>
+</li>
+</ol>
+<h2 id="参考链接："><a href="#参考链接：" class="headerlink" title="参考链接："></a>参考链接：</h2><p>gitalk 参考文档说明 （<a href="https://github.com/gitalk/gitalk/blob/master/readme-cn.md%EF%BC%89">https://github.com/gitalk/gitalk/blob/master/readme-cn.md）</a></p>
+]]></content>
+      <categories>
+        <category>Hexo博客</category>
+      </categories>
+      <tags>
+        <tag>Next</tag>
+        <tag>gitalk</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Java中的关键字和标识符号</title>
     <url>/posts/89799f4a/</url>
     <content><![CDATA[<h1 id="Java-的关键字和标识符"><a href="#Java-的关键字和标识符" class="headerlink" title="Java 的关键字和标识符"></a>Java 的关键字和标识符</h1><h2 id="常用关键字展示："><a href="#常用关键字展示：" class="headerlink" title="常用关键字展示："></a>常用关键字展示：</h2><span id="more"></span>
@@ -1751,6 +1817,49 @@ SPEC 提供的 CPU 基准测试程序，就好像 CPU 届的“高考”，通�
       <categories>
         <category>Java</category>
       </categories>
+  </entry>
+  <entry>
+    <title>next主题下为博客添加页面宠物</title>
+    <url>/posts/9fbcb947/</url>
+    <content><![CDATA[<h1 id="博客添加页面宠物"><a href="#博客添加页面宠物" class="headerlink" title="博客添加页面宠物"></a>博客添加页面宠物</h1><blockquote>
+<p>为个人博客添加宠物显示来美化修饰，使用 npm命令来完成在live2d中模型的选择。</p>
+</blockquote>
+<span id="more"></span>
+<h2 id="具体步骤"><a href="#具体步骤" class="headerlink" title="具体步骤"></a>具体步骤</h2><ol>
+<li>首先在博客目录下执行<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">npm install -save hexo-helper-live2d</span><br></pre></td></tr></table></figure></li>
+<li>然后在站点配置文件中加入:<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">live2d:</span><br><span class="line">  enable: true</span><br><span class="line">  scriptFrom: local</span><br><span class="line">  pluginRootPath: live2dw/</span><br><span class="line">  pluginJsPath: lib/</span><br><span class="line">  pluginModelPath: assets/</span><br><span class="line">  tagMode: false</span><br><span class="line">  model:</span><br><span class="line">    use: live2d-widget-model-wanko  #选择哪种模型</span><br><span class="line">  display: #放置位置和大小</span><br><span class="line">    position: right</span><br><span class="line">    width: 150</span><br><span class="line">    height: 300</span><br><span class="line">  mobile:</span><br><span class="line">    show: false #是否在手机端显示</span><br></pre></td></tr></table></figure></li>
+<li>注意：<br>上面模型的选择可在lived2d中选择，并下载相应的模型：</li>
+</ol>
+<ul>
+<li>例如：<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">npm install live2d-widget-model-wanko</span><br></pre></td></tr></table></figure>
+<h2 id="可供模型"><a href="#可供模型" class="headerlink" title="可供模型"></a>可供模型</h2></li>
+</ul>
+<hr>
+<p>链接地址：<a href="https://github.com/xiazeyu/live2d-widget-models">live2d</a><br>live2d-widget-model-chitose</p>
+<p>live2d-widget-model-epsilon2_1</p>
+<p>live2d-widget-model-gf</p>
+<p>live2d-widget-model-haru&#x2F;01 (use npm install –save live2d-widget-model-haru)</p>
+<p>live2d-widget-model-haru&#x2F;02 (use npm install –save live2d-widget-model-haru)</p>
+<p>live2d-widget-model-haruto</p>
+<p>live2d-widget-model-hibiki</p>
+<p>live2d-widget-model-hijiki</p>
+<p>live2d-widget-model-izumi</p>
+<p>live2d-widget-model-koharu</p>
+<p>live2d-widget-model-miku</p>
+<p>live2d-widget-model-ni-j</p>
+<p>live2d-widget-model-nico</p>
+<p>live2d-widget-model-nietzsche<br>等等···</p>
+<ul>
+<li>模型展示<br>等等···</li>
+</ul>
+]]></content>
+      <categories>
+        <category>Hexo博客</category>
+      </categories>
+      <tags>
+        <tag>Next</tag>
+        <tag>博客定制</tag>
+      </tags>
   </entry>
   <entry>
     <title>Java知识点总结（一）</title>
@@ -1837,115 +1946,6 @@ ntegerCache 是 Integer 的内部类，其代码如下所示:<figure class="high
       </categories>
       <tags>
         <tag>面向对象</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Hexo博客下集成Gitalk评论</title>
-    <url>/posts/d37d3bf7/</url>
-    <content><![CDATA[<h1 id="Hexo-Next博客下集成-Gitalk-评论功能"><a href="#Hexo-Next博客下集成-Gitalk-评论功能" class="headerlink" title="Hexo+Next博客下集成 Gitalk 评论功能"></a>Hexo+Next博客下集成 Gitalk 评论功能</h1><blockquote>
-<p>Gitalk 是基于 GitHub Issues 的评论系统 ，面向程序员，不能匿名评论，需博主初始化话题，用户需登录 github 账号评论。并且支持markdown 格式。</p>
-</blockquote>
-<span id="more"></span>
-
-<h2 id="Gitalk-功能集成过程："><a href="#Gitalk-功能集成过程：" class="headerlink" title="Gitalk 功能集成过程："></a>Gitalk 功能集成过程：</h2><h3 id="新建评论仓库"><a href="#新建评论仓库" class="headerlink" title="新建评论仓库"></a><strong>新建评论仓库</strong></h3><p>如果 Hexo博客是通过Github的仓库（repositories）部署到远端的话，该仓库即可以作为评论仓库，在setting中启动该仓库的Issues即可。</p>
-<p> 否则的话，需要新建一个空的仓库来使用，并且启动该仓库的 Issues。</p>
-<h3 id="注册OAuth-Application"><a href="#注册OAuth-Application" class="headerlink" title="注册OAuth Application"></a>注册OAuth Application</h3><ul>
-<li><p>进入GitHub官网<a href="https://github.com/">https://github.com/</a> ，点击右上角头像，选择setting.</p>
-</li>
-<li><p>接着在setting后选择developer setting 。<img src="/img/Next/talk1.png" alt="talk1" style="zoom:67%;" /></p>
-</li>
-<li><p>然后 new OAuth app</p>
-</li>
-</ul>
-<img src="/img/Next/talk2.png" alt="talk2" style="zoom:67%;" />
-
-<ul>
-<li>接着完成注册信息。<br>​                    <img src="/img/Next/talk3.png" alt="talk3" style="zoom: 50%;" /></li>
-</ul>
-<p>值得注意的是第四个参数信息很重要！是回调URL，这个一定不能填写错，一般填写你博客主页地址。</p>
-<p><img src="/img/Next/talk4.png" alt="talk4" style="zoom:67%;" />注册成功之后会有 Client ID和 Client Secret ，需要记录下来之后会用到。</p>
-<h3 id="配置文件修改"><a href="#配置文件修改" class="headerlink" title="配置文件修改"></a>配置文件修改</h3><p>第一步：新建或修改<code>/layout/_third-party/comments/gitalk.swig</code>文件，并添加内容（若该文件下载后已存在则无需进行更改，Next8.0 版本后为.njk 后缀结尾文件）。</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&#123;%- if page.comments %&#125;</span><br><span class="line">&#123;%- set gitalk_css_uri = theme.vendors.gitalk_css | default(&#x27;//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css&#x27;) %&#125;</span><br><span class="line">&lt;link rel=&quot;stylesheet&quot; href=&quot;&#123;&#123; gitalk_css_uri &#125;&#125;&quot;&gt;</span><br><span class="line"></span><br><span class="line">&#123;%- set gitalk_js_uri = theme.vendors.gitalk_js | default(&#x27;//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js&#x27;) %&#125;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line">  NexT.utils.getScript(&#x27;&#123;&#123; gitalk_js_uri &#125;&#125;&#x27;, () =&gt; &#123;</span><br><span class="line">    var gitalk = new Gitalk(&#123;</span><br><span class="line">      clientID: &#x27;&#123;&#123; theme.gitalk.client_id &#125;&#125;&#x27;,</span><br><span class="line">      clientSecret: &#x27;&#123;&#123; theme.gitalk.client_secret &#125;&#125;&#x27;,</span><br><span class="line">      repo: &#x27;&#123;&#123; theme.gitalk.repo &#125;&#125;&#x27;,</span><br><span class="line">      owner: &#x27;&#123;&#123; theme.gitalk.github_id &#125;&#125;&#x27;,</span><br><span class="line">      admin: [&#x27;&#123;&#123; theme.gitalk.admin_user &#125;&#125;&#x27;],</span><br><span class="line">      id: &#x27;&#123;&#123; gitalk_md5(page.path) &#125;&#125;&#x27;,</span><br><span class="line">      &#123;%- if theme.gitalk.language == &#x27;&#x27; %&#125;</span><br><span class="line">        language: window.navigator.language || window.navigator.userLanguage,</span><br><span class="line">      &#123;% else %&#125;</span><br><span class="line">        language: &#x27;&#123;&#123; theme.gitalk.language &#125;&#125;&#x27;,</span><br><span class="line">      &#123;%- endif %&#125;</span><br><span class="line">      distractionFreeMode: &#x27;&#123;&#123; theme.gitalk.distraction_free_mode &#125;&#125;&#x27;</span><br><span class="line">    &#125;);</span><br><span class="line">    gitalk.render(&#x27;gitalk-container&#x27;);</span><br><span class="line">  &#125;, window.Gitalk);</span><br><span class="line">&lt;/script&gt;</span><br><span class="line">&#123;%- endif %&#125;</span><br></pre></td></tr></table></figure>
-
-<p><strong>comments.swig</strong></p>
-<p>第二步：修改<code>/layout/_partials/comments.swig</code>文件，在最后一个<code>&#123;%- endif %&#125;</code>前面加上如下内容 (十分重要)：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&#123;% elseif theme.gitalk.enable %&#125;</span><br><span class="line"> &lt;div id=&quot;gitalk-container&quot;&gt;&lt;/div&gt;</span><br></pre></td></tr></table></figure>
-
-<p><strong>index.swig</strong></p>
-<p>第三步：新建或者修改<code>layout/_third-party/comments/index.swig</code>文件，在最后添加内容</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&#123;% include &#x27;gitalk.swig&#x27; %&#125;</span><br></pre></td></tr></table></figure>
-
-<p><strong>gitalk.styl</strong></p>
-<p>第四步：新建或者修改<code>/source/css/_common/components/third-party/gitalk.styl</code>文件，添加内容：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">if (hexo-config(&#x27;gitalk.enable&#x27;)) &#123;</span><br><span class="line">  .gt-header a, .gt-comments a, .gt-popup a &#123;</span><br><span class="line">    border-bottom: 0;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  .gt-container .gt-popup .gt-action.is--active::before &#123;</span><br><span class="line">    top: .7em;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><strong>_config.xml</strong></p>
-<p>第五步：在主题配置文件<code>next/_config.xml</code>中找到<code>gitalk处</code>修改或者添加如下内容：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">gitalk:</span><br><span class="line">  enable: true</span><br><span class="line">  githubID: github帐号  # 例：TateTang</span><br><span class="line">  repo: 仓库名称   # 例：blog-comments</span><br><span class="line">  ClientID: Client ID</span><br><span class="line">  ClientSecret: Client Secret</span><br><span class="line">  adminUser: github帐号 #指定可初始化评论账户 如：TateTang</span><br><span class="line">  distractionFreeMode: true</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p>这时我们就需要用到之前记录的 Client ID和 Client Secret ，需要注意的是<strong>repo必须是你存放评论并启动Issues的仓库（repository）名称</strong>。</p>
-<h3 id="初始化-Issues"><a href="#初始化-Issues" class="headerlink" title="初始化 Issues"></a>初始化 Issues</h3><p>完成上述工作后，即可在博客主目录下输入命令<code>hexo clean &amp;&amp; hexo g &amp;&amp; hexo d</code> 运行</p>
-<p>进入博客后在评论会出现下图情况，这时使用注册 OAuth Application 的GitHub登录进行初始化创建即可。   <img src="/img/Next/talk5.png" alt="talk5" style="zoom:67%;" /></p>
-<p>首次初始化会有如下结果，点击授权即可完成！（Gitalk Lin 是我OAuth APP注册的项目名称）<br><img src="/img/Next/talk6.png" alt="talk6" style="zoom:67%;" /></p>
-<h2 id="注意事项："><a href="#注意事项：" class="headerlink" title="注意事项："></a>注意事项：</h2><ol>
-<li><p>有时授权完成后可能显示 <code>Error Not Found</code> 问题，很可能的情况是没有创建或者已经存在 (在Setting中) 启动了 Issues的 GitHub 仓库，或者在 Next主题的配置文件中 <em><strong>repo</strong></em>名称输入有误（请与创建的评论仓库的名称相一致）。</p>
-<p>例如： repo: blog-Comments</p>
-<p>(blog-Comments 即为创建时的仓库名)</p>
-</li>
-<li><p>虽然已完成 Gitalk功能的集成，但是需要每篇博客都允许其他人可以评论的话，那么你要在该博客下登陆评论仓库（repo）使用的 GitHub 账号来完成 Issues的初始化！</p>
-</li>
-</ol>
-<h2 id="参考链接："><a href="#参考链接：" class="headerlink" title="参考链接："></a>参考链接：</h2><p>gitalk 参考文档说明 （<a href="https://github.com/gitalk/gitalk/blob/master/readme-cn.md%EF%BC%89">https://github.com/gitalk/gitalk/blob/master/readme-cn.md）</a></p>
-]]></content>
-      <categories>
-        <category>Hexo博客</category>
-      </categories>
-      <tags>
-        <tag>Next</tag>
-        <tag>gitalk</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>next主题下为博客添加页面宠物</title>
-    <url>/posts/9fbcb947/</url>
-    <content><![CDATA[<h1 id="博客添加页面宠物"><a href="#博客添加页面宠物" class="headerlink" title="博客添加页面宠物"></a>博客添加页面宠物</h1><blockquote>
-<p>为个人博客添加宠物显示来美化修饰，使用 npm命令来完成在live2d中模型的选择。</p>
-</blockquote>
-<span id="more"></span>
-<h2 id="具体步骤"><a href="#具体步骤" class="headerlink" title="具体步骤"></a>具体步骤</h2><ol>
-<li>首先在博客目录下执行<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">npm install -save hexo-helper-live2d</span><br></pre></td></tr></table></figure></li>
-<li>然后在站点配置文件中加入:<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">live2d:</span><br><span class="line">  enable: true</span><br><span class="line">  scriptFrom: local</span><br><span class="line">  pluginRootPath: live2dw/</span><br><span class="line">  pluginJsPath: lib/</span><br><span class="line">  pluginModelPath: assets/</span><br><span class="line">  tagMode: false</span><br><span class="line">  model:</span><br><span class="line">    use: live2d-widget-model-wanko  #选择哪种模型</span><br><span class="line">  display: #放置位置和大小</span><br><span class="line">    position: right</span><br><span class="line">    width: 150</span><br><span class="line">    height: 300</span><br><span class="line">  mobile:</span><br><span class="line">    show: false #是否在手机端显示</span><br></pre></td></tr></table></figure></li>
-<li>注意：<br>上面模型的选择可在lived2d中选择，并下载相应的模型：</li>
-</ol>
-<ul>
-<li>例如：<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">npm install live2d-widget-model-wanko</span><br></pre></td></tr></table></figure>
-<h2 id="可供模型"><a href="#可供模型" class="headerlink" title="可供模型"></a>可供模型</h2></li>
-</ul>
-<hr>
-<p>链接地址：<a href="https://github.com/xiazeyu/live2d-widget-models">live2d</a><br>live2d-widget-model-chitose</p>
-<p>live2d-widget-model-epsilon2_1</p>
-<p>live2d-widget-model-gf</p>
-<p>live2d-widget-model-haru&#x2F;01 (use npm install –save live2d-widget-model-haru)</p>
-<p>live2d-widget-model-haru&#x2F;02 (use npm install –save live2d-widget-model-haru)</p>
-<p>live2d-widget-model-haruto</p>
-<p>live2d-widget-model-hibiki</p>
-<p>live2d-widget-model-hijiki</p>
-<p>live2d-widget-model-izumi</p>
-<p>live2d-widget-model-koharu</p>
-<p>live2d-widget-model-miku</p>
-<p>live2d-widget-model-ni-j</p>
-<p>live2d-widget-model-nico</p>
-<p>live2d-widget-model-nietzsche<br>等等···</p>
-<ul>
-<li>模型展示<br>等等···</li>
-</ul>
-]]></content>
-      <categories>
-        <category>Hexo博客</category>
-      </categories>
-      <tags>
-        <tag>Next</tag>
-        <tag>博客定制</tag>
       </tags>
   </entry>
   <entry>
@@ -2098,6 +2098,32 @@ ntegerCache 是 Integer 的内部类，其代码如下所示:<figure class="high
       </tags>
   </entry>
   <entry>
+    <title>斐波那契数列</title>
+    <url>/posts/cc713db/</url>
+    <content><![CDATA[<h1 id="斐波那契数列"><a href="#斐波那契数列" class="headerlink" title="斐波那契数列"></a>斐波那契数列</h1><ul>
+<li>求取斐波那契数列第N位的值。</li>
+</ul>
+<p><strong>斐波那契数列：</strong>每一位的值等于他前两位数字之和。例如：前两位固定，有0,1,1,2,3,5,8,13······</p>
+<span id="more"></span>
+<h2 id="解法一：暴力递归"><a href="#解法一：暴力递归" class="headerlink" title="解法一：暴力递归"></a>解法一：暴力递归</h2><img src="/img/coding/array1.png" alt="array1" style="zoom: 67%;" />
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">public static int calculate(int num)&#123;</span><br><span class="line">    if(num == 0)&#123;</span><br><span class="line">    	return 0;</span><br><span class="line">    &#125;</span><br><span class="line">    if(num == 1)&#123;</span><br><span class="line">    	return 1;</span><br><span class="line">    &#125;</span><br><span class="line">    return calculate(num-1) + calculate(num-2);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+---
+
+<h2 id="解法二：去重递归"><a href="#解法二：去重递归" class="headerlink" title="解法二：去重递归"></a>解法二：去重递归</h2><ul>
+<li>递归得出具体数值之后、存储到一个集合(下标与数列下标一致)，后面递归之前先到该集合查询一次， 如果查到则无需递归、直接取值。查不到再进行递归计算。<img src="/img/coding/array2.png" alt="array2" style="zoom: 67%;" />
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">public static int calculate2(int num)&#123;</span><br><span class="line">   int[] arr=new int[num+1];</span><br><span class="line">   return recurse(arr,num);</span><br><span class="line">&#125;</span><br><span class="line">private static int recurse(int[] arr,int num)&#123;</span><br><span class="line">   if(num == 0)&#123;</span><br><span class="line">   	return 0;</span><br><span class="line">   &#125;</span><br><span class="line">   if(num == 1)&#123;</span><br><span class="line">   	return 1;</span><br><span class="line">   &#125; </span><br><span class="line">   if(arr[num] != 0)&#123;</span><br><span class="line">   	return arr[num];</span><br><span class="line">   &#125;</span><br><span class="line">   arr[num] = recurse(arr,num-1) + recurse(arr,num-2);</span><br><span class="line">   return arr[num];</span><br><span class="line">&#125; </span><br></pre></td></tr></table></figure></li>
+</ul>
+<hr>
+<h2 id="解法三：双指针迭代"><a href="#解法三：双指针迭代" class="headerlink" title="解法三：双指针迭代"></a>解法三：双指针迭代</h2><ul>
+<li>基于去重递归优化，集合没有必要保存每一个下标值，只需保存前两位即可，向后遍历，得出N的值。<img src="/img/coding/array3.png" alt="array3" style="zoom: 67%;" />
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">public static int iterate(int num)&#123;</span><br><span class="line">   if(num == 0)&#123;</span><br><span class="line">   	return 0;	</span><br><span class="line">   &#125;</span><br><span class="line">   if(num == 1)&#123;</span><br><span class="line">   	return 1;</span><br><span class="line">   &#125;</span><br><span class="line">   int low = 0 , high = 1;</span><br><span class="line">   for(int i=2; i&lt;=num; i++)&#123;</span><br><span class="line">   	int sum = low + high;</span><br><span class="line">	low = high;</span><br><span class="line">	high = sum;</span><br><span class="line">   &#125;</span><br><span class="line">   return high;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+]]></content>
+      <categories>
+        <category>LeeCode Coding</category>
+      </categories>
+  </entry>
+  <entry>
     <title>反转链表</title>
     <url>/posts/82b7a1a9/</url>
     <content><![CDATA[<h1 id="关于链表反转"><a href="#关于链表反转" class="headerlink" title="关于链表反转"></a>关于链表反转</h1><h2 id="一、整个链表的反转"><a href="#一、整个链表的反转" class="headerlink" title="一、整个链表的反转"></a>一、整个链表的反转</h2><blockquote>
@@ -2157,32 +2183,6 @@ ntegerCache 是 Integer 的内部类，其代码如下所示:<figure class="high
 <p>例如:n &#x3D; 25 会计算以下<br>2* 4&#x3D;8<br>3 * 4 &#x3D; 12<br>但实际上8和12已经标记过，在n &#x3D; 17时已经计算了 3 * 4，2 * 4</p>
 </blockquote>
 </li>
-</ul>
-]]></content>
-      <categories>
-        <category>LeeCode Coding</category>
-      </categories>
-  </entry>
-  <entry>
-    <title>斐波那契数列</title>
-    <url>/posts/cc713db/</url>
-    <content><![CDATA[<h1 id="斐波那契数列"><a href="#斐波那契数列" class="headerlink" title="斐波那契数列"></a>斐波那契数列</h1><ul>
-<li>求取斐波那契数列第N位的值。</li>
-</ul>
-<p><strong>斐波那契数列：</strong>每一位的值等于他前两位数字之和。例如：前两位固定，有0,1,1,2,3,5,8,13······</p>
-<span id="more"></span>
-<h2 id="解法一：暴力递归"><a href="#解法一：暴力递归" class="headerlink" title="解法一：暴力递归"></a>解法一：暴力递归</h2><img src="/img/coding/array1.png" alt="array1" style="zoom: 67%;" />
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">public static int calculate(int num)&#123;</span><br><span class="line">    if(num == 0)&#123;</span><br><span class="line">    	return 0;</span><br><span class="line">    &#125;</span><br><span class="line">    if(num == 1)&#123;</span><br><span class="line">    	return 1;</span><br><span class="line">    &#125;</span><br><span class="line">    return calculate(num-1) + calculate(num-2);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
----
-
-<h2 id="解法二：去重递归"><a href="#解法二：去重递归" class="headerlink" title="解法二：去重递归"></a>解法二：去重递归</h2><ul>
-<li>递归得出具体数值之后、存储到一个集合(下标与数列下标一致)，后面递归之前先到该集合查询一次， 如果查到则无需递归、直接取值。查不到再进行递归计算。<img src="/img/coding/array2.png" alt="array2" style="zoom: 67%;" />
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">public static int calculate2(int num)&#123;</span><br><span class="line">   int[] arr=new int[num+1];</span><br><span class="line">   return recurse(arr,num);</span><br><span class="line">&#125;</span><br><span class="line">private static int recurse(int[] arr,int num)&#123;</span><br><span class="line">   if(num == 0)&#123;</span><br><span class="line">   	return 0;</span><br><span class="line">   &#125;</span><br><span class="line">   if(num == 1)&#123;</span><br><span class="line">   	return 1;</span><br><span class="line">   &#125; </span><br><span class="line">   if(arr[num] != 0)&#123;</span><br><span class="line">   	return arr[num];</span><br><span class="line">   &#125;</span><br><span class="line">   arr[num] = recurse(arr,num-1) + recurse(arr,num-2);</span><br><span class="line">   return arr[num];</span><br><span class="line">&#125; </span><br></pre></td></tr></table></figure></li>
-</ul>
-<hr>
-<h2 id="解法三：双指针迭代"><a href="#解法三：双指针迭代" class="headerlink" title="解法三：双指针迭代"></a>解法三：双指针迭代</h2><ul>
-<li>基于去重递归优化，集合没有必要保存每一个下标值，只需保存前两位即可，向后遍历，得出N的值。<img src="/img/coding/array3.png" alt="array3" style="zoom: 67%;" />
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">public static int iterate(int num)&#123;</span><br><span class="line">   if(num == 0)&#123;</span><br><span class="line">   	return 0;	</span><br><span class="line">   &#125;</span><br><span class="line">   if(num == 1)&#123;</span><br><span class="line">   	return 1;</span><br><span class="line">   &#125;</span><br><span class="line">   int low = 0 , high = 1;</span><br><span class="line">   for(int i=2; i&lt;=num; i++)&#123;</span><br><span class="line">   	int sum = low + high;</span><br><span class="line">	low = high;</span><br><span class="line">	high = sum;</span><br><span class="line">   &#125;</span><br><span class="line">   return high;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
 </ul>
 ]]></content>
       <categories>
