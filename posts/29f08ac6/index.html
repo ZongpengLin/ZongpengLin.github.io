@@ -23,31 +23,30 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"zongpenglin.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":true,"version":"8.10.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"gitalk","storage":true,"lazyload":true,"nav":{"gitalk":{"order":-1}},"activeClass":"gitalk"},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
 
-  <meta name="description" content="删除排序链表中的重复元素 删除排序链表中的重复元素1 描述:存在一个按升序排列的链表，给你这个链表的头节点head，请你删除所有重复的元素，使每个元素只出现一次。">
+  <meta name="description" content="PayController代码优化 本项目还在完善更新中。。。。。   本代码集成了SPringBoot中freemarker的.tfl文件：">
 <meta property="og:type" content="website">
-<meta property="og:title" content="“删除排序链表中的重复元素”">
-<meta property="og:url" content="https://zongpenglin.github.io/posts/fc09ef28/index.html">
+<meta property="og:title" content="PayController代码优化">
+<meta property="og:url" content="https://zongpenglin.github.io/posts/29f08ac6/index.html">
 <meta property="og:site_name" content="Pang-YUM&#39;s Neverland">
-<meta property="og:description" content="删除排序链表中的重复元素 删除排序链表中的重复元素1 描述:存在一个按升序排列的链表，给你这个链表的头节点head，请你删除所有重复的元素，使每个元素只出现一次。">
+<meta property="og:description" content="PayController代码优化 本项目还在完善更新中。。。。。   本代码集成了SPringBoot中freemarker的.tfl文件：">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://zongpenglin.github.io/img/coding/deleteListNode.png">
-<meta property="og:image" content="https://zongpenglin.github.io/img/coding/deleteListNode.png">
-<meta property="article:published_time" content="2022-02-18T02:15:07.000Z">
-<meta property="article:modified_time" content="2022-02-28T04:56:48.355Z">
+<meta property="article:published_time" content="2022-02-27T16:00:00.000Z">
+<meta property="article:modified_time" content="2022-03-03T07:51:23.272Z">
 <meta property="article:author" content="Zongpeng Lin">
-<meta property="article:tag" content="ListNode">
+<meta property="article:tag" content="IDEA">
+<meta property="article:tag" content="freemark">
+<meta property="article:tag" content="Mapping定义">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://zongpenglin.github.io/img/coding/deleteListNode.png">
 
 
-<link rel="canonical" href="https://zongpenglin.github.io/posts/fc09ef28/">
+<link rel="canonical" href="https://zongpenglin.github.io/posts/29f08ac6/">
 
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://zongpenglin.github.io/posts/fc09ef28/","path":"posts/fc09ef28/","title":"“删除排序链表中的重复元素”"}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://zongpenglin.github.io/posts/29f08ac6/","path":"posts/29f08ac6/","title":"PayController代码优化"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
-<title>“删除排序链表中的重复元素” | Pang-YUM's Neverland</title>
+<title>PayController代码优化 | Pang-YUM's Neverland</title>
   
 
 
@@ -155,7 +154,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%88%A0%E9%99%A4%E6%8E%92%E5%BA%8F%E9%93%BE%E8%A1%A8%E4%B8%AD%E7%9A%84%E9%87%8D%E5%A4%8D%E5%85%83%E7%B4%A0"><span class="nav-number">1.</span> <span class="nav-text">删除排序链表中的重复元素</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%A0%E9%99%A4%E6%8E%92%E5%BA%8F%E9%93%BE%E8%A1%A8%E4%B8%AD%E7%9A%84%E9%87%8D%E5%A4%8D%E5%85%83%E7%B4%A01"><span class="nav-number">1.1.</span> <span class="nav-text">删除排序链表中的重复元素1</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A7%A3%E6%B3%95"><span class="nav-number">1.1.1.</span> <span class="nav-text">解法</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%A0%E9%99%A4%E6%8E%92%E5%BA%8F%E9%93%BE%E8%A1%A8%E4%B8%AD%E7%9A%84%E9%87%8D%E5%A4%8D%E5%85%83%E7%B4%A02"><span class="nav-number">1.2.</span> <span class="nav-text">删除排序链表中的重复元素2</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A7%A3%E6%B3%95%EF%BC%9A"><span class="nav-number">1.2.1.</span> <span class="nav-text">解法：</span></a></li></ol></li></ol></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#PayController%E4%BB%A3%E7%A0%81%E4%BC%98%E5%8C%96"><span class="nav-number">1.</span> <span class="nav-text">PayController代码优化</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#tfl-%E6%96%87%E4%BB%B6"><span class="nav-number">1.1.</span> <span class="nav-text">.tfl 文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#control%E5%B1%82%E7%9A%84PayController%E4%BB%A3%E7%A0%81%E4%BC%98%E5%8C%96"><span class="nav-number">1.2.</span> <span class="nav-text">control层的PayController代码优化</span></a></li></ol></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -240,7 +239,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://zongpenglin.github.io/posts/fc09ef28/">
+    <link itemprop="mainEntityOfPage" href="https://zongpenglin.github.io/posts/29f08ac6/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/author.jpg">
@@ -253,7 +252,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          “删除排序链表中的重复元素”
+          PayController代码优化
         </h1>
 
         <div class="post-meta-container">
@@ -264,7 +263,7 @@
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2022-02-18 10:15:07" itemprop="dateCreated datePublished" datetime="2022-02-18T10:15:07+08:00">2022-02-18</time>
+      <time title="创建时间：2022-02-28 00:00:00" itemprop="dateCreated datePublished" datetime="2022-02-28T00:00:00+08:00">2022-02-28</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -272,11 +271,11 @@
       </span>
       <span class="post-meta-item-text">分类于</span>
         <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/LeeCode-Coding/" itemprop="url" rel="index"><span itemprop="name">LeeCode Coding</span></a>
+          <a href="/categories/%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%98/" itemprop="url" rel="index"><span itemprop="name">项目实战</span></a>
         </span>
           ，
         <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/LeeCode-Coding/%E7%AE%97%E6%B3%95%E7%B1%BB/" itemprop="url" rel="index"><span itemprop="name">算法类</span></a>
+          <a href="/categories/%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%98/%E6%94%AF%E4%BB%98%E7%B3%BB%E7%BB%9F/" itemprop="url" rel="index"><span itemprop="name">支付系统</span></a>
         </span>
     </span>
 
@@ -287,7 +286,7 @@
         <i class="far fa-file-word"></i>
       </span>
       <span class="post-meta-item-text">本文字数：</span>
-      <span>2.7k</span>
+      <span>2.2k</span>
     </span>
     <span class="post-meta-item" title="阅读时长">
       <span class="post-meta-item-icon">
@@ -305,52 +304,28 @@
     
     
     <div class="post-body" itemprop="articleBody">
-        <h1 id="删除排序链表中的重复元素"><a href="#删除排序链表中的重复元素" class="headerlink" title="删除排序链表中的重复元素"></a>删除排序链表中的重复元素</h1><hr>
-<h2 id="删除排序链表中的重复元素1"><a href="#删除排序链表中的重复元素1" class="headerlink" title="删除排序链表中的重复元素1"></a>删除排序链表中的重复元素1</h2><ul>
-<li>描述:存在一个按升序排列的链表，给你这个链表的头节点head，请你删除所有重复的元素，使每个元素只出现一次。<span id="more"></span>
-例如：<blockquote>
-<p>输入：head &#x3D; [1,1,2,3,3]<br>输出：[1,2,3]</p>
-<img src="/img/coding/deleteListNode.png" alt="deleteListNode" style="zoom:65%;" /></blockquote>
-</li>
-</ul>
-<h3 id="解法"><a href="#解法" class="headerlink" title="解法"></a>解法</h3><ul>
-<li>使用一个指针解决</li>
-</ul>
-<ul>
-<li>既然是排过序的，那么相同的节点肯定是挨着的。我们可以使用一个指针cur，每次都要判断是否和他后面的节点值相同，如果相同就把后面的那个节点给删除。*</li>
-</ul>
-<p><strong>代码如下：</strong></p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">public ListNode deleteDuplicates(ListNode head) &#123;</span><br><span class="line">    //如果但前节点是空，或者是单个节点，直接返回</span><br><span class="line">    if (head == null || head.next == null)</span><br><span class="line">        return head;</span><br><span class="line">    //只用一个指针cur指向当前节点</span><br><span class="line">    ListNode cur = head;</span><br><span class="line">    while (cur.next != null) &#123;</span><br><span class="line">        //如果当前节点的值和下一个节点的值相同，</span><br><span class="line">        //就把下一个节点值给删除</span><br><span class="line">        if (cur.val == cur.next.val) &#123;</span><br><span class="line">            cur.next = cur.next.next;</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            //否则cur就往后移一步</span><br><span class="line">            cur = cur.next;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    return head;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-<hr>
-<ul>
-<li>递归方式解决<br>以输入链表为 head&#x3D;[1,1,2,3,3]为例，下图为理解图：<br>&lt;img &#x3D;src&#x3D;”&#x2F;img&#x2F;coding&#x2F;deleteListNode1.png” alt&#x3D;”deleteListNode1” style:”zoom: 65%;” &#x2F;&gt;</li>
-</ul>
-<p>代码如下：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">public ListNode deleteDuplicates(ListNode head)&#123;</span><br><span class="line">    //递归的边界条件判断</span><br><span class="line">    if (head == null || head.next == null)</span><br><span class="line">        return head;</span><br><span class="line">    //递归，相当于从后往前遍历</span><br><span class="line">    head.next = deleteDuplicates(head.next);</span><br><span class="line">    //如果当前节点和下一个一样，直接返回下一个节点，否则</span><br><span class="line">    //返回当前节点</span><br><span class="line">    return head.val == head.next.val ? head.next : head;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<hr>
-<hr>
-<h2 id="删除排序链表中的重复元素2"><a href="#删除排序链表中的重复元素2" class="headerlink" title="删除排序链表中的重复元素2"></a>删除排序链表中的重复元素2</h2><ul>
-<li>描述：存在一个按升序排列的链表，给你这个链表的头节点head，请你删除链表中所有存在数字重复情况的节点，只保留原始链表中没有重复出现的数字。返回同样按升序排列的结果链表。<br>例如：<blockquote>
-<p>输入：head &#x3D; [1,2,3,3,4,4,5]<br>输出：[1,2,5]</p>
-<img src="/img/coding/deleteListNode.png" alt="deleteListNode" style="zoom: 50%;" /></blockquote>
-</li>
-</ul>
-<h3 id="解法："><a href="#解法：" class="headerlink" title="解法："></a>解法：</h3><ul>
-<li>双指针解决<br>这题的解决思路就是使用两个指针，一个指针cur指向当前节点，一个指针pre指向当前节点cur的前一个节点。cur始终和他的下一个节点比较，如果相同就往后移，如果不相同我们就需要判断pre的下一个节点是否是cur，如果是cur说明没有相同的节点，如果不是cur说明有相同的节点.<br>来看一下代码：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">public ListNode deleteDuplicates(ListNode head) &#123;</span><br><span class="line">    if(head==null || head.next==null)&#123;</span><br><span class="line">    	return null;</span><br><span class="line">    &#125;</span><br><span class="line">    //添加一个dummy节点</span><br><span class="line">    ListNode dummy=new ListNode(0);</span><br><span class="line">    //让dummy节点的next指针指向head。</span><br><span class="line">    dummy.next=head;</span><br><span class="line">    //指向当前遍历的节点</span><br><span class="line">    ListNode cur=head;</span><br><span class="line">    //指向当前节点pre的前一个节点</span><br><span class="line">    ListNode pre=dummy;</span><br><span class="line">    while(cur!=null)&#123;</span><br><span class="line">    	while(cur.next!=null &amp;&amp; cur.next.val==cur.val)&#123;</span><br><span class="line">	     //如果有重复的，cur就一直往下走</span><br><span class="line">	     cur=cur.next;</span><br><span class="line">   	 &#125;</span><br><span class="line">	//判断上面有没有重复的节点，如果pre.next == cur，说明没有</span><br><span class="line">        //重复的节点。否则说明有重复的节点，然后还要把重复的节点给删除</span><br><span class="line">    	if(pre.next==cur)&#123;</span><br><span class="line">    	     pre=pre.next;</span><br><span class="line">    	&#125;else&#123;</span><br><span class="line">             //有重复的就删除</span><br><span class="line">             pre.next=cur.next;</span><br><span class="line">    	&#125;</span><br><span class="line">	cur=cur.next;</span><br><span class="line">    &#125;</span><br><span class="line">    return dummy.next;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
-</ul>
-<hr>
-<ul>
-<li>递归方式解决<blockquote>
-<p> 我们先定义一个函数deleteDuplicates(ListNode head)表示删除重复的节点。<br>如果<code> head.val != head.next.val</code>，也就是说当前节点和他的下一个节点值不一样，我们不做任何的删除，直接递归head节点的下一个节点，也就是</p>
+        <h1 id="PayController代码优化"><a href="#PayController代码优化" class="headerlink" title="PayController代码优化"></a>PayController代码优化</h1><blockquote>
+<p>本项目还在完善更新中。。。。。</p>
 </blockquote>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">head.next = deleteDuplicates(head.next);</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>如果<code> head.val == head.next.val</code>，说明有重复的节点，这里到底是重复一个还是重复多个，我们不知道，需要通过一个循环来确定。然后把重复的全部删除，也就是</p>
-</blockquote>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">while (head.next != null &amp;&amp; head.val == head.next.val)</span><br><span class="line">    head = head.next;</span><br><span class="line">return deleteDuplicates(head.next);</span><br></pre></td></tr></table></figure></li>
+<ul>
+<li>本代码集成了SPringBoot中freemarker的.tfl文件：<span id="more"></span>
+需要结合着修改。</li>
 </ul>
-<p>那递归的终止条件是什么呢，就是节点为空，或者只有一个节点，这种情况下是不可能有重复的，直接返回即可。我们来看下完整代码:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">public ListNode deleteDuplicates(ListNode head) &#123;</span><br><span class="line">    if (head == null || head.next == null)</span><br><span class="line">        return head;</span><br><span class="line">    if (head.val != head.next.val) &#123;</span><br><span class="line">        //如果当前节点和下一个节点的值不相同</span><br><span class="line">        head.next = deleteDuplicates(head.next);</span><br><span class="line">        return head;</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        //如果当前节点和下一个节点的值相同，说明出现了重复的，</span><br><span class="line">        //把重复的全部给删除</span><br><span class="line">        while (head.next != null &amp;&amp; head.val == head.next.val)</span><br><span class="line">            head = head.next;</span><br><span class="line">        return deleteDuplicates(head.next);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<hr>
+<h2 id="tfl-文件"><a href="#tfl-文件" class="headerlink" title=".tfl 文件"></a>.tfl 文件</h2><p>原始版本，使用html语法</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">    &lt;meta charset=&quot;utf-8&quot;&gt;</span><br><span class="line">    &lt;title&gt;支付&lt;/title&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">&lt;div id=&quot;myQrcode&quot;&gt;&lt;/div&gt;</span><br><span class="line">&lt;script src=&quot;https://cdn.bootcdn.net/ajax/libs/jquery/1.5.1/jquery.min.js&quot;&gt;&lt;/script&gt;</span><br><span class="line">&lt;script src=&quot;https://cdn.bootcdn.net/ajax/libs/jquery.qrcode/1.0/jquery.qrcode.min.js&quot;&gt;&lt;/script&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">    jQuery(&#x27;#myQrcode&#x27;).qrcode(&#123;</span><br><span class="line">         text	: &quot;weixin://wxpay/bizpayurl?pr=nTrHFdrzz&quot;</span><br><span class="line">    &#125;);</span><br><span class="line">&lt;/script&gt;</span><br><span class="line">&lt;/body&gt;</span><br></pre></td></tr></table></figure>
+<p><strong>注意的是：text中显示的的根据订单号和支付金额生成的微信支付的CodeUrl，使我们生成支付二维码的依据！</strong></p>
+<p>对control层的PayController.java 修改可以通过啊参数传递，此时jQuery部分可以修改为：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">script&gt;</span><br><span class="line">    jQuery(&#x27;#myQrcode&#x27;).qrcode(&#123;</span><br><span class="line">        text    : &quot;$&#123;codeUrl&#125;&quot;</span><br><span class="line">    &#125;);</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+
+<h2 id="control层的PayController代码优化"><a href="#control层的PayController代码优化" class="headerlink" title="control层的PayController代码优化"></a>control层的PayController代码优化</h2><p>原始代码文件：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">// PayController源码(省略import部分)</span><br><span class="line">@Controller</span><br><span class="line">@RequestMapping(&quot;/pay&quot;)</span><br><span class="line">public class PayController &#123;</span><br><span class="line">    @Autowired</span><br><span class="line">    private PayService payService;</span><br><span class="line">    @GetMapping(&quot;/create&quot;)</span><br><span class="line">    public ModelAndView create ()&#123;</span><br><span class="line">        return new ModelAndView(&quot;create&quot;);</span><br><span class="line"></span><br><span class="line">	Map map=new HashMap&lt;&gt;();</span><br><span class="line">        map.put(&quot;codeUrl&quot;,&quot;weixin://wxpay/bizpayurl?pr=nTrHFdrzz&quot;);</span><br><span class="line">        return new ModelAndView(&quot;create&quot;,map);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<hr>
+<p>**注意的的是, 这里使用HashMap接收已经生成的支付CodeUrl ; ** 我们需要在程序中根据orderId  和 amount 生成 CodeUrl，于是有了以下优化：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">// 需要在PayService 方法中设返回值，即为PayResponse类</span><br><span class="line">public ModelAndView create ()&#123;</span><br><span class="line">        PayResponse responce = payService.create(&quot;12134567&quot;, BigDecimal.valueOf(0.05));</span><br><span class="line"></span><br><span class="line">        //渲染 ，自动化生成</span><br><span class="line">        Map map=new HashMap&lt;&gt;();</span><br><span class="line">        map.put(&quot;codeUrl&quot;,response.getCodeUrl);</span><br><span class="line">        return new ModelAndView(&quot;create&quot;,map);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<hr>
+<p> 我们还可以通过在网址中传参的方式来实现支付二维码的生成，例如：<br>将本地作为测试地址：<code> http://localhost:8080/pay/create?orderId=12131&amp;amount=0.06  </code><br>优化代码如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">public ModelAndView create (@RequestParam(&quot;orderId&quot;) String orderId ,</span><br><span class="line">                                @RequestParam(&quot;amount&quot;) BigDecimal amount</span><br><span class="line">                                )&#123;</span><br><span class="line">        PayResponse response = payService.create(orderId,amount);</span><br><span class="line"></span><br><span class="line">        Map map=new HashMap&lt;&gt;();</span><br><span class="line">        map.put(&quot;codeUrl&quot;,response.getCodeUrl());</span><br><span class="line">        return new ModelAndView(&quot;create&quot;,map);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
     </div>
 
@@ -368,7 +343,7 @@
   </li>
   <li class="post-copyright-link">
       <strong>本文链接：</strong>
-      <a href="https://zongpenglin.github.io/posts/fc09ef28/" title="“删除排序链表中的重复元素”">https://zongpenglin.github.io/posts/fc09ef28/</a>
+      <a href="https://zongpenglin.github.io/posts/29f08ac6/" title="PayController代码优化">https://zongpenglin.github.io/posts/29f08ac6/</a>
   </li>
   <li class="post-copyright-license">
     <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
@@ -406,7 +381,119 @@
 </div>
 
           <div class="post-tags">
-              <a href="/tags/ListNode/" rel="tag"><i class="fa fa-tag"></i> ListNode</a>
+              <a href="/tags/IDEA/" rel="tag"><i class="fa fa-tag"></i> IDEA</a>
+	  <script type="text/javascript">
+            var tagsall=document.getElementsByClassName("post-tags")
+            for (var i = tagsall.length - 1; i >= 0; i--){
+                var tags=tagsall[i].getElementsByTagName("a");
+                for (var j = tags.length - 1; j >= 0; j--) {
+                    var golden_ratio = 0.618033988749895;
+                    var s = 0.5;
+                    var v = 0.999;
+                    var h = golden_ratio + Math.random()*0.8 - 0.5;
+                    var h_i = parseInt(h * 6);
+                    var f = h * 6 - h_i;
+                    var p = v * (1 - s);
+                    var q = v * (1 - f * s);
+                    var t = v * (1 - (1 - f) * s);
+                    var r, g, b;
+                    switch (h_i) {
+                        case 0:
+                            r = v;
+                            g = t;
+                            b = p;
+                            break;
+                        case 1:
+                            r = q;
+                            g = v;
+                            b = p;
+                            break;
+                        case 2:
+                            r = p;
+                            g = v;
+                            b = t;
+                            break;
+                        case 3 :
+                            r = p;
+                            g = q;
+                            b = v;
+                            break;
+                        case 4:
+                            r = t;
+                            g = p;
+                            b = v;
+                            break;
+                        case 5:
+                            r = v;
+                            g = p;
+                            b = q;
+                            break;
+                        default:
+                            r = 1;
+                            g = 1;
+                            b = 1;
+                      }
+                    tags[j].style.background = "rgba("+parseInt(r*255)+","+parseInt(g*255)+","+parseInt(b*255)+","+0.5+")";
+                }
+            }
+            </script>
+              <a href="/tags/freemark/" rel="tag"><i class="fa fa-tag"></i> freemark</a>
+	  <script type="text/javascript">
+            var tagsall=document.getElementsByClassName("post-tags")
+            for (var i = tagsall.length - 1; i >= 0; i--){
+                var tags=tagsall[i].getElementsByTagName("a");
+                for (var j = tags.length - 1; j >= 0; j--) {
+                    var golden_ratio = 0.618033988749895;
+                    var s = 0.5;
+                    var v = 0.999;
+                    var h = golden_ratio + Math.random()*0.8 - 0.5;
+                    var h_i = parseInt(h * 6);
+                    var f = h * 6 - h_i;
+                    var p = v * (1 - s);
+                    var q = v * (1 - f * s);
+                    var t = v * (1 - (1 - f) * s);
+                    var r, g, b;
+                    switch (h_i) {
+                        case 0:
+                            r = v;
+                            g = t;
+                            b = p;
+                            break;
+                        case 1:
+                            r = q;
+                            g = v;
+                            b = p;
+                            break;
+                        case 2:
+                            r = p;
+                            g = v;
+                            b = t;
+                            break;
+                        case 3 :
+                            r = p;
+                            g = q;
+                            b = v;
+                            break;
+                        case 4:
+                            r = t;
+                            g = p;
+                            b = v;
+                            break;
+                        case 5:
+                            r = v;
+                            g = p;
+                            b = q;
+                            break;
+                        default:
+                            r = 1;
+                            g = 1;
+                            b = 1;
+                      }
+                    tags[j].style.background = "rgba("+parseInt(r*255)+","+parseInt(g*255)+","+parseInt(b*255)+","+0.5+")";
+                }
+            }
+            </script>
+              <a href="/tags/Mapping%E5%AE%9A%E4%B9%89/" rel="tag"><i class="fa fa-tag"></i> Mapping定义</a>
 	  <script type="text/javascript">
             var tagsall=document.getElementsByClassName("post-tags")
             for (var i = tagsall.length - 1; i >= 0; i--){
@@ -468,14 +555,11 @@
 
           <div class="post-nav">
             <div class="post-nav-item">
-                <a href="/posts/6a70f096/" rel="prev" title="Hexo-Next添加打字特效、鼠标点击特效">
-                  <i class="fa fa-chevron-left"></i> Hexo-Next添加打字特效、鼠标点击特效
+                <a href="/posts/b8d49cf8/" rel="prev" title="java.lang.NullPointerException出现的原因分析">
+                  <i class="fa fa-chevron-left"></i> java.lang.NullPointerException出现的原因分析
                 </a>
             </div>
             <div class="post-nav-item">
-                <a href="/posts/7c58280b/" rel="next" title="Mybatis Generator配置详解">
-                  Mybatis Generator配置详解 <i class="fa fa-chevron-right"></i>
-                </a>
             </div>
           </div>
     </footer>
@@ -556,7 +640,7 @@
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.css" integrity="sha256-AJnUHL7dBv6PGaeyPQJcgQPDjt/Hn/PvYZde1iqfp8U=" crossorigin="anonymous">
 
-<script class="next-config" data-name="gitalk" type="application/json">{"enable":true,"github_id":"ZongpengLin","repo":"ZongpengLin.github.io","client_id":"36ebabd2295be1a65fa9","client_secret":"435e046aada90de190c5f73eff4d2db58c8e0748","admin_user":"ZongpengLin","distraction_free_mode":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token","language":"zh-CN","js":{"url":"https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.min.js","integrity":"sha256-Pmj85ojLaPOWwRtlMJwmezB/Qg8BzvJp5eTzvXaYAfA="},"path_md5":"56b7fee4e0262d1521723e90e53fbad8"}</script>
+<script class="next-config" data-name="gitalk" type="application/json">{"enable":true,"github_id":"ZongpengLin","repo":"ZongpengLin.github.io","client_id":"36ebabd2295be1a65fa9","client_secret":"435e046aada90de190c5f73eff4d2db58c8e0748","admin_user":"ZongpengLin","distraction_free_mode":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token","language":"zh-CN","js":{"url":"https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.min.js","integrity":"sha256-Pmj85ojLaPOWwRtlMJwmezB/Qg8BzvJp5eTzvXaYAfA="},"path_md5":"7e45242738a90ea01ffe84c09876e815"}</script>
 <script src="/js/third-party/comments/gitalk.js"></script>
 
   
