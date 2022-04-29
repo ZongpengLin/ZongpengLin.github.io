@@ -489,6 +489,125 @@
       </categories>
   </entry>
   <entry>
+    <title>排序算法汇总II.md</title>
+    <url>/posts/6fa6c399/</url>
+    <content><![CDATA[<h1 id="排序算法汇总-II"><a href="#排序算法汇总-II" class="headerlink" title="排序算法汇总 II"></a>排序算法汇总 II</h1><h2 id="插入排序："><a href="#插入排序：" class="headerlink" title="插入排序："></a>插入排序：</h2><blockquote>
+<p>插入排序的思想非常简单，生活中有一个很常见的场景：在打扑克牌时，我们一边抓牌一边给扑克牌排序，每次摸一张牌，就将它插入手上已有的牌中合适的位置，逐渐完成整个排序。</p>
+</blockquote>
+<span id="more"></span>
+<p>有两种写法：</p>
+<ul>
+<li>交换法： 在新数字插入过程中，不断与前面的数字交换，直到找到自己合适的位置。</li>
+<li>移动法： 在新数字插入过程中，与前面的数字不断比较，前面的数字不断向后挪出位置，当新数字找到自己的位置后，插入一次即可。</li>
+</ul>
+<p>具体写法如下：<br>一、交换法</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">public static void insertSort(int[] arr)&#123;</span><br><span class="line">	// 从第二个数开始，往前插入数字</span><br><span class="line">	for(int i= 1; i&lt;arr.length;i++)&#123;</span><br><span class="line">		// j 记录当前数字下标</span><br><span class="line">		int j= i;</span><br><span class="line">		//  当前数字比前一个数字小，则将当前数字与前一个数字交换</span><br><span class="line">		while(j&gt;=1 &amp;&amp; arr[j]&lt;arr[j-1])&#123;</span><br><span class="line">			swap(arr,j,j-1);</span><br><span class="line">			j--;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>当数字少于两个时，不存在排序问题，当然也不需要插入，所以我们直接从第二个数字开始往前插入。<br>整个过程就像是已经有一些数字坐成了一排，这时一个新的数字要加入，这个新加入的数字原本坐在这一排数字的最后一位，然后它不断地与前面的数字比较，如果前面的数字比它大，它就和前面的数字交换位置。</p>
+<p>二、移动法<br>实际上，新插入的这个数字并不一定适合与它交换的数字所在的位置。也就是说，它刚换到新的位置上不久，下一次比较后，如果又需要交换，它马上又会被换到前一个数字的位置。<br><em>由此，我们可以想到一种优化方案：让新插入的数字先进行比较，前面比它大的数字不断向后移动，直到找到适合这个新数字的位置后，新数字只做一次插入操作即可。</em></p>
+<p>代码如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">public static void insertSort(int[] arr)&#123;</span><br><span class="line">	// 从第二个数字开始，往前插入数字</span><br><span class="line">	for(int i=1 ; i&lt;arr.length;i++)&#123;</span><br><span class="line">		int cur = arr[i];</span><br><span class="line">		int j=i-1;</span><br><span class="line">		// 寻找插入位置的过程中，不断地将比 currentNumber 大的数字向后挪</span><br><span class="line">		while(j&gt;=0 &amp;&amp; cur&lt;arr[j])&#123;</span><br><span class="line">			arr[j+1] = cur;</span><br><span class="line">			j-- ;</span><br><span class="line">		&#125;</span><br><span class="line">		// 两种情况会跳出循环：1. 遇到一个小于或等于 currentNumber 的数字，跳出循环，currentNumber 就坐到它后面。</span><br><span class="line">        // 2. 已经走到数列头部，仍然没有遇到小于或等于 currentNumber 的数字，也会跳出循环，此时 j 等于 -1，currentNumber 就坐到数列头部。</span><br><span class="line">		arr[j+1] = cur;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="时间复杂度O-nlogn-的排序算法"><a href="#时间复杂度O-nlogn-的排序算法" class="headerlink" title="时间复杂度O(nlogn)的排序算法"></a>时间复杂度O(nlogn)的排序算法</h2><h3 id="希尔排序"><a href="#希尔排序" class="headerlink" title="希尔排序"></a>希尔排序</h3><blockquote>
+<p>希尔排序本质上是对插入排序的一种优化，它利用了插入排序的简单，又克服了插入排序每次只交换相邻两个元素的缺点。它的基本思想是：</p>
+<ol>
+<li>将待排序数组按照一定的间隔分为多个子数组，每组分别进行插入排序。这里按照间隔分组指的不是取连续的一段数组，而是每跳跃一定间隔取一个值组成一组</li>
+<li>逐渐缩小间隔进行下一轮排序</li>
+<li>最后一轮时，取间隔为 11，也就相当于直接使用插入排序。但这时经过前面的「宏观调控」，数组已经基本有序了，所以此时的插入排序只需进行少量交换便可完成</li>
+</ol>
+</blockquote>
+<p><strong>其中，每一遍排序的间隔在希尔排序中被称之为增量，所有的增量组成的序列称之为增量序列.增量依次递减，最后一个增量必须为 11，所以希尔排序又被称之为「缩小增量排序」。</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">public static void shellSort(int[] arr)&#123;</span><br><span class="line">	int n = arr.length;</span><br><span class="line">	// 间隔序列，在希尔排序中我们称之为增量序列</span><br><span class="line">	for(int gap = n/2 ; gap&gt;0 ; gap/=2)&#123;</span><br><span class="line">		// 插入排序</span><br><span class="line">		for(int groupIndedx = 0 ; groupIndex &lt;gap ;groupIndex++)&#123;</span><br><span class="line">			for(int cur = groupIndex +gap;cur&lt;n;cur+=gap)&#123;</span><br><span class="line">				int curNum = arr[cur];</span><br><span class="line">				int pre = cur - gap;</span><br><span class="line">				while( pre &gt;=groupIndex &amp;&amp; curNum &lt; arr[pre])&#123;</span><br><span class="line">					// 向后挪位置</span><br><span class="line">					arr[pre+gap] = arr[preIndex];</span><br><span class="line">					pre- = gap;</span><br><span class="line">				&#125;</span><br><span class="line">				// curNum找到合适的位置</span><br><span class="line">				arr[pre+gap] = curNum;</span><br><span class="line"></span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><em>实际上，这段代码可以优化一下。</em>我们现在的处理方式是：处理完一组间隔序列后，再回来处理下一组间隔序列，这非常符合人类思维。但对于计算机来说，它更喜欢从第 gap 个元素开始，按照顺序将每个元素依次向前插入自己所在的组这种方式。虽然这个过程看起来是在不同的间隔序列中不断跳跃，但站在计算机的角度，它是在访问一段连续数组。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">public static void shellSort(int[] arr)&#123;</span><br><span class="line">	for(int gap = n/2 ; gap&gt;0 ;gap/=2)&#123;</span><br><span class="line">		for(int i = gap ;i&lt;n;i++)&#123;</span><br><span class="line">		 	int curNum = arr[i];</span><br><span class="line">		 	int pre = i-gap;</span><br><span class="line">		 	while( pre &gt;=0 &amp;&amp; curNum&lt;arr[pre])&#123;</span><br><span class="line">		 		arr[pre+gap] = arr[pre];</span><br><span class="line">		 		pre-=gap;</span><br><span class="line">		 	&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		arr[pre+gap] = curNum</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><strong>增量序列</strong><br>增量序列如果选得不好，希尔排序的效率可能比插入排序效率还要低。<br>以 Knuth 增量序列为例，使用 Knuth 序列进行希尔排序的代码如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">public static void shellSortByKnuth(int[] arr)&#123;</span><br><span class="line">	// 找到当前数组需要用到的 Knuth 序列中的最大值</span><br><span class="line">	int maxKnuthNumber = 1;</span><br><span class="line">	while(maxKnuthNumber &lt;= arr.length/3)&#123;</span><br><span class="line">		maxknuthNumber = maxKunthNumber*3 + 1;</span><br><span class="line">	&#125;</span><br><span class="line">	// 增量按照Kunth 序列规则依次递减</span><br><span class="line">	for(int gap = maxKunthNumber; gap&gt;0 ;gap = (gap-1)/3)&#123;</span><br><span class="line">		// 从 gap 开始，按照顺序将每个元素依次向前插入自己所在的组</span><br><span class="line">		for(int i= gap ;i&lt;arr.length;i++)&#123;</span><br><span class="line">			// currentNumber 站起来，开始找位置</span><br><span class="line">			int curNum = arr[i];</span><br><span class="line">			// 该组前一个数字的索引</span><br><span class="line">			int pre = i-gap ;</span><br><span class="line">			while(pre&gt;=0 &amp;&amp; curNum&lt;arr[pre])&#123;</span><br><span class="line">				arr[pre+gap] = arr[pre];</span><br><span class="line">				pre- = gap;</span><br><span class="line">			&#125;</span><br><span class="line">			arr[pre+gap] = curNUm;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="快速排序"><a href="#快速排序" class="headerlink" title="快速排序"></a>快速排序</h3><p>它的时间复杂度也是 O(nlogn)O(nlogn)，但它在时间复杂度为 O(nlogn)O(nlogn) 级的几种排序算法中，大多数情况下效率更高，所以快速排序的应用非常广泛。再加上快速排序所采用的分治思想非常实用。</p>
+<blockquote>
+<ol>
+<li>从数组中取出一个数，为基数（pivot）;</li>
+<li>遍历数组，将比基数大的数字放到它的右边，比基数小的数字放到它的左边。遍历完成后，数组被分成了左右两个区域。</li>
+<li>将左右两个区域视为两个数组，重复前两个步骤，直到排序完成。</li>
+</ol>
+<p><strong>说明：</strong><br>事实上，快速排序的每一次遍历，都将基数摆到了最终位置上。第一轮遍历排好 1 个基数，第二轮遍历排好 2 个基数（每个区域一个基数，但如果某个区域为空，则此轮只能排好一个基数），第三轮遍历排好 4 个基数（同理，最差的情况下，只能排好一个基数），以此类推。总遍历次数为 logn～n 次 。</p>
+</blockquote>
+<ul>
+<li>快速排序的递归框架<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">public static void quickSort(int[] arr)&#123;</span><br><span class="line">	quickSort(arr,0,arr.length-1);</span><br><span class="line">&#125;</span><br><span class="line">public static void quickSort(int[] arr ,int start,int end)&#123;</span><br><span class="line">	// 将数组分区，并获得中间值的下标</span><br><span class="line">	int mid = partition(arr, start,end);</span><br><span class="line">	// 对左边区域快速排序</span><br><span class="line">	quickSort(arr,start,mid-1);</span><br><span class="line">	// 对右边区域快速排序</span><br><span class="line">	quickSort(arr,mid+1,end);</span><br><span class="line">&#125;</span><br><span class="line">public static int partition(int[] arr, int start , int end)&#123;</span><br><span class="line">	// TODO: 将 arr 从 start 到 end 分区，左边区域比基数小，右边区域比基数大，然后返回中间值的下标</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+具体代码如下：<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">public static void quickSort(int[] arr) &#123;</span><br><span class="line">    quickSort(arr, 0, arr.length - 1);</span><br><span class="line">&#125;</span><br><span class="line">public static void quickSort(int[] arr, int start,int end)&#123;</span><br><span class="line">	if(start&gt;=end) return;</span><br><span class="line">	int mid = partition(arr,start,end);</span><br><span class="line">	quickSort(arr,start,mid-1);</span><br><span class="line">	quickSort(arr,mid+1,end);</span><br><span class="line">&#125;</span><br><span class="line">public static int partition(int[] arr,int start,int end)&#123;</span><br><span class="line">	int pivot = arr[start];</span><br><span class="line">	int left = start+1;</span><br><span class="line">	int right = end;</span><br><span class="line">	while(left&lt;right)&#123;</span><br><span class="line">		while(left&lt;right &amp;&amp; arr[left]&lt;=pivot) left++;</span><br><span class="line">		if(left!=right)&#123;</span><br><span class="line">			swap(arr,left,right);</span><br><span class="line">			right--;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	if(left == right &amp;&amp; arr[right]&gt;pivot) right--;</span><br><span class="line">	if(right!=start) swap(arr,start,right);</span><br><span class="line">	return right;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+第二种关于区域划分的方法，使用双指针。<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">public static int partition(int[] arr,int start ,int end)&#123;</span><br><span class="line">	int pivot = arr[start];</span><br><span class="line">	int left = start+1;</span><br><span class="line">	int right = end;</span><br><span class="line">	while(left&lt;right)&#123;</span><br><span class="line">		while(left&lt;right &amp;&amp; arr[left]&lt;=pivot) left++;</span><br><span class="line">		while(left&lt;right &amp;&amp; arr[right]&gt;=pivot)  right--;</span><br><span class="line">		if(left&lt;right)&#123;</span><br><span class="line">			swap(arr,left,right);</span><br><span class="line">			left++;</span><br><span class="line">			right--;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	if(left == right &amp;&amp; arr[right]&gt;pivot) right--;</span><br><span class="line">	swap(arr,start,right);</span><br><span class="line">	return right;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure></li>
+</ul>
+<hr>
+<h3 id="归并排序"><a href="#归并排序" class="headerlink" title="归并排序"></a>归并排序</h3><p>只要开辟一个长度等同于两个数组长度之和的新数组，并使用两个指针来遍历原有的两个数组，不断将较小的数字添加到新数组中，并移动对应的指针即可。</p>
+<ul>
+<li><p>根据这个思路，可以写出合并两个有序列表的代码：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">private static int[] merge(int[] arr1, int[] arr2) &#123;</span><br><span class="line">	int[] res = new int[arr1.length+arr2.length];</span><br><span class="line">	int idx1 = 0,idx2=0;</span><br><span class="line">	while(idx1 &lt; arr1.length &amp;&amp; idx2&lt; arr2.length)&#123;</span><br><span class="line">		if(arr1[idx1]&lt;=arr2[idx2])&#123;</span><br><span class="line">			res[idx1+idx2] = arr1[idx1];</span><br><span class="line">			idx++;</span><br><span class="line">		&#125;else&#123;</span><br><span class="line">			res[idx1+idx2] = arr2[idx2];</span><br><span class="line">			idx2++</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	while(idx1&lt;arr1.length)&#123;</span><br><span class="line">		res[idx1+idx2]=arr1[idx1++];</span><br><span class="line">	&#125;</span><br><span class="line">	while(idx2&lt;arr2.length)&#123;</span><br><span class="line">		res[idx1+idx2]=arr1[idx2++];</span><br><span class="line">	&#125;</span><br><span class="line">	return res;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li><p><strong>将数组拆分层有序数组</strong><br>拆分过程使用了二分的思想，这是一个递归的过程，归并排序使用的递归框架如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">public static void mergeSort(int[] arr) &#123;</span><br><span class="line">    if (arr.length == 0) return;</span><br><span class="line">    int[] result = mergeSort(arr, 0, arr.length - 1);</span><br><span class="line">    // 将结果拷贝到 arr 数组中</span><br><span class="line">    for (int i = 0; i &lt; result.length; i++) &#123;</span><br><span class="line">        arr[i] = result[i];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 对 arr 的 [start, end] 区间归并排序</span><br><span class="line">private static int[] mergeSort(int[] arr, int start, int end) &#123;</span><br><span class="line">    // 只剩下一个数字，停止拆分，返回单个数字组成的数组</span><br><span class="line">    if (start == end) return new int[]&#123;arr[start]&#125;;</span><br><span class="line">    int middle = (start + end) / 2;</span><br><span class="line">    // 拆分左边区域</span><br><span class="line">    int[] left = mergeSort(arr, start, middle);</span><br><span class="line">    // 拆分右边区域</span><br><span class="line">    int[] right = mergeSort(arr, middle + 1, end);</span><br><span class="line">    // 合并左右区域</span><br><span class="line">    return merge(left, right);</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>归并排序的优化：减少临时空间的开辟</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">public static void mergeSort(int[] arr) &#123;</span><br><span class="line">    if (arr.length == 0) return;</span><br><span class="line">    int[] result = new int[arr.length];</span><br><span class="line">    mergeSort(arr, 0, arr.length - 1, result);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 对 arr 的 [start, end] 区间归并排序</span><br><span class="line">private static void mergeSort(int[] arr, int start, int end, int[] result) &#123;</span><br><span class="line">    // 只剩下一个数字，停止拆分</span><br><span class="line">    if (start == end) return;</span><br><span class="line">    int middle = (start + end) / 2;</span><br><span class="line">    // 拆分左边区域，并将归并排序的结果保存到 result 的 [start, middle] 区间</span><br><span class="line">    mergeSort(arr, start, middle, result);</span><br><span class="line">    // 拆分右边区域，并将归并排序的结果保存到 result 的 [middle + 1, end] 区间</span><br><span class="line">    mergeSort(arr, middle + 1, end, result);</span><br><span class="line">    // 合并左右区域到 result 的 [start, end] 区间</span><br><span class="line">    merge(arr, start, end, result);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 将 result 的 [start, middle] 和 [middle + 1, end] 区间合并</span><br><span class="line">private static void merge(int[] arr, int start,  int end, int[] result) &#123;</span><br><span class="line">    int middle = (start + end) / 2;</span><br><span class="line">    // 数组 1 的首尾位置</span><br><span class="line">    int start1 = start;</span><br><span class="line">    int end1 = middle;</span><br><span class="line">    // 数组 2 的首尾位置</span><br><span class="line">    int start2 = middle + 1;</span><br><span class="line">    int end2 = end;</span><br><span class="line">    // 用来遍历数组的指针</span><br><span class="line">    int index1 = start1;</span><br><span class="line">    int index2 = start2;</span><br><span class="line">    // 结果数组的指针</span><br><span class="line">    int resultIndex = start1;</span><br><span class="line">    while (index1 &lt;= end1 &amp;&amp; index2 &lt;= end2) &#123;</span><br><span class="line">        if (arr[index1] &lt;= arr[index2]) &#123;</span><br><span class="line">            result[resultIndex++] = arr[index1++];</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            result[resultIndex++] = arr[index2++];</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    // 将剩余数字补到结果数组之后</span><br><span class="line">    while (index1 &lt;= end1) &#123;</span><br><span class="line">        result[resultIndex++] = arr[index1++];</span><br><span class="line">    &#125;</span><br><span class="line">    while (index2 &lt;= end2) &#123;</span><br><span class="line">        result[resultIndex++] = arr[index2++];</span><br><span class="line">    &#125;</span><br><span class="line">    // 将 result 操作区间的数字拷贝到 arr 数组中，以便下次比较</span><br><span class="line">    for (int i = start; i &lt;= end; i++) &#123;</span><br><span class="line">        arr[i] = result[i];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure></li>
+</ul>
+]]></content>
+      <categories>
+        <category>算法思想</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>排序算法汇总I</title>
+    <url>/posts/61878920/</url>
+    <content><![CDATA[<h1 id="排序算法汇总-I"><a href="#排序算法汇总-I" class="headerlink" title="排序算法汇总 I"></a>排序算法汇总 I</h1><h2 id="冒泡排序"><a href="#冒泡排序" class="headerlink" title="冒泡排序"></a>冒泡排序</h2><blockquote>
+<p>一边比较一边向后两两交换，将最大值&#x2F;最小值冒泡到最后一位。<br>经过优化的写法，使用一个变量记录当前的轮次是否发生过交换，如果没有发生过交换表示已经有序，不需要继续排序。 <span id="more"></span><br>进一步优化：除了变量记录当前轮次是否发生过交换外，在使用一个变量记录上次发生交换的位置，下一次排序时到上次交换的位置就停止比较。</p>
+</blockquote>
+<p>具体写法如下：</p>
+<ul>
+<li>第一种写法<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">public static void bubbleSort(int[] arr)&#123;</span><br><span class="line">	for(int i=0;i&lt;arr.length-1;i++)&#123;</span><br><span class="line">		for(int j=0;j&lt;arr.length-1-i;j++)&#123;</span><br><span class="line">			if(arr[j]&gt;arr[j+1])&#123;</span><br><span class="line">				// 如果左边的数大于右边的数，则交换，保证右边的数字最大</span><br><span class="line">                swap(arr, j, j + 1);</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;	</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line">//交换元素</span><br><span class="line">private static void swap(int[] arr, int i, int j) &#123;</span><br><span class="line">    int temp = arr[i];</span><br><span class="line">    arr[i] = arr[j];</span><br><span class="line">    arr[j] = temp;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+这种写法相当于相邻的数字两两比较，并且规定：“谁大谁站右边”。经过 n-1n−1 轮，数字就从小到大排序完成了。整个过程看起来就像一个个气泡不断上浮，这也是“冒泡排序法”名字的由来。</li>
+</ul>
+<hr>
+<ul>
+<li>第二种写法<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">public static void bubbleSort(int[] arr)&#123;</span><br><span class="line">	// 初始时 swapped 为 true，否则排序过程无法启动</span><br><span class="line">	boolean swapped = true;</span><br><span class="line">	for(int i=0;i &lt; arr.length-1 ; i++)&#123;</span><br><span class="line">	    // 如果没有发生过交换，则说明剩余部分已经有序，排序完成</span><br><span class="line">	    if(!swapped) break;</span><br><span class="line">	    swapped = false;</span><br><span class="line">	    // 设置 swapped 为 false，如果发生交换，则将其置为 true</span><br><span class="line">	    for(int j=0;j &lt; arr.length-1-i;j++)&#123;</span><br><span class="line">	        if(arr[j] &gt; arr[j+1])&#123;</span><br><span class="line">	            // 如果左边的数大于右边的数，则交换，保证右边的数字最大</span><br><span class="line">	        	swap(arr,j,j+1);</span><br><span class="line">	        	// 表示发生了交换</span><br><span class="line">	        	swapped = true;</span><br><span class="line">	        &#125;</span><br><span class="line">	    &#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+最外层的 for 循环每经过一轮，剩余数字中的最大值仍然是被移动到当前轮次的最后一位。这种写法相对于第一种写法的优点是：如果一轮比较中没有发生过交换，则立即停止排序，因为此时剩余数字一定已经有序了。</li>
+</ul>
+<hr>
+<ul>
+<li>第三种写法<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">public static void bubbleSort(int[] arr)&#123;</span><br><span class="line">	boolean swapped = true;</span><br><span class="line">	// 最后一个没有经过排序的元素的下标</span><br><span class="line">	int indexTerm = arr.length - 1 ;</span><br><span class="line">	// 上次发生交换的位置</span><br><span class="line">	int swapIdx = -1;</span><br><span class="line">	while(swapped)&#123;</span><br><span class="line">		swapped = false;</span><br><span class="line">		for(int i=0 ;i&lt;indexTerm;i++)&#123;</span><br><span class="line">		   if(arr[i] &gt; arr[i+1])&#123;</span><br><span class="line">		   	   // 如果左边的数大于右边的数，则交换，保证右边的数字最大</span><br><span class="line">		       swap(arr,i,i+1)</span><br><span class="line">		       // 表示发生了交换</span><br><span class="line">		       swapped = true;</span><br><span class="line">		       // 更新交换的位置</span><br><span class="line">		       swapIdx = i;</span><br><span class="line">		   &#125;</span><br><span class="line">		&#125;</span><br><span class="line">		// 最后一个没有经过排序的元素的下标就是最后一次发生交换的位置</span><br><span class="line">		indexTerm = swapIdx ; </span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<p>经过再一次的优化，代码看起来就稍微有点复杂了。最外层的 while 循环每经过一轮，剩余数字中的最大值仍然是被移动到当前轮次的最后一位。</p>
+<p>在下一轮比较时，只需比较到上一轮比较中，最后一次发生交换的位置即可。因为后面的所有元素都没有发生过交换，必然已经有序了。</p>
+<p>当一轮比较中从头到尾都没有发生过交换，则表示整个列表已经有序，排序完成。</p>
+<hr>
+<h2 id="选择排序"><a href="#选择排序" class="headerlink" title="选择排序"></a>选择排序</h2><p>算法思想： 双重循环遍历数组，每经过一轮比较，找到最小元素的下标，将其交换到首位。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">public static void selectSort(int[] arr)&#123;</span><br><span class="line">	int minIndex;</span><br><span class="line">	for(int i = 0; i &lt;arr.length-1 ; i++)&#123;</span><br><span class="line">		minIndex = i;</span><br><span class="line">		for(int j=i+1;j&lt;arr.length;j++)&#123;</span><br><span class="line">			if(arr[minIndex] &gt; arr[j])&#123;</span><br><span class="line">			   // 记录最小值的下标</span><br><span class="line">				minIndex = j;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		int temp = arr[i];</span><br><span class="line">		arr[i] = arr[minIndex];</span><br><span class="line">		arr[minIndex] = temp;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>选择排序就好比第一个数字站在擂台上，大吼一声：“还有谁比我小？”。剩余数字来挨个打擂，如果出现比第一个数字小的数，则新的擂主产生。每轮打擂结束都会找出一个最小的数，将其交换至首位。经过 n-1 轮打擂，所有的数字就按照从小到大排序完成了。</p>
+<p><strong>冒泡排序和选择排序的比较：</strong></p>
+<ul>
+<li>都是两层循环，时间复杂度都为 O(n^2)； 都只使用有限个变量，空间复杂度 O(1)。</li>
+<li>冒泡排序在比较过程中就不断交换；而选择排序增加了一个变量保存最小值 &#x2F; 最大值的下标，遍历完成后才交换，减少了交换次数。</li>
+<li>冒泡排序法是稳定的，选择排序法是不稳定的。</li>
+</ul>
+<h2 id="扩展："><a href="#扩展：" class="headerlink" title="扩展："></a>扩展：</h2><p><strong>关于排序算法的稳定性</strong></p>
+<blockquote>
+<p>假定在待排序的记录序列中，存在多个具有相同的关键字的记录，若经过排序，这些记录的相对次序保持不变，即在原序列中，r[i] &#x3D; r[j]，且 r[i] 在 r[j] 之前，而在排序后的序列中，r[i] 仍在 r[j] 之前，则称这种排序算法是稳定的；否则称为不稳定的。</p>
+</blockquote>
+<ul>
+<li>在冒泡排序中，只有左边的数字大于右边的数字时才会发生交换，相等的数字之间不会发生交换，所以它是稳定的。</li>
+<li>选择排序中，最小值和首位交换的过程可能会破坏稳定性。比如数列：[2, 2, 1]，在选择排序中第一次进行交换时，原数列中的两个 2 的相对顺序就被改变了，因此，我们说选择排序是不稳定的。</li>
+<li>排序的稳定性的意义：</li>
+</ul>
+<ol>
+<li>当要排序的内容是一个对象的多个属性，且其原本的顺序存在意义时，如果我们需要在二次排序后保持原有排序的意义，就需要使用到稳定性的算法。举个例子，如果我们要对一组商品排序，商品存在两个属性：价格和销量。当我们按照价格从高到低排序后，要再按照销量对其排序，这时，如果要保证销量相同的商品仍保持价格从高到低的顺序，就必须使用稳定性算法。</li>
+</ol>
+]]></content>
+      <categories>
+        <category>算法思想</category>
+      </categories>
+      <tags>
+        <tag>排序</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>关于用impl继承service层</title>
     <url>/posts/7703eca7/</url>
     <content><![CDATA[<h1 id="软件分层之-impl继承service层"><a href="#软件分层之-impl继承service层" class="headerlink" title="软件分层之-impl继承service层"></a>软件分层之-impl继承service层</h1><blockquote>
@@ -2405,73 +2524,6 @@ ntegerCache 是 Integer 的内部类，其代码如下所示:<figure class="high
       </tags>
   </entry>
   <entry>
-    <title>存储器层次结构</title>
-    <url>/posts/8e9c1609/</url>
-    <content><![CDATA[<h1 id="存储器层次结构全景：数据存储的大金字塔长什么样？"><a href="#存储器层次结构全景：数据存储的大金字塔长什么样？" class="headerlink" title="存储器层次结构全景：数据存储的大金字塔长什么样？"></a>存储器层次结构全景：数据存储的大金字塔长什么样？</h1><h2 id="存储器的层次结构"><a href="#存储器的层次结构" class="headerlink" title="存储器的层次结构"></a>存储器的层次结构</h2><p>在有计算机之前，我们通常把信息和数据存储在书、文件这样的物理介质里面<span id="more"></span>。有了计算机之后，我们通常把数据存储在计算机的存储器里面。而存储器系统是一个通过各种不同的方法和设备，一层一层组合起来的系统。</p>
-<p>我们常常把 CPU 比喻成计算机的“大脑”。我们思考的东西，就好比 CPU 中的寄存器（Register）。 寄存器更像是 CPU 本身的一部分，只能存放极其有限的信息，但是速度非常快，和 CPU 同步。</p>
-<p>而我们大脑中的记忆，就好比 CPU Cache（CPU 高速缓存，我们常常简称为“缓存”）。CPU Cache 用的是一种叫作  <strong>SRAM</strong>（Static Random-Access Memory，<strong>静态随机存取存储器</strong>）的芯片。</p>
-<h2 id="SRAM"><a href="#SRAM" class="headerlink" title="SRAM"></a>SRAM</h2><p>SRAM 之所以被称为“静态”存储器，是因为只要处在通电状态，里面的数据就可以保持存在。而一旦断电，里面的数据就会丢失了。在 SRAM 里面，一个比特的数据，需要 6～8 个晶体管。所以 SRAM 的存储密度不高。同样的物理空间下，能够存储的数据有限。不过，因为 SRAM 的电路简单，所以访问速度非常快。</p>
-<img src="/img/computer_img/6个晶体管组成的SRAM 一个比特.webp" alt="6个晶体管组成的SRAM 一个比特" style="zoom:50%;" />
-
-<center>6 个晶体管组成 SRAM 的一个比特</center>
-
-
-
-<p>在 CPU 里，通常会有 L1、L2、L3 这样三层高速缓存。每个 CPU 核心都有一块属于自己的 L1 高速缓存，通常分成指令缓存和数据缓存，分开存放 CPU 使用的指令和数据。L1 的 Cache 往往就嵌在 CPU 核心的内部。</p>
-<p><strong>L2</strong> 的 Cache 同样是每个 CPU 核心都有的，不过它往往不在 CPU 核心的内部。所以，L2 Cache 的访问速度会比 L1 稍微慢一些。而 <strong>L3 Cache，</strong>则通常是多个 CPU 核心共用的，尺寸会更大一些，访问速度自然也就更慢一些。</p>
-<p>你可以把 CPU 中的 L1 Cache 理解为我们的短期记忆，把 L2&#x2F;L3 Cache 理解成长期记忆，把内存当成我们拥有的书架或者书桌。 当我们自己记忆中没有资料的时候，可以从书桌或者书架上拿书来翻阅。<em><strong>这个过程中就相当于，数据从内存中加载到 CPU 的寄存器和 Cache 中，然后通过“大脑”，也就是 CPU，进行处理和运算。</strong></em></p>
-<h2 id="DRAM"><a href="#DRAM" class="headerlink" title="DRAM"></a>DRAM</h2><p>内存用的芯片和 Cache 有所不同，它用的是一种叫作 DRAM（Dynamic Random Access Memory，动态随机存取存储器）的芯片，比起 SRAM 来说，它的密度更高，有更大的容量，而且它也比 SRAM 芯片便宜不少。</p>
-<p>DRAM 被称为“动态”存储器，是因为 DRAM 需要靠不断地“刷新”，才能保持数据被存储起来。DRAM 的一个比特，只需要<em><strong>一个晶体管和一个电容</strong></em>就能存储。所以，DRAM 在同样的物理空间下，能够存储的数据也就更多，也就是存储的“密度”更大。但是，因为数据是存储在电容里的，电容会不断漏电，所以需要定时刷新充电，才能保持数据不丢失。DRAM 的数据访问电路和刷新电路都比 SRAM 更复杂，所以访问延时也就更长。</p>
-<img src="/img/computer_img/L1L2L3.webp" alt="L1L2L3" style="zoom:50%;" />
-
-
-
-<h2 id="存储器的层级结构"><a href="#存储器的层级结构" class="headerlink" title="存储器的层级结构"></a>存储器的层级结构</h2><p>整个存储器的层次结构，其实都类似于 SRAM 和 DRAM 在性能和价格上的差异。SRAM 更贵，速度更快。DRAM 更便宜，容量更大。SRAM 好像我们的大脑中的记忆，而 DRAM 就好像属于我们自己的书桌。</p>
-<p>大脑（CPU）中的记忆（L1 Cache），不仅受成本层面的限制，更受物理层面的限制。这就好比 L1 Cache 不仅昂贵，其访问速度和它到 CPU 的物理距离有关。芯片造得越大，总有部分离 CPU 的距离会变远。电信号的传输速度又受物理原理的限制，没法超过光速。所以想要快，并不是靠多花钱就能解决的。</p>
-<p>我们自己的书房和书桌（也就是内存）空间一般是有限的，没有办法放下所有书（也就是数据）。如果想要扩大空间的话，就相当于要多买几平方米的房子，成本就会很高。于是，想要放下更多的书，我们就要寻找更加廉价的解决方案。</p>
-<hr>
-<p>没错，我们想到了公共图书馆。对于内存来说，SSD（Solid-state drive 或 Solid-state disk，固态硬盘）、HDD（Hard Disk Drive，硬盘）这些被称为硬盘的外部存储设备，就是公共图书馆。于是，我们就可以去家附近的图书馆借书了。图书馆有更多的空间（存储空间）和更多的书（数据）。</p>
-<p>SSD 这种基于 NAND 芯片的高速硬盘，价格已经大幅度下降。而 HDD 硬盘则是一种完全符合“磁盘”这个名字的传统硬件。“磁盘”的硬件结构，决定了它的访问速度受限于它的物理结构，是最慢的。</p>
-<img src="/img/computer_img/存储器层次结构.webp" alt="存储器层次结构" style="zoom:50%;" />
-
-<center> 存储器层次结构 </center>
-
-<p>从 Cache、内存，到 SSD 和 HDD 硬盘，一台现代计算机中，就用上了所有这些存储器设备。其中，容量越小的设备速度越快，而且，CPU 并不是直接和每一种存储器设备打交道，而是每一种存储器设备，只和他相邻的存储器设备打交道。</p>
-<p>比如，CPU Cache 是从内存里加载而来的，或者需要写回内存，并不会直接写回数据到硬盘，也不会直接从硬盘加载数据到 CPU Cache 中，而是先加载到内存，再从内存加载到 Cache 中。</p>
-<p><strong>这样，各个存储器只和相邻的一层存储器打交道，并且随着一层层向下，存储器的容量逐层增大，访问速度逐层变慢，而单位存储成本也逐层下降，也就构成了我们日常所说的存储器层次结构。</strong></p>
-<h3 id="使用存储器的时候，该如何权衡价格和性能？"><a href="#使用存储器的时候，该如何权衡价格和性能？" class="headerlink" title="使用存储器的时候，该如何权衡价格和性能？"></a>使用存储器的时候，该如何权衡价格和性能？</h3><p>存储器在不同层级之间的性能差异和价格差异，都至少在一个数量级以上。L1 Cache 的访问延时是 1 纳秒（ns），而内存就已经是 100 纳秒了。在价格上，这两者也差出了 400 倍。</p>
-<p>因为这个价格和性能的差异，你会看到，我们实际在进行电脑硬件配置的时候，会去组合配置各种存储设备。</p>
-<p>我们可以找一台现在主流的笔记本电脑来看看，比如，一款入门级的惠普战 66 的笔记本电脑。今天在京东上的价格是 4999 人民币。它的配置是下面这样的。</p>
-<ol>
-<li>Intle i5-8265U 的 CPU（这是一块 4 核的 CPU）</li>
-</ol>
-<ul>
-<li>这块 CPU 每个核有 32KB，一共 128KB 的 L1 指令 Cache。</li>
-<li>同样，每个核还有 32KB，一共 128KB 的 L1 数据 Cache，指令 Cache 和数据 Cache 都是采用 8 路组相连的放置策略。</li>
-<li>每个核有 256KB，一共 1MB 的 L2 Cache。L2 Cache 是用 4 路组相连的放置策略。</li>
-<li>最后还有一块多个核心共用的 12MB 的 L3 Cache，采用的是 12 路组相连的放置策略。</li>
-</ul>
-<ol start="2">
-<li><p>8GB 的内存</p>
-</li>
-<li><p>一块 128G 的 SSD 硬盘</p>
-</li>
-<li><p>一块 1T 的 HDD 硬盘</p>
-</li>
-</ol>
-<p>你可以看到，在一台实际的计算机里面，越是速度快的设备，容量就越小。这里一共十多兆的 Cache，成本只是几十美元。而 8GB 的内存、128G 的 SSD 以及 1T 的 HDD，大概零售价格加在一起，也就和我们的高速缓存的价格差不多。</p>
-<h3 id="总结延伸"><a href="#总结延伸" class="headerlink" title="总结延伸"></a>总结延伸</h3><p>我们常常把 CPU 比喻成高速运转的大脑，那么和大脑同步的寄存器（Register），就存放着我们当下正在思考和处理的数据。<strong>而 L1-L3 的 CPU Cache，好比存放在我们大脑中的短期到长期的记忆。</strong>我们需要小小花费一点时间，就能调取并进行处理。</p>
-<p>我们自己的书桌书架就好比计算机的内存，能放下更多的书也就是数据，但是找起来和看起来就要慢上不少。而图书馆更像硬盘这个外存，能够放下更多的数据，找起来也更费时间。<strong>从寄存器、CPU Cache，到内存、硬盘，这样一层层下来的存储器，速度越来越慢，空间越来越大，价格也越来越便宜。</strong></p>
-]]></content>
-      <categories>
-        <category>计算机组成原理</category>
-      </categories>
-      <tags>
-        <tag>寄存器</tag>
-        <tag>cache</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>动态链接</title>
     <url>/posts/44c769c7/</url>
     <content><![CDATA[<h1 id="动态链接：程序内部的“共享单车”"><a href="#动态链接：程序内部的“共享单车”" class="headerlink" title="动态链接：程序内部的“共享单车”"></a>动态链接：程序内部的“共享单车”</h1><p>程序的链接，是把对应的不同文件内的代码段，合并到一起，成为最后的可执行文件。这个链接的方式，<span id="more"></span>让我们在写代码的时候做到了“复用”。同样的功能代码只要写一次，然后提供给不同的程序进行链接就行了。</p>
@@ -2540,6 +2592,73 @@ ntegerCache 是 Integer 的内部类，其代码如下所示:<figure class="high
       <tags>
         <tag>链接</tag>
         <tag>虚拟内存</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>存储器层次结构</title>
+    <url>/posts/8e9c1609/</url>
+    <content><![CDATA[<h1 id="存储器层次结构全景：数据存储的大金字塔长什么样？"><a href="#存储器层次结构全景：数据存储的大金字塔长什么样？" class="headerlink" title="存储器层次结构全景：数据存储的大金字塔长什么样？"></a>存储器层次结构全景：数据存储的大金字塔长什么样？</h1><h2 id="存储器的层次结构"><a href="#存储器的层次结构" class="headerlink" title="存储器的层次结构"></a>存储器的层次结构</h2><p>在有计算机之前，我们通常把信息和数据存储在书、文件这样的物理介质里面<span id="more"></span>。有了计算机之后，我们通常把数据存储在计算机的存储器里面。而存储器系统是一个通过各种不同的方法和设备，一层一层组合起来的系统。</p>
+<p>我们常常把 CPU 比喻成计算机的“大脑”。我们思考的东西，就好比 CPU 中的寄存器（Register）。 寄存器更像是 CPU 本身的一部分，只能存放极其有限的信息，但是速度非常快，和 CPU 同步。</p>
+<p>而我们大脑中的记忆，就好比 CPU Cache（CPU 高速缓存，我们常常简称为“缓存”）。CPU Cache 用的是一种叫作  <strong>SRAM</strong>（Static Random-Access Memory，<strong>静态随机存取存储器</strong>）的芯片。</p>
+<h2 id="SRAM"><a href="#SRAM" class="headerlink" title="SRAM"></a>SRAM</h2><p>SRAM 之所以被称为“静态”存储器，是因为只要处在通电状态，里面的数据就可以保持存在。而一旦断电，里面的数据就会丢失了。在 SRAM 里面，一个比特的数据，需要 6～8 个晶体管。所以 SRAM 的存储密度不高。同样的物理空间下，能够存储的数据有限。不过，因为 SRAM 的电路简单，所以访问速度非常快。</p>
+<img src="/img/computer_img/6个晶体管组成的SRAM 一个比特.webp" alt="6个晶体管组成的SRAM 一个比特" style="zoom:50%;" />
+
+<center>6 个晶体管组成 SRAM 的一个比特</center>
+
+
+
+<p>在 CPU 里，通常会有 L1、L2、L3 这样三层高速缓存。每个 CPU 核心都有一块属于自己的 L1 高速缓存，通常分成指令缓存和数据缓存，分开存放 CPU 使用的指令和数据。L1 的 Cache 往往就嵌在 CPU 核心的内部。</p>
+<p><strong>L2</strong> 的 Cache 同样是每个 CPU 核心都有的，不过它往往不在 CPU 核心的内部。所以，L2 Cache 的访问速度会比 L1 稍微慢一些。而 <strong>L3 Cache，</strong>则通常是多个 CPU 核心共用的，尺寸会更大一些，访问速度自然也就更慢一些。</p>
+<p>你可以把 CPU 中的 L1 Cache 理解为我们的短期记忆，把 L2&#x2F;L3 Cache 理解成长期记忆，把内存当成我们拥有的书架或者书桌。 当我们自己记忆中没有资料的时候，可以从书桌或者书架上拿书来翻阅。<em><strong>这个过程中就相当于，数据从内存中加载到 CPU 的寄存器和 Cache 中，然后通过“大脑”，也就是 CPU，进行处理和运算。</strong></em></p>
+<h2 id="DRAM"><a href="#DRAM" class="headerlink" title="DRAM"></a>DRAM</h2><p>内存用的芯片和 Cache 有所不同，它用的是一种叫作 DRAM（Dynamic Random Access Memory，动态随机存取存储器）的芯片，比起 SRAM 来说，它的密度更高，有更大的容量，而且它也比 SRAM 芯片便宜不少。</p>
+<p>DRAM 被称为“动态”存储器，是因为 DRAM 需要靠不断地“刷新”，才能保持数据被存储起来。DRAM 的一个比特，只需要<em><strong>一个晶体管和一个电容</strong></em>就能存储。所以，DRAM 在同样的物理空间下，能够存储的数据也就更多，也就是存储的“密度”更大。但是，因为数据是存储在电容里的，电容会不断漏电，所以需要定时刷新充电，才能保持数据不丢失。DRAM 的数据访问电路和刷新电路都比 SRAM 更复杂，所以访问延时也就更长。</p>
+<img src="/img/computer_img/L1L2L3.webp" alt="L1L2L3" style="zoom:50%;" />
+
+
+
+<h2 id="存储器的层级结构"><a href="#存储器的层级结构" class="headerlink" title="存储器的层级结构"></a>存储器的层级结构</h2><p>整个存储器的层次结构，其实都类似于 SRAM 和 DRAM 在性能和价格上的差异。SRAM 更贵，速度更快。DRAM 更便宜，容量更大。SRAM 好像我们的大脑中的记忆，而 DRAM 就好像属于我们自己的书桌。</p>
+<p>大脑（CPU）中的记忆（L1 Cache），不仅受成本层面的限制，更受物理层面的限制。这就好比 L1 Cache 不仅昂贵，其访问速度和它到 CPU 的物理距离有关。芯片造得越大，总有部分离 CPU 的距离会变远。电信号的传输速度又受物理原理的限制，没法超过光速。所以想要快，并不是靠多花钱就能解决的。</p>
+<p>我们自己的书房和书桌（也就是内存）空间一般是有限的，没有办法放下所有书（也就是数据）。如果想要扩大空间的话，就相当于要多买几平方米的房子，成本就会很高。于是，想要放下更多的书，我们就要寻找更加廉价的解决方案。</p>
+<hr>
+<p>没错，我们想到了公共图书馆。对于内存来说，SSD（Solid-state drive 或 Solid-state disk，固态硬盘）、HDD（Hard Disk Drive，硬盘）这些被称为硬盘的外部存储设备，就是公共图书馆。于是，我们就可以去家附近的图书馆借书了。图书馆有更多的空间（存储空间）和更多的书（数据）。</p>
+<p>SSD 这种基于 NAND 芯片的高速硬盘，价格已经大幅度下降。而 HDD 硬盘则是一种完全符合“磁盘”这个名字的传统硬件。“磁盘”的硬件结构，决定了它的访问速度受限于它的物理结构，是最慢的。</p>
+<img src="/img/computer_img/存储器层次结构.webp" alt="存储器层次结构" style="zoom:50%;" />
+
+<center> 存储器层次结构 </center>
+
+<p>从 Cache、内存，到 SSD 和 HDD 硬盘，一台现代计算机中，就用上了所有这些存储器设备。其中，容量越小的设备速度越快，而且，CPU 并不是直接和每一种存储器设备打交道，而是每一种存储器设备，只和他相邻的存储器设备打交道。</p>
+<p>比如，CPU Cache 是从内存里加载而来的，或者需要写回内存，并不会直接写回数据到硬盘，也不会直接从硬盘加载数据到 CPU Cache 中，而是先加载到内存，再从内存加载到 Cache 中。</p>
+<p><strong>这样，各个存储器只和相邻的一层存储器打交道，并且随着一层层向下，存储器的容量逐层增大，访问速度逐层变慢，而单位存储成本也逐层下降，也就构成了我们日常所说的存储器层次结构。</strong></p>
+<h3 id="使用存储器的时候，该如何权衡价格和性能？"><a href="#使用存储器的时候，该如何权衡价格和性能？" class="headerlink" title="使用存储器的时候，该如何权衡价格和性能？"></a>使用存储器的时候，该如何权衡价格和性能？</h3><p>存储器在不同层级之间的性能差异和价格差异，都至少在一个数量级以上。L1 Cache 的访问延时是 1 纳秒（ns），而内存就已经是 100 纳秒了。在价格上，这两者也差出了 400 倍。</p>
+<p>因为这个价格和性能的差异，你会看到，我们实际在进行电脑硬件配置的时候，会去组合配置各种存储设备。</p>
+<p>我们可以找一台现在主流的笔记本电脑来看看，比如，一款入门级的惠普战 66 的笔记本电脑。今天在京东上的价格是 4999 人民币。它的配置是下面这样的。</p>
+<ol>
+<li>Intle i5-8265U 的 CPU（这是一块 4 核的 CPU）</li>
+</ol>
+<ul>
+<li>这块 CPU 每个核有 32KB，一共 128KB 的 L1 指令 Cache。</li>
+<li>同样，每个核还有 32KB，一共 128KB 的 L1 数据 Cache，指令 Cache 和数据 Cache 都是采用 8 路组相连的放置策略。</li>
+<li>每个核有 256KB，一共 1MB 的 L2 Cache。L2 Cache 是用 4 路组相连的放置策略。</li>
+<li>最后还有一块多个核心共用的 12MB 的 L3 Cache，采用的是 12 路组相连的放置策略。</li>
+</ul>
+<ol start="2">
+<li><p>8GB 的内存</p>
+</li>
+<li><p>一块 128G 的 SSD 硬盘</p>
+</li>
+<li><p>一块 1T 的 HDD 硬盘</p>
+</li>
+</ol>
+<p>你可以看到，在一台实际的计算机里面，越是速度快的设备，容量就越小。这里一共十多兆的 Cache，成本只是几十美元。而 8GB 的内存、128G 的 SSD 以及 1T 的 HDD，大概零售价格加在一起，也就和我们的高速缓存的价格差不多。</p>
+<h3 id="总结延伸"><a href="#总结延伸" class="headerlink" title="总结延伸"></a>总结延伸</h3><p>我们常常把 CPU 比喻成高速运转的大脑，那么和大脑同步的寄存器（Register），就存放着我们当下正在思考和处理的数据。<strong>而 L1-L3 的 CPU Cache，好比存放在我们大脑中的短期到长期的记忆。</strong>我们需要小小花费一点时间，就能调取并进行处理。</p>
+<p>我们自己的书桌书架就好比计算机的内存，能放下更多的书也就是数据，但是找起来和看起来就要慢上不少。而图书馆更像硬盘这个外存，能够放下更多的数据，找起来也更费时间。<strong>从寄存器、CPU Cache，到内存、硬盘，这样一层层下来的存储器，速度越来越慢，空间越来越大，价格也越来越便宜。</strong></p>
+]]></content>
+      <categories>
+        <category>计算机组成原理</category>
+      </categories>
+      <tags>
+        <tag>寄存器</tag>
+        <tag>cache</tag>
       </tags>
   </entry>
   <entry>
@@ -2779,57 +2898,6 @@ ntegerCache 是 Integer 的内部类，其代码如下所示:<figure class="high
       </tags>
   </entry>
   <entry>
-    <title>关于性能提升</title>
-    <url>/posts/bc93e288/</url>
-    <content><![CDATA[<h1 id="穿越功耗墙，我们该从哪些方面提升“性能”？"><a href="#穿越功耗墙，我们该从哪些方面提升“性能”？" class="headerlink" title="穿越功耗墙，我们该从哪些方面提升“性能”？"></a>穿越功耗墙，我们该从哪些方面提升“性能”？</h1><center> ` 程序的 CPU 执行时间 = 指令数 × CPI × Clock Cycle Time `</center>
-
-<h2 id="功耗：CPU-的“人体极限”"><a href="#功耗：CPU-的“人体极限”" class="headerlink" title="功耗：CPU 的“人体极限”"></a>功耗：CPU 的“人体极限”</h2><p>案例：奔腾 4 的 CPU 主频从来没有达到过 10GHz，最终它的主频上限定格在 3.8GHz。这还不是最糟的，更糟糕的事情是，大家发现，奔腾 4 的主频虽然高，但是它的实际性能却配不上同样的主频。想要用在笔记本上的奔腾 4 2.4GHz 处理器，其性能只和基于奔腾 3 架构的奔腾 M 1.6GHz 处理器差不多。</p>
-<span id="more"></span>
-<img src="https://static001.geekbang.org/resource/image/18/80/1826102a89e4cdd31f7573db53dd9280.png?wh=756*468" alt="CPU的主频变化" style="zoom: 75%;"/>
-
-<p>2019 年的最高配置 Intel i9 CPU，主频也只不过是 5GHz 而已。相较于 1978 年到 2000 年，这 20 年里 300 倍的主频提升，从 2000 年到现在的这 19 年，CPU 的主频大概提高了 3 倍。 </p>
-<p>奔腾 4 的主频为什么没能超过 3.8GHz 的障碍呢？答案就是功耗问题。什么是功耗问题呢？</p>
-<p>(一个 3.8GHz 的奔腾 4 处理器，满载功率是 130 瓦。这个 130 瓦是什么概念呢？机场允许带上飞机的充电宝的容量上限是 100 瓦时。如果我们把这个 CPU 安在手机里面，不考虑屏幕内存之类的耗电，这个 CPU 满载运行 45 分钟，充电宝里面就没电了。而 iPhone X 使用 ARM 架构的 CPU，功率则只有 4.5 瓦左右。)</p>
-<p>我们的 CPU，一般都被叫作超大规模集成电路（Very-Large-Scale Integration，VLSI）。这些电路，实际上都是一个个晶体管组合而成的。CPU 在计算，其实就是让晶体管里面的“开关”不断地去“打开”和“关闭”，来组合完成各种运算和功能。</p>
-<p>想要计算的快，一方面，我们要在 CPU 里，同样的面积里面，多放一些晶体管，也就是增加密度；另一方面，我们要让晶体管“打开”和“关闭”得更快一点，也就是提升主频。而这两者，都会增加功耗，带来耗电和散热的问题。</p>
-<p>在 CPU 里面，能够放下的晶体管数量和晶体管的“开关”频率也都是有限的。一个CPU 的公路，可以用一个公式表示：</p>
-<center> 功耗 ~= 1/2 ×负载电容×电压的平方×开关频率×晶体管数量</center>
-
-<p>那么，为了要提升性能，我们需要不断地增加晶体管数量。同样的面积下，我们想要多放一点晶体管，就要把晶体管造得小一点。这个就是平时我们所说的提升“制程”。从 28nm 到 7nm，相当于晶体管本身变成了原来的 1&#x2F;4 大小。我们还要提升主频，让开关的频率变快。 但是，功耗增加太多，就会导致 CPU 散热跟不上，这时，我们就需要降低电压。这里有一点非常关键，在整个功耗的公式里面，功耗和电压的平方是成正比的。这意味着电压下降到原来的 1&#x2F;5，整个的功耗会变成原来的 1&#x2F;25 。</p>
-<h2 id="并行优化，理解阿姆达尔定律"><a href="#并行优化，理解阿姆达尔定律" class="headerlink" title="并行优化，理解阿姆达尔定律"></a>并行优化，理解阿姆达尔定律</h2><p>就是所谓的“吞吐率”变大。所以，不管你有没有需要，现在 CPU 的性能就是提升了 2 倍乃至 8 倍、16 倍。这也是一个最常见的提升性能的方式，<strong>通过并行提高性能。</strong></p>
-<p>通过并行提高性能来解决。如果想要使用这种思想，需要满足这样几个条件。</p>
-<ol>
-<li>需要进行的计算，本身可以分解成几个可以并行的任务。好比上面的乘法和加法计算，几个人可以同时进行，不会影响最后的结果。</li>
-<li>需要能够分解好问题，并确保几个人的结果能够汇总到一起。</li>
-<li>在“汇总”这个阶段，是没有办法并行进行的，还是得顺序执行，一步一步来。</li>
-</ol>
-<p>这就引出了阿姆达尔定律（Amdahl’s Law）：</p>
-<p>这个定律说的就是，对于一个程序进行优化之后，处理器并行运算之后效率提升的情况。具体可以用这样一个公式来表示：</p>
-<center> **优化后的执行时间 = 受优化影响的执行时间 / 加速倍数 + 不受影响的执行时间** </center>
-
-<p>比如上面的各个向量的一小段的点积，需要 100ns，加法需要 20ns，总共需要 120ns。这里通过并行 4 个 CPU 有了 4 倍的加速度。那么最终优化后，就有了 100&#x2F;4+20&#x3D;45ns。即使我们增加更多的并行度来提供加速倍数，比如有 100 个 CPU，整个时间也需要 100&#x2F;100+20&#x3D;21ns。</p>
-<p><img src="https://static001.geekbang.org/resource/image/f1/e5/f1d05ec439e6377803df741bc07b09e5.jpeg?wh=3140*2039"></p>
-<p>T1就是不受影响的执行时间 ，T2就是可以优化影响的执行时间</p>
-<h2 id="延伸："><a href="#延伸：" class="headerlink" title="延伸："></a>延伸：</h2><p>在“摩尔定律”和“并行计算”之外，在整个计算机组成层面，还有这样几个原则性的性能提升方法。</p>
-<ol>
-<li><p>加速大概率事件。最典型的就是，过去几年流行的深度学习，整个计算过程中，99% 都是向量和矩阵计算，于是，工程师们通过用 GPU 替代 CPU，大幅度提升了深度学习的模型训练过程。本来一个 CPU 需要跑几小时甚至几天的程序，GPU 只需要几分钟就好了。Google 更是不满足于 GPU 的性能，进一步地推出了 TPU。</p>
-</li>
-<li><p>通过流水线提高性能。现代的工厂里的生产线叫“流水线”。我们可以把装配 iPhone 这样的任务拆分成一个个细分的任务，让每个人都只需要处理一道工序，最大化整个工厂的生产效率。类似的，我们的 CPU 其实就是一个“运算工厂”。我们把 CPU 指令执行的过程进行拆分，细化运行，也是现代 CPU 在主频没有办法提升那么多的情况下，性能仍然可以得到提升的重要原因之一。</p>
-</li>
-<li><p>通过预测提高性能。通过预先猜测下一步该干什么，而不是等上一步运行的结果，提前进行运算，也是让程序跑得更快一点的办法。典型的例子就是在一个循环访问数组的时候，凭经验，你也会猜到下一步我们会访问数组的下一项。所谓的“分支和冒险”、“局部性原理”这些 CPU 和存储系统设计方法，其实都是在利用我们对于未来的“预测”，提前进行相应的操作，来提升我们的程序性能。</p>
-</li>
-</ol>
-<p>比如：</p>
-<p>1.加速大概率事件<br>各种缓存(内存缓存、CDN缓存)<br>2.流水线<br>并发编程、异步编程<br>音视频播放器边播放边缓冲<br>3.预测<br>小说的下一页预加载<br>电商大促的CDN预热</p>
-]]></content>
-      <categories>
-        <category>计算机组成原理</category>
-      </categories>
-      <tags>
-        <tag>性能与主频</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>初窥计算机指令</title>
     <url>/posts/d754f544/</url>
     <content><![CDATA[<h1 id="初窥计算机指令"><a href="#初窥计算机指令" class="headerlink" title="初窥计算机指令"></a>初窥计算机指令</h1><h2 id="在软硬件接口中，CPU-帮我们做了什么事？"><a href="#在软硬件接口中，CPU-帮我们做了什么事？" class="headerlink" title="在软硬件接口中，CPU 帮我们做了什么事？"></a>在软硬件接口中，CPU 帮我们做了什么事？</h2><ul>
@@ -2882,6 +2950,57 @@ ntegerCache 是 Integer 的内部类，其代码如下所示:<figure class="high
         <tag>CPU</tag>
         <tag>指令集</tag>
         <tag>机器码</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>关于性能提升</title>
+    <url>/posts/bc93e288/</url>
+    <content><![CDATA[<h1 id="穿越功耗墙，我们该从哪些方面提升“性能”？"><a href="#穿越功耗墙，我们该从哪些方面提升“性能”？" class="headerlink" title="穿越功耗墙，我们该从哪些方面提升“性能”？"></a>穿越功耗墙，我们该从哪些方面提升“性能”？</h1><center> ` 程序的 CPU 执行时间 = 指令数 × CPI × Clock Cycle Time `</center>
+
+<h2 id="功耗：CPU-的“人体极限”"><a href="#功耗：CPU-的“人体极限”" class="headerlink" title="功耗：CPU 的“人体极限”"></a>功耗：CPU 的“人体极限”</h2><p>案例：奔腾 4 的 CPU 主频从来没有达到过 10GHz，最终它的主频上限定格在 3.8GHz。这还不是最糟的，更糟糕的事情是，大家发现，奔腾 4 的主频虽然高，但是它的实际性能却配不上同样的主频。想要用在笔记本上的奔腾 4 2.4GHz 处理器，其性能只和基于奔腾 3 架构的奔腾 M 1.6GHz 处理器差不多。</p>
+<span id="more"></span>
+<img src="https://static001.geekbang.org/resource/image/18/80/1826102a89e4cdd31f7573db53dd9280.png?wh=756*468" alt="CPU的主频变化" style="zoom: 75%;"/>
+
+<p>2019 年的最高配置 Intel i9 CPU，主频也只不过是 5GHz 而已。相较于 1978 年到 2000 年，这 20 年里 300 倍的主频提升，从 2000 年到现在的这 19 年，CPU 的主频大概提高了 3 倍。 </p>
+<p>奔腾 4 的主频为什么没能超过 3.8GHz 的障碍呢？答案就是功耗问题。什么是功耗问题呢？</p>
+<p>(一个 3.8GHz 的奔腾 4 处理器，满载功率是 130 瓦。这个 130 瓦是什么概念呢？机场允许带上飞机的充电宝的容量上限是 100 瓦时。如果我们把这个 CPU 安在手机里面，不考虑屏幕内存之类的耗电，这个 CPU 满载运行 45 分钟，充电宝里面就没电了。而 iPhone X 使用 ARM 架构的 CPU，功率则只有 4.5 瓦左右。)</p>
+<p>我们的 CPU，一般都被叫作超大规模集成电路（Very-Large-Scale Integration，VLSI）。这些电路，实际上都是一个个晶体管组合而成的。CPU 在计算，其实就是让晶体管里面的“开关”不断地去“打开”和“关闭”，来组合完成各种运算和功能。</p>
+<p>想要计算的快，一方面，我们要在 CPU 里，同样的面积里面，多放一些晶体管，也就是增加密度；另一方面，我们要让晶体管“打开”和“关闭”得更快一点，也就是提升主频。而这两者，都会增加功耗，带来耗电和散热的问题。</p>
+<p>在 CPU 里面，能够放下的晶体管数量和晶体管的“开关”频率也都是有限的。一个CPU 的公路，可以用一个公式表示：</p>
+<center> 功耗 ~= 1/2 ×负载电容×电压的平方×开关频率×晶体管数量</center>
+
+<p>那么，为了要提升性能，我们需要不断地增加晶体管数量。同样的面积下，我们想要多放一点晶体管，就要把晶体管造得小一点。这个就是平时我们所说的提升“制程”。从 28nm 到 7nm，相当于晶体管本身变成了原来的 1&#x2F;4 大小。我们还要提升主频，让开关的频率变快。 但是，功耗增加太多，就会导致 CPU 散热跟不上，这时，我们就需要降低电压。这里有一点非常关键，在整个功耗的公式里面，功耗和电压的平方是成正比的。这意味着电压下降到原来的 1&#x2F;5，整个的功耗会变成原来的 1&#x2F;25 。</p>
+<h2 id="并行优化，理解阿姆达尔定律"><a href="#并行优化，理解阿姆达尔定律" class="headerlink" title="并行优化，理解阿姆达尔定律"></a>并行优化，理解阿姆达尔定律</h2><p>就是所谓的“吞吐率”变大。所以，不管你有没有需要，现在 CPU 的性能就是提升了 2 倍乃至 8 倍、16 倍。这也是一个最常见的提升性能的方式，<strong>通过并行提高性能。</strong></p>
+<p>通过并行提高性能来解决。如果想要使用这种思想，需要满足这样几个条件。</p>
+<ol>
+<li>需要进行的计算，本身可以分解成几个可以并行的任务。好比上面的乘法和加法计算，几个人可以同时进行，不会影响最后的结果。</li>
+<li>需要能够分解好问题，并确保几个人的结果能够汇总到一起。</li>
+<li>在“汇总”这个阶段，是没有办法并行进行的，还是得顺序执行，一步一步来。</li>
+</ol>
+<p>这就引出了阿姆达尔定律（Amdahl’s Law）：</p>
+<p>这个定律说的就是，对于一个程序进行优化之后，处理器并行运算之后效率提升的情况。具体可以用这样一个公式来表示：</p>
+<center> **优化后的执行时间 = 受优化影响的执行时间 / 加速倍数 + 不受影响的执行时间** </center>
+
+<p>比如上面的各个向量的一小段的点积，需要 100ns，加法需要 20ns，总共需要 120ns。这里通过并行 4 个 CPU 有了 4 倍的加速度。那么最终优化后，就有了 100&#x2F;4+20&#x3D;45ns。即使我们增加更多的并行度来提供加速倍数，比如有 100 个 CPU，整个时间也需要 100&#x2F;100+20&#x3D;21ns。</p>
+<p><img src="https://static001.geekbang.org/resource/image/f1/e5/f1d05ec439e6377803df741bc07b09e5.jpeg?wh=3140*2039"></p>
+<p>T1就是不受影响的执行时间 ，T2就是可以优化影响的执行时间</p>
+<h2 id="延伸："><a href="#延伸：" class="headerlink" title="延伸："></a>延伸：</h2><p>在“摩尔定律”和“并行计算”之外，在整个计算机组成层面，还有这样几个原则性的性能提升方法。</p>
+<ol>
+<li><p>加速大概率事件。最典型的就是，过去几年流行的深度学习，整个计算过程中，99% 都是向量和矩阵计算，于是，工程师们通过用 GPU 替代 CPU，大幅度提升了深度学习的模型训练过程。本来一个 CPU 需要跑几小时甚至几天的程序，GPU 只需要几分钟就好了。Google 更是不满足于 GPU 的性能，进一步地推出了 TPU。</p>
+</li>
+<li><p>通过流水线提高性能。现代的工厂里的生产线叫“流水线”。我们可以把装配 iPhone 这样的任务拆分成一个个细分的任务，让每个人都只需要处理一道工序，最大化整个工厂的生产效率。类似的，我们的 CPU 其实就是一个“运算工厂”。我们把 CPU 指令执行的过程进行拆分，细化运行，也是现代 CPU 在主频没有办法提升那么多的情况下，性能仍然可以得到提升的重要原因之一。</p>
+</li>
+<li><p>通过预测提高性能。通过预先猜测下一步该干什么，而不是等上一步运行的结果，提前进行运算，也是让程序跑得更快一点的办法。典型的例子就是在一个循环访问数组的时候，凭经验，你也会猜到下一步我们会访问数组的下一项。所谓的“分支和冒险”、“局部性原理”这些 CPU 和存储系统设计方法，其实都是在利用我们对于未来的“预测”，提前进行相应的操作，来提升我们的程序性能。</p>
+</li>
+</ol>
+<p>比如：</p>
+<p>1.加速大概率事件<br>各种缓存(内存缓存、CDN缓存)<br>2.流水线<br>并发编程、异步编程<br>音视频播放器边播放边缓冲<br>3.预测<br>小说的下一页预加载<br>电商大促的CDN预热</p>
+]]></content>
+      <categories>
+        <category>计算机组成原理</category>
+      </categories>
+      <tags>
+        <tag>性能与主频</tag>
       </tags>
   </entry>
   <entry>
